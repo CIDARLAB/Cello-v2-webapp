@@ -1,0 +1,6 @@
+{
+  "Constitutive Expression": {
+    "eugene": "//Size=4\n\n// COUNTING\np exactly 1\nr exactly 1\nc exactly 1\nt exactly 1\n\n//POSITIONING\nt after c\nc after r\nr after p\n\n//ORIENTATION\nALL_FORWARD",
+    "stl": "G[0.0,1500.0](out0 >= 0.0)"
+  }
+}

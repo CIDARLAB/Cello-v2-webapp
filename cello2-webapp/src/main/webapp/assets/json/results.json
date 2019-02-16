@@ -1,0 +1,43 @@
+[
+  {
+    "name":"Result 1",
+    "img":"/sbol/4qXOAqRk.png",
+    "score":0.97,
+    "traces":[
+      {
+        "x": [0, 1, 2, 3, 4, 5],
+        "y": [0, 1, 2, 3, 4, 5],
+        "type": "scatter",
+        "legendgroup": "output",
+        "name": "output"
+
+      },
+      {
+        "x": [0, 1, 2, 3, 4, 5],
+        "y": [2, 3, 4, 5, 6, 7],
+        "type": "scatter",
+        "legendgroup": "output",
+        "name": "output"
+      }
+    ]
+  },
+  {
+    "name":"Result 2",
+    "img":"/sbol/4qXOAqRk.png",
+    "score":0.99,
+    "traces":[
+      {
+        "x": [0, 1, 2, 3, 4, 5],
+        "y": [0, 1, 2, 6, 6, 3],
+        "type": "scatter",
+        "legendgroup": "output"
+      },
+      {
+        "x": [0, 1, 2, 3, 4, 5],
+        "y": [6, 6, 7, 5, 6, 7],
+        "type": "scatter",
+        "legendgroup": "output"
+      }
+    ]
+  }
+]

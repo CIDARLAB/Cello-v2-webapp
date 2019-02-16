@@ -1,0 +1,58 @@
+[
+  {
+    "img": "assets/images/testFigure.png",
+    "tus": [
+      {
+        "candidates": [
+          {
+            "candidate": "P018U016;RBS 1;GFP;",
+            "active": true
+          },
+          {
+            "candidate": "P018U018;RBS 1;GFP;",
+            "active": true
+          },
+          {
+            "candidate": "P018U017;RBS 1;GFP;",
+            "active": true
+          },
+          {
+            "candidate": "P018U015;RBS 1;GFP;",
+            "active": true
+          }
+        ],
+        "img": "/home/prash/cidar/phoenix/alpha/lib/dnaFigures/plots/4qXOAqRk.png",
+        "cds": {
+          "candidates": [
+            {
+              "candidate": "GFP;",
+              "active": true
+            }
+          ],
+          "img": "/home/prash/cidar/phoenix/alpha/lib/dnaFigures/plots/clNvzav9.png"
+        },
+        "promoter": {
+          "candidates": [
+            {
+              "candidate": "P018U016;RBS 1;",
+              "active": true
+            },
+            {
+              "candidate": "P018U018;RBS 1;",
+              "active": true
+            },
+            {
+              "candidate": "P018U017;RBS 1;",
+              "active": true
+            },
+            {
+              "candidate": "P018U015;RBS 1;",
+              "active": true
+            }
+          ],
+          "img": "/home/prash/cidar/phoenix/alpha/lib/dnaFigures/plots/tV8MnpO6.png"
+        }
+      }
+    ]
+  }
+]
