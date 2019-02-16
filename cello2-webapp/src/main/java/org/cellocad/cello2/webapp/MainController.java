@@ -27,20 +27,26 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bson.types.ObjectId;
+import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.database.Database;
-import org.cellocad.cello2.webapp.project.ApplicationProject;
-import org.cellocad.cello2.webapp.project.ApplicationProjectFactory;
+import org.cellocad.cello2.webapp.project.Project;
+import org.cellocad.cello2.webapp.project.ProjectFactory;
+import org.cellocad.cello2.webapp.project.ProjectUtils;
 import org.cellocad.cello2.webapp.results.ResultsUtils;
 import org.cellocad.cello2.webapp.schemas.Session;
 import org.cellocad.cello2.webapp.schemas.User;
-import org.cellocad.cello2.webapp.specification.ApplicationSpecification;
-import org.cellocad.cello2.webapp.specification.ApplicationSpecificationFactory;
+import org.cellocad.cello2.webapp.specification.Specification;
+import org.cellocad.cello2.webapp.specification.SpecificationFactory;
+import org.cellocad.cello2.webapp.specification.SpecificationUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,280 +63,409 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class MainController {
 
+	@PostConstruct
+	public void init() {
+		String projects = ApplicationUtils.getProjectsDirectory();
+		if (!Utils.isValidFilepath(projects)) {
+			Utils.makeDirectory(projects);
+		}
+		String users = ApplicationUtils.getUsersFile();
+		if(!Utils.isValidFilepath(users)){
+			ApplicationUtils.createUsersFile();
+		}
+	}
+
+	private static void writeMessage(String message, HttpServletResponse response) {
+		PrintWriter writer;
+		try {
+			writer = response.getWriter();
+			writer.write(message);
+			writer.flush();
+		} catch (IOException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+		}
+	}
+
 	@ResponseBody
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public void login(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
-        JSONObject json = new JSONObject(request);
+		JSONObject json;
+		String email;
+		String password;
+		try {
+			json = new JSONObject(request);
+			email = json.getString("email");
+			password = json.getString("password");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
+		User user = User.findByCredentials(email, password);
 
-        String email = json.getString("email");
-        String password = json.getString("password");
-        
-        User user = User.findByCredentials(email, password);
-        
-        try {
-            if(user != null) {
-                ObjectId key = new ObjectId();
-                Session session = new Session(user, key);
-                Database.getInstance().save(session);
+		if(user != null) {
+			ObjectId key = new ObjectId();
+			Session session = new Session(user, key);
+			Database.getInstance().save(session);
 
-                PrintWriter writer;
-                JSONObject res = new JSONObject();
-                res.put("token", key.toString());
-                res.put("id", session.getId().toString());
-                res.put("user", new JSONObject(user));
-                res.put("session", new JSONObject(session));
+			JSONObject res = new JSONObject();
+			res.put("token", key.toString());
+			res.put("id", session.getId().toString());
+			res.put("user", new JSONObject(user));
+			res.put("session", new JSONObject(session));
 
-                response.setStatus(HttpServletResponse.SC_OK);
-                writer = response.getWriter();
-                writer.print(res.toString());
-                writer.flush();
-            } else {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            }
-        } catch (IOException e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-        }
+			response.setStatus(HttpServletResponse.SC_OK);
+			MainController.writeMessage(res.toString(),response);
+		} else {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		}
 	}
 
 	@ResponseBody
-    @RequestMapping(value = "/signup", method = RequestMethod.POST)
-	public void signup(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
-        JSONObject json = new JSONObject(request);
+	@RequestMapping(value = "/signup", method = RequestMethod.POST)
+	public void signup(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException, IOException {
+		String institution;
+		String password;
+		String email;
+		String name;
+		try {
+			JSONObject json = new JSONObject(request);
+			institution = json.getString("institution");
+			password = json.getString("password");
+			email = json.getString("email");
+			name = json.getString("name");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
 
-        String institution = json.getString("institution");
-        String password = json.getString("password");
-        String email = json.getString("email");
-        String name = json.getString("name");
-        
-        try {
-            if(User.userExists(email)) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-            } else {
-                User user = new User(name,email,password,institution);
-                Database.getInstance().save(user);
-                ObjectId key = new ObjectId();
-                Session session = new Session(user, key);
-                Database.getInstance().save(session);
-                
-                ResultsUtils.createUserResultsDirectory(user);
-                
-                PrintWriter writer;
-                JSONObject res = new JSONObject();
-                res.put("session", new JSONObject(session));
-                res.put("token", key.toString());
-                res.put("id", session.getId().toString());
-                res.put("user", new JSONObject(user));
-                
-                response.setStatus(HttpServletResponse.SC_OK);
-                writer = response.getWriter();
-                writer.print(res.toString());
-                writer.flush();
-            }
-        } catch (IOException e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-        }
+		if (User.userExists(email)) {
+			response.setStatus(HttpServletResponse.SC_CONFLICT);
+		} else {
+			User user = new User(name,email,password,institution);
+			Database.getInstance().save(user);
+			ObjectId key = new ObjectId();
+			Session session = new Session(user, key);
+			Database.getInstance().save(session);
+
+			ProjectUtils.createUserDirectory(user);
+
+			JSONObject res = new JSONObject();
+			res.put("session", new JSONObject(session));
+			res.put("token", key.toString());
+			res.put("id", session.getId().toString());
+			res.put("user", new JSONObject(user));
+
+			response.setStatus(HttpServletResponse.SC_OK);
+			MainController.writeMessage(res.toString(),response); 
+		}
 	}
 
 	@ResponseBody
-    @RequestMapping(value = "/reset", method = RequestMethod.POST)
-    public void reset(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
-    }
+	@RequestMapping(value = "/reset", method = RequestMethod.POST)
+	public void reset(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
+	}
 
 	@ResponseBody
-    @RequestMapping(value = "/forgot", method = RequestMethod.POST)
-    public void forgot(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
-        JSONObject json = new JSONObject(request);
+	@RequestMapping(value = "/forgot", method = RequestMethod.POST)
+	public void forgot(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException, IOException {
+		String email;
+		try {
+			JSONObject json = new JSONObject(request);
+			email = json.getString("email");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
 
-        String email = json.getString("email");
-        
-        try {
-            User user = User.getUserByEmail(email);
-            if(user != null) {
-                String key = new ObjectId().toString();
-                user.setForgotPasswordKey(key);
-                response.setStatus(HttpServletResponse.SC_OK);
-                PrintWriter writer;
-                writer = response.getWriter();
-                System.out.println("Send this key via email:" + key);
-                writer.print("A password reset link has been emailed to you.");
-                writer.flush();
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                PrintWriter writer;
-                writer = response.getWriter();
-                writer.print("User not found.");
-                writer.flush();
-            }
-        } catch (IOException e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-        }
+		User user = User.getUserByEmail(email);
+		if(user != null) {
+			String key = new ObjectId().toString();
+			user.setForgotPasswordKey(key);
+			response.setStatus(HttpServletResponse.SC_OK);
+			// System.out.println("Send this key via email:" + key);
+			MainController.writeMessage("Contact administrator.",response);
+		} else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			MainController.writeMessage("User not found.",response);
+		}
 	}
-	
+
 	@ResponseBody
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
-    public void updateUser(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
-        JSONObject json = new JSONObject(request);
+	@RequestMapping(value = "/user", method = RequestMethod.POST)
+	public void updateUser(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
+		String sessionId;
+		String token;
+		boolean advUser;
+		String emailOptions;
+		String[] registires;
+		try {
+			JSONObject json = new JSONObject(request);
+			sessionId = json.getString("id");
+			token = json.getString("token");
+			advUser = json.getBoolean("advUser");
+			emailOptions = json.getString("emailOption");
+			registires = json.getJSONArray("registries").toString().replace("},{", " ,").split(" ");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
 
-        String sessionId = json.getString("id");
-        String token = json.getString("token");
-        boolean advUser = json.getBoolean("advUser");
-        String emailOptions = json.getString("emailOption");
-        String[] registires = json.getJSONArray("registries").toString().replace("},{", " ,").split(" ");
-        
-        try {
-            Session session = Session.findByCredentials(sessionId, token);
-            if(session != null) {
-                User user = Session.getUser(session);
-                user.setAdvancedUser(advUser);
-                user.setEmailOptions(emailOptions);
-                user.setRegistries(registires);
-                user.save();
+		Session session = Session.findByCredentials(sessionId, token);
+		if (session != null) {
+			User user = Session.getUser(session);
+			user.setAdvancedUser(advUser);
+			user.setEmailOptions(emailOptions);
+			user.setRegistries(registires);
+			user.save();
+			MainController.writeMessage("User updated.",response);
+		} else {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			MainController.writeMessage("User not found.",response);
+		}
 
-                PrintWriter writer;
-                writer = response.getWriter();
-                writer.print("User updated.");
-                writer.flush();
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                PrintWriter writer;
-                writer = response.getWriter();
-                writer.print("User not found.");
-                writer.flush();
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-        }
 	}
-	
-    @ResponseBody
-    @RequestMapping(value = "/projects", method = RequestMethod.POST)
-    public void projects(@RequestBody String request, HttpServletResponse response){
-        JSONObject json = new JSONObject(request);
-        
-        String sessionId = json.getString("id");
-        String token = json.getString("token");
-        
-        Session session = Session.findByCredentials(sessionId,token);
-        
-        if (session != null) {
-            User user = Session.getUser(session);
-            JSONArray projectList = ResultsUtils.getJSONProjectList(user.getId().toString());
-            PrintWriter writer;
-            try {
-                response.setStatus(HttpServletResponse.SC_OK);
-                writer = response.getWriter();
-                writer.print(projectList.toString());
-                writer.flush();
-            } catch (IOException ex) {
-                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-    }
-    
-    @ResponseBody
-    @RequestMapping(value = "/execute", method = RequestMethod.POST)
-    public void execute(@RequestBody String request, HttpServletResponse response){
-        JSONObject json = new JSONObject(request);
-        
-        String sessionId = json.getString("id");
-        String token = json.getString("token");
-        String name = json.getString("name");
-        
-        Session session = Session.findByCredentials(sessionId,token);
-        
-        if (session != null) {
-            User user = Session.getUser(session);
-            
-            ApplicationProject project = ResultsUtils.getProject(user.getId().toString(), name);
-            
-            PrintWriter writer;
-            
-            if (project == null) {
-            	try {
-            		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    writer = response.getWriter();
-                    writer.print("Project not found.");
-                    writer.flush();
-            	} catch (IOException e) {
-            		Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-            	}
-            } else {
-	            project.execute();
-	            try {
-	                response.setStatus(HttpServletResponse.SC_OK);
-	                writer = response.getWriter();
-	                writer.flush();
-	            } catch (IOException e) {
-	                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-	            }
-            }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-    }
-    
-    @ResponseBody
-    @RequestMapping(value = "/specification", method = RequestMethod.POST)
-    public void specification(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException, URISyntaxException {
-    	JSONObject json = new JSONObject(request);
-        PrintWriter writer;
-        
-        String sessionId = json.getString("id");
-        String token = json.getString("token");
-        String name = json.getString("name");
-        String type = json.getString("application");
-        JSONObject specification = json.getJSONObject("specification");
-        
-        try {
-            Session session = Session.findByCredentials(sessionId, token);
-            if(session != null) {
-                User user = Session.getUser(session);
-                String userId = user.getId().toString();
-                ApplicationProject project = ResultsUtils.getProject(userId,name);
-                if (project != null) {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
-                    writer = response.getWriter();
-                    JSONObject res = new JSONObject();
-                    res.append("message", "A project with that name already exists.");
-                    writer.write(res.toString());
-                    writer.flush();
-                } else {
-                    try {
-                    	ApplicationProjectFactory projFactory = new ApplicationProjectFactory();
-                    	String directory = ResultsUtils.getProjectDirectory(userId,name);
-                    	String jobId = ResultsUtils.newJobId();
-                        project = projFactory.getProject(type,userId,jobId,directory);
 
-                        ApplicationSpecificationFactory specFactory = new ApplicationSpecificationFactory();
-                        ApplicationSpecification spec = specFactory.getSpecification(type,specification); 
-                        
-                        project.setSpecification(spec);
-                        
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        JSONObject res = new JSONObject();
-                        res.append("job_id", project.getJobId());
-                        res.append("message", "Project created.");
-                        writer = response.getWriter();
-                        writer.write(res.toString());
-                        writer.flush();
-                    }
-//                    catch (SBOLValidationException | SBOLConversionException |InterruptedException ex) {
-//                        response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-//                        writer = response.getWriter();
-//                        writer.write(ex.toString());
-//                        writer.flush();
-//                        Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-                    catch (Exception e) {
-                    	e.printStackTrace();
-                    }
-                }
-            }
-        } catch(IOException e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
-        }
-    }
+	@ResponseBody
+	@RequestMapping(value = "/projects", method = RequestMethod.POST)
+	public void projects(@RequestBody String request, HttpServletResponse response) throws IOException {
+		String sessionId;
+		String token;
+		try {
+			JSONObject json = new JSONObject(request);
+			sessionId = json.getString("id");
+			token = json.getString("token");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
+
+		Session session = Session.findByCredentials(sessionId,token);
+
+		if (session != null) {
+			User user = Session.getUser(session);
+			JSONArray projectList = ProjectUtils.getProjects(user.getId().toString());
+			response.setStatus(HttpServletResponse.SC_OK);
+			MainController.writeMessage(projectList.toString(),response);
+		} else {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public void delete(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
+		String sessionId;
+		String token;
+		String name;
+		try {
+			JSONObject json = new JSONObject(request);
+			sessionId = json.getString("id");
+			token = json.getString("token");
+			name = json.getString("name");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
+
+		Session session = Session.findByCredentials(sessionId,token);
+
+		if (session != null) {
+			User user = Session.getUser(session);
+			String userId = user.getId().toString();
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/execute", method = RequestMethod.POST)
+	public void execute(@RequestBody String request, HttpServletResponse response) throws IOException {
+		String sessionId;
+		String token;
+		String name;
+		try {
+			JSONObject json = new JSONObject(request);
+			sessionId = json.getString("id");
+			token = json.getString("token");
+			name = json.getString("name");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
+
+		Session session = Session.findByCredentials(sessionId,token);
+
+		if (session != null) {
+			User user = Session.getUser(session);
+			String userId = user.getId().toString();
+
+			Project project;
+			try {
+				project = ProjectUtils.getProject(userId, name);
+			} catch (CelloWebException e) {
+				response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+				MainController.writeMessage(e.getMessage(),response);
+				return;
+			}   
+			if (project == null) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				MainController.writeMessage("Project not found.",response);
+			} else {
+				try {
+					project.execute();
+					ResultsUtils.createResultsFile(userId,name);
+				} catch (CelloWebException e) {
+					response.setStatus(HttpServletResponse.SC_ACCEPTED);
+					MainController.writeMessage(e.getMessage(),response);
+					e.printStackTrace();
+					return;
+				}
+				response.setStatus(HttpServletResponse.SC_OK);
+				JSONObject res = new JSONObject();
+				res.append("message", "Job completed.");
+				MainController.writeMessage(res.toString(),response);
+			}
+		} else {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/specify", method = RequestMethod.POST)
+	public void specify(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException, URISyntaxException, IOException {
+		String sessionId;
+		String token;
+		String name;
+		JSONObject specification;
+		try {
+			JSONObject json = new JSONObject(request);
+			sessionId = json.getString("id");
+			token = json.getString("token");
+			name = json.getString("name");
+			specification = json.getJSONObject("specification");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
+
+		Session session = Session.findByCredentials(sessionId, token);
+		if (session == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+
+		JSONObject settings = specification.getJSONObject("settings");
+		String application = settings.getString("application");
+		if (application.equals("")) {
+			response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+			MainController.writeMessage("No application specified.",response);
+			return;
+		}
+
+		User user = Session.getUser(session);
+		String userId = user.getId().toString();
+		Project project;
+		try {
+			project = ProjectUtils.getProject(userId,name);
+		} catch (CelloWebException e) {
+			response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+			MainController.writeMessage(e.getMessage(),response);
+			return;
+		}
+		if (project != null) {
+			response.setStatus(HttpServletResponse.SC_CONFLICT);
+			MainController.writeMessage("A project with that name already exists.",response);
+			return;
+		}
+
+		String directory = ProjectUtils.createProjectDirectory(userId,name);
+		String jobId = ProjectUtils.newJobId();
+		ProjectUtils.writeDetailsFile(userId,name,application,jobId);
+		ProjectFactory projFactory = new ProjectFactory();
+		project = projFactory.getProject(application,userId,jobId,directory);
+
+		SpecificationFactory specFactory = new SpecificationFactory();
+		Specification spec = null;
+		try {
+			spec = specFactory.getSpecification(application,name,directory,specification);
+			SpecificationUtils.writeSpecificationFile(userId,name,spec);
+		} catch (CelloWebException ce) {
+			Logger.getLogger(MainController.class.getName()).log(Level.WARNING, null, ce);
+			MainController.writeMessage(ce.getMessage(),response);
+			return;
+		} 
+		project.setSpecification(spec);
+
+		JSONObject res = new JSONObject();
+		res.append("job_id", project.getJobId());
+		response.setStatus(HttpServletResponse.SC_OK);
+		MainController.writeMessage(res.toString(),response);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/results/{name}", method = RequestMethod.POST)
+	public void results(@PathVariable(value="name") String name, @RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
+		String sessionId;
+		String token;
+		try {
+			JSONObject json = new JSONObject(request);
+			sessionId = json.getString("id");
+			token = json.getString("token");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
+
+		Session session = Session.findByCredentials(sessionId, token);
+		if (session == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+
+		User user = Session.getUser(session);
+		String userId = user.getId().toString();
+		JSONArray results;
+		try {
+			results = ResultsUtils.getResults(userId,name);
+		} catch (CelloWebException ce) {
+			Logger.getLogger(MainController.class.getName()).log(Level.WARNING, null, ce);
+			MainController.writeMessage(ce.getMessage(),response);
+			return;
+		}
+
+		response.setStatus(HttpServletResponse.SC_OK);
+		MainController.writeMessage(results.toString(),response);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/results/{name}/{id}", method = RequestMethod.POST)
+	public void result(@PathVariable(value="name") String name, @PathVariable(value="id") String id, @RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException {
+		String sessionId;
+		String token;
+		try {
+			JSONObject json = new JSONObject(request);
+			sessionId = json.getString("id");
+			token = json.getString("token");
+		} catch (JSONException e) {
+			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
+			return;
+		}
+
+		Session session = Session.findByCredentials(sessionId, token);
+		if (session == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+
+		User user = Session.getUser(session);
+		String userId = user.getId().toString();
+		JSONArray results;
+		try {
+			results = ResultsUtils.getResults(userId,name);
+		} catch (CelloWebException ce) {
+			Logger.getLogger(MainController.class.getName()).log(Level.WARNING, null, ce);
+			MainController.writeMessage(ce.getMessage(),response);
+			return;
+		}
+	}
 
 }
+

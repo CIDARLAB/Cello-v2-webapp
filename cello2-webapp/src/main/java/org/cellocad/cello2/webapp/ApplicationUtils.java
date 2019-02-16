@@ -18,13 +18,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp.specification.DNACompiler.data;
+package org.cellocad.cello2.webapp;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.common.JSON.JSONUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -32,29 +31,61 @@ import org.json.JSONObject;
  *
  * @author Timothy Jones
  *
- * @date Feb 16, 2019
+ * @date 2019-02-23
  *
  */
-public class TargetDataUtils {
-	
-	public static File writeTargetData(File UCF, File PartitionProfile, String filename) {
-		File rtn = null;
-		String str = "";
-		try {
-			str = Utils.getFileContentAsString(UCF.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
-		}
-		JSONObject json1 = new JSONObject(str);
-		try {
-			str = Utils.getFileContentAsString(PartitionProfile.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
-		}
-		JSONObject json2 = new JSONObject(str);
-		JSONObject json = JSONUtils.mergeJSONObjects(json1, json2);
-		Utils.writeToFile(json.toString(), filename);
+public class ApplicationUtils {
+
+	/**
+	 * @return
+	 */
+	public static String getProjectsDirectory() {
+	    String rtn = "";
+	    rtn = Utils.getFilepath() + "projects";
+	    return rtn;
+	}
+
+	/**
+	 * 
+	 */
+	public static void createProjectsDirectory() {
+		Utils.makeDirectory(getProjectsDirectory());
+	}
+
+	/**
+	 * @return
+	 */
+	public static String getUsersFile() {
+		String rtn = "";
+		rtn = getProjectsDirectory() + Utils.getFileSeparator() + "users.json";
 		return rtn;
+	}
+
+	/**
+	 * 
+	 */
+	public static void createUsersFile() {
+		String filepath = getUsersFile();
+	    JSONArray arr = new JSONArray();
+	    Utils.writeToFile(arr.toString(),filepath);
+	}
+
+	/**
+	 * 
+	 */
+	public static void appendToUsersFile(String userId, String email) {
+		String filepath = getUsersFile();
+		String str;
+		try {
+			str = Utils.getFileContentAsString(filepath);
+		} catch (IOException e) {
+			throw new RuntimeException("Error with file.");
+		}
+		JSONArray arr = new JSONArray(str);
+		JSONObject obj = new JSONObject();
+		obj.put(email,userId);
+		arr.put(obj);
+		Utils.writeToFile(arr.toString(),filepath);
 	}
 
 }

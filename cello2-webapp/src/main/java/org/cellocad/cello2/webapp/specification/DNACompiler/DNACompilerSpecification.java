@@ -20,9 +20,8 @@
  */
 package org.cellocad.cello2.webapp.specification.DNACompiler;
 
-import java.io.File;
-
-import org.cellocad.cello2.webapp.specification.ApplicationSpecification;
+import org.cellocad.cello2.webapp.CelloWebException;
+import org.cellocad.cello2.webapp.specification.Specification;
 import org.json.JSONObject;
 
 /**
@@ -33,7 +32,7 @@ import org.json.JSONObject;
  * @date Feb 16, 2019
  *
  */
-public class DNACompilerSpecification extends ApplicationSpecification {
+public class DNACompilerSpecification extends Specification {
 
 	/**
 	 * @param netlistConstraint
@@ -41,12 +40,12 @@ public class DNACompilerSpecification extends ApplicationSpecification {
 	 * @param optionsFile
 	 * @param verilogFile
 	 */
-	public DNACompilerSpecification(File netlistConstraintFile, File targetDataFile, File optionsFile, File verilogFile) {
+	public DNACompilerSpecification(String netlistConstraintFile, String targetDataFile, String optionsFile, String verilogFile) {
 		super(netlistConstraintFile, targetDataFile, optionsFile, verilogFile);
 	}
 	
-	public DNACompilerSpecification(JSONObject jObj) {
-		super(jObj);
+	public DNACompilerSpecification(String name, String directory, JSONObject jObj) throws CelloWebException {
+		super(name,directory,jObj);
 	}
 
 }

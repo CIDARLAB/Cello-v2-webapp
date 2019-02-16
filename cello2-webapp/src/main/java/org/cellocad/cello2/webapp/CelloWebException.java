@@ -18,43 +18,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp.specification.DNACompiler.data;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.common.JSON.JSONUtils;
-import org.json.JSONObject;
+package org.cellocad.cello2.webapp;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * @date Feb 16, 2019
+ * @date 2019-02-19
  *
  */
-public class TargetDataUtils {
+public class CelloWebException extends Exception {
+
+	private static final long serialVersionUID = 3703991400592007037L;
+
+	public CelloWebException() {
+		super();
+	}
+
+	public CelloWebException(String message) {
+		super(message);
+	}
+
+	public CelloWebException(String message, Throwable cause) {
+		super(message, cause);
+	}
 	
-	public static File writeTargetData(File UCF, File PartitionProfile, String filename) {
-		File rtn = null;
-		String str = "";
-		try {
-			str = Utils.getFileContentAsString(UCF.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
-		}
-		JSONObject json1 = new JSONObject(str);
-		try {
-			str = Utils.getFileContentAsString(PartitionProfile.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
-		}
-		JSONObject json2 = new JSONObject(str);
-		JSONObject json = JSONUtils.mergeJSONObjects(json1, json2);
-		Utils.writeToFile(json.toString(), filename);
-		return rtn;
+	public CelloWebException(Throwable cause) {
+		super(cause);
 	}
 
 }

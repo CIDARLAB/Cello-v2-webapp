@@ -1,0 +1,10 @@
+[
+	{
+		"name": "structure",
+		"pattern": ".*\\\\.(xml|dot)"
+	},
+	{
+		"name": "performance",
+		"pattern": ".*\\\\.csv"
+	}
+]

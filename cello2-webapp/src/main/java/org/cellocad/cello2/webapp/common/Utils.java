@@ -25,9 +25,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.Date;
 import java.util.Random;
 
@@ -39,37 +42,58 @@ import java.util.Random;
  *
  */
 final public class Utils {
-    
-    public static String getFileContentAsString(String filepath){
-        String rtn = "";
-        
-        File file = new File(filepath);
-        try { 
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            while((line=reader.readLine()) != null){
-                rtn += (line+"\n");
-            }
-            reader.close();
-        } catch (IOException e) {
-           e.printStackTrace();
-       }
-        return rtn;
-    }
-    
-    public static boolean makeDirectory(String filepath){
-    	boolean rtn = false;
-        File file = new File(filepath);
-        rtn = file.mkdir();
-        return rtn;
-    }
-    
-    public static boolean isValidFilepath(String filepath){
-    	boolean rtn = false;
-        File file = new File(filepath);
-        rtn = file.exists();
-        return rtn;
-    }
+
+	public static URL getResource(String resource) {
+		URL rtn = null;
+		rtn = Utils.class.getClassLoader().getResource(resource);
+		return rtn;
+	}
+
+	public static String getBufferedReaderContentAsString(BufferedReader br) throws IOException {
+		String rtn = "";
+		StringBuffer sb = new StringBuffer();
+		String line;
+		while ((line = br.readLine()) != null) {
+			sb.append(line);
+		}
+		rtn = sb.toString();
+		return rtn;
+	}
+
+	public static String getResourceAsString(String resource) throws IOException {
+		String rtn = "";
+		InputStream is = Utils.getResource(resource).openStream();
+		InputStreamReader isr = new InputStreamReader(is);
+		BufferedReader br = new BufferedReader(isr);
+		rtn = Utils.getBufferedReaderContentAsString(br);
+		br.close();
+		isr.close();
+		is.close();
+		return rtn;
+	}
+
+	public static String getFileContentAsString(String filepath) throws IOException {
+		String rtn = "";
+		File file = new File(filepath);
+		FileReader fr = new FileReader(file);
+		BufferedReader br = new BufferedReader(fr);
+		rtn = Utils.getBufferedReaderContentAsString(br);
+		return rtn;
+	}
+
+	public static boolean makeDirectory(String filepath){
+		boolean rtn = false;
+		File file = new File(filepath);
+		rtn = file.mkdir();
+		return rtn;
+	}
+
+	public static boolean isValidFilepath(String filepath){
+		boolean rtn = false;
+		File file = new File(filepath);
+		rtn = file.exists();
+		return rtn;
+	}
 
 	/**
 	 * Returns the path of the ClassLoader
@@ -126,14 +150,14 @@ final public class Utils {
 	 * @return true if the file was created by this method; false if the file could not be created because the named file already exists
 	 *
 	 */
-	static public boolean createFile (String filename) {
+	static public boolean createFile(String filename) {
 		boolean rtn = false;
 		try {
-		     File file = new File(filename);
-		     rtn = file.createNewFile();
+			File file = new File(filename);
+			rtn = file.createNewFile();
 		}
 		catch (IOException e) {
-    		e.printStackTrace();
+			e.printStackTrace();
 		}
 		return rtn;
 	}
@@ -167,7 +191,7 @@ final public class Utils {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Delete the file referenced by <i>name<i>
 	 * 
@@ -200,7 +224,7 @@ final public class Utils {
 	public static boolean isMac() {
 		return (Utils.isMac(Utils.getOS()));
 	}
-	
+
 	/**
 	 * Returns a boolean flag signifying the Operating System being Unix-based. 
 	 * 
@@ -210,7 +234,7 @@ final public class Utils {
 	public static boolean isUnix() {
 		return (Utils.isUnix(Utils.getOS()));
 	}
-	
+
 	/**
 	 * Returns a string containing the operating system name 
 	 * 
@@ -232,7 +256,7 @@ final public class Utils {
 	private static boolean isUnix(final String OS) {
 		return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
 	}
-	
+
 	/**
 	 * Executes and waits for the command in parameter <i>cmd</i>.
 	 * Returns the ExecCommand instance that executed the command.
@@ -255,8 +279,8 @@ final public class Utils {
 	 */
 	static public String getTimeString(){
 		String rtn;
-        Date date = new Date();
-        rtn = String.valueOf(date.getTime());
+		Date date = new Date();
+		rtn = String.valueOf(date.getTime());
 		return rtn;
 	}
 
@@ -270,7 +294,7 @@ final public class Utils {
 		String rtn = System.getProperty("user.dir").toString();
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a string representing the file separator on the system
 	 * 
@@ -281,7 +305,7 @@ final public class Utils {
 		String rtn = System.getProperty("file.separator").toString();
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a string representing the elements in the parameter <i>folders</i> separated by the File Separator of the System
 	 * 
@@ -296,7 +320,7 @@ final public class Utils {
 		}
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a string representing the elements in the parameter <i>folders</i> separated by the File Separator of the System omitting the last File Separator
 	 * 
@@ -315,7 +339,7 @@ final public class Utils {
 		}
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a string representing the line separator on the system
 	 * 
@@ -326,7 +350,7 @@ final public class Utils {
 		String rtn = System.getProperty("line.separator").toString();
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a string representing the parameter <i>str</i> indented with parameter <i>numIndent</i> tabulator character(s).
 	 * 
@@ -345,7 +369,7 @@ final public class Utils {
 		}
 		return rtn;		
 	}
-	
+
 	/**
 	 * Returns a string representing the tabulator character.
 	 * 
@@ -356,7 +380,7 @@ final public class Utils {
 		String rtn = "\t";
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a string representing the tabulator character repeated <i>num</i> number of times.
 	 * 
@@ -371,7 +395,7 @@ final public class Utils {
 		}		
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an instance of the Boolean class.
 	 * 
@@ -591,7 +615,7 @@ final public class Utils {
 		rtn = str;
 		return rtn;
 	}
-	
+
 	/**
 	 * Exits the current executable with exit code equivalent to parameter <i>exit</i>.
 	 * 
@@ -617,7 +641,7 @@ final public class Utils {
 		rtn = random.nextInt(max - min + 1) + min;
 		return rtn;
 	}
-	
+
 	/**
 	 * Returns a random integer value between a minimum value defined by parameter <i>min</i> and
 	 * a maximum value defined by parameter <i>max</i> using the seed defined by parameter <i>seed</i>

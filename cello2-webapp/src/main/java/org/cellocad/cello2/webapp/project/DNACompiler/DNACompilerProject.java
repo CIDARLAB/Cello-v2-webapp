@@ -20,14 +20,19 @@
  */
 package org.cellocad.cello2.webapp.project.DNACompiler;
 
-import org.cellocad.cello2.webapp.project.ApplicationProject;
-import org.cellocad.cello2.webapp.specification.DNACompiler.DNACompilerSpecification;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.cellocad.cello2.DNACompiler.runtime.Main;
 import org.cellocad.cello2.DNACompiler.runtime.environment.DNACompilerArgString;
+import org.cellocad.cello2.common.CelloException;
+import org.cellocad.cello2.webapp.CelloWebException;
+import org.cellocad.cello2.webapp.project.Project;
 
 /**
  * 
@@ -37,22 +42,39 @@ import org.cellocad.cello2.DNACompiler.runtime.environment.DNACompilerArgString;
  * @date 2019-02-16
  *
  */
-public class DNACompilerProject extends ApplicationProject {
+public class DNACompilerProject extends Project {
 	
-	public class MainRunnable implements Runnable {
-
-	    private String[] args;
-
-	    public MainRunnable(final String[] args) {
+	public class DNACompilerMainCallable implements Callable<Void> {
+		
+		private String[] args;
+		
+		public DNACompilerMainCallable(final String[] args) {
 	        this.args = args;
 	    }
 
-	    public void run() {
-	    	Main.main(this.args);
-	    }
+		/* (non-Javadoc)
+		 * @see java.util.concurrent.Callable#call()
+		 */
+		@Override
+		public Void call() throws CelloException {
+			Main.main(this.args);
+			return null;
+		}
+		
 	}
 	
-	private DNACompilerSpecification specification;
+//	public class MainRunnable implements Runnable {
+//
+//	    private String[] args;
+//
+//	    public MainRunnable(final String[] args) {
+//	        this.args = args;
+//	    }
+//
+//	    public void run() {
+//	    	Main.main(this.args);
+//	    }
+//	}
 
 	/**
 	 * @param userId
@@ -62,44 +84,35 @@ public class DNACompilerProject extends ApplicationProject {
 	public DNACompilerProject(String userId, String jobId, String directory) {
 		super(userId, jobId, directory);
 	}
-	
-	/**
-	 * Getter for <i>specification</i>
-	 * @return value of <i>specification</i>
-	 */
-	public DNACompilerSpecification getSpecification() {
-		return specification;
-	}
-
-	/**
-	 * Setter for <i>specification</i>
-	 * @param specification the value to set <i>specification</i>
-	 */
-	public void setSpecification(DNACompilerSpecification specification) {
-		this.specification = specification;
-	}
 
 	/* (non-Javadoc)
 	 * @see org.cellocad.cello2.webapp.project.Project#execute()
 	 */
 	@Override
-	public void execute() {
+	public void execute() throws CelloWebException {
 		List<String> args = new ArrayList<>();
-		args.add(DNACompilerArgString.INPUTNETLIST);
-		args.add(this.getSpecification().getVerilogFile().getAbsolutePath());
-		args.add(DNACompilerArgString.TARGETDATAFILE);
-		args.add(this.getSpecification().getTargetDataFile().getAbsolutePath());
-		args.add(DNACompilerArgString.NETLISTCONSTRAINTFILE);
-		args.add(this.getSpecification().getNetlistConstraintFile().getAbsolutePath());
-		args.add(DNACompilerArgString.OPTIONS);
-		args.add(this.getSpecification().getOptionsFile().getAbsolutePath());
-		args.add(DNACompilerArgString.OUTPUTDIR);
+		args.add("-" + DNACompilerArgString.INPUTNETLIST);
+		args.add(this.getSpecification().getVerilogFile());
+		args.add("-" + DNACompilerArgString.TARGETDATAFILE);
+		args.add(this.getSpecification().getTargetDataFile());
+		args.add("-" + DNACompilerArgString.NETLISTCONSTRAINTFILE);
+		args.add(this.getSpecification().getNetlistConstraintFile());
+		args.add("-" + DNACompilerArgString.OPTIONS);
+		args.add(this.getSpecification().getOptionsFile());
+		args.add("-" + DNACompilerArgString.OUTPUTDIR);
 		args.add(this.getDirectory());
 		// main
-		MainRunnable main = new MainRunnable((String[])args.toArray());
-        Thread t = new Thread(main);
-        t.start();
-		
+		DNACompilerMainCallable main = new DNACompilerMainCallable(args.toArray(new String[1]));
+		ExecutorService executor = new ScheduledThreadPoolExecutor(5);
+		Future<Void> future = executor.submit(main);
+        //Thread t = new Thread(main);
+        //t.start();
+		try {
+			future.get();
+		} catch (Exception e) {
+			//e.printStackTrace();
+			throw new CelloWebException();
+		}		
 	}
 
 }

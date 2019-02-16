@@ -18,13 +18,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp.specification.DNACompiler.data;
+package org.cellocad.cello2.webapp.specification;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.common.JSON.JSONUtils;
+import org.cellocad.cello2.webapp.CelloWebException;
+import org.cellocad.cello2.webapp.common.CObject;
+import org.cellocad.cello2.webapp.specification.DNACompiler.DNACompilerSpecification;
 import org.json.JSONObject;
 
 /**
@@ -35,26 +33,22 @@ import org.json.JSONObject;
  * @date Feb 16, 2019
  *
  */
-public class TargetDataUtils {
+public class SpecificationFactory extends CObject {
 	
-	public static File writeTargetData(File UCF, File PartitionProfile, String filename) {
-		File rtn = null;
-		String str = "";
-		try {
-			str = Utils.getFileContentAsString(UCF.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
+	public Specification getSpecification(final String type, final String name, final String directory, final JSONObject specification) throws CelloWebException {
+		Specification rtn = null;
+		if (type.equals("DNACompiler")) {
+			rtn = new DNACompilerSpecification(name,directory,specification);
 		}
-		JSONObject json1 = new JSONObject(str);
-		try {
-			str = Utils.getFileContentAsString(PartitionProfile.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
+		return rtn;		
+	}
+	
+	public Specification getSpecification(final String type, String netlistConstraintFile, String targetDataFile, String optionsFile, String verilogFile) throws CelloWebException {
+		Specification rtn = null;
+		if (type.equals("DNACompiler")) {
+			rtn = new DNACompilerSpecification(netlistConstraintFile,targetDataFile,optionsFile,verilogFile);
 		}
-		JSONObject json2 = new JSONObject(str);
-		JSONObject json = JSONUtils.mergeJSONObjects(json1, json2);
-		Utils.writeToFile(json.toString(), filename);
-		return rtn;
+		return rtn;		
 	}
 
 }

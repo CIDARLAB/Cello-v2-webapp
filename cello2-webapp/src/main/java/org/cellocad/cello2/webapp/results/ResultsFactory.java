@@ -18,14 +18,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp.specification.DNACompiler.data;
+package org.cellocad.cello2.webapp.results;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.common.JSON.JSONUtils;
-import org.json.JSONObject;
+import org.cellocad.cello2.webapp.common.CObject;
+import org.cellocad.cello2.webapp.results.DNACompiler.DNACompilerResults;
 
 /**
  *
@@ -35,25 +31,13 @@ import org.json.JSONObject;
  * @date Feb 16, 2019
  *
  */
-public class TargetDataUtils {
+public class ResultsFactory extends CObject {
 	
-	public static File writeTargetData(File UCF, File PartitionProfile, String filename) {
-		File rtn = null;
-		String str = "";
-		try {
-			str = Utils.getFileContentAsString(UCF.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
+	public Results getProject(final String type, final String userId, final String jobId, final String directory) {
+		Results rtn = null;
+		if (type.equals("DNACompiler")) {
+			rtn = new DNACompilerResults(userId,jobId);
 		}
-		JSONObject json1 = new JSONObject(str);
-		try {
-			str = Utils.getFileContentAsString(PartitionProfile.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
-		}
-		JSONObject json2 = new JSONObject(str);
-		JSONObject json = JSONUtils.mergeJSONObjects(json1, json2);
-		Utils.writeToFile(json.toString(), filename);
 		return rtn;
 	}
 
