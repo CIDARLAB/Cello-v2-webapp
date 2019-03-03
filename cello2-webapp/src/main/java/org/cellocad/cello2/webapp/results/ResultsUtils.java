@@ -55,10 +55,7 @@ public class ResultsUtils {
 		JSONArray rtn = null;
 		String filename = application + ".json";
 		String filepath = "";
-		filepath += "results";
-		filepath += Utils.getFileSeparator();
-		filepath += "filter";
-		filepath += Utils.getFileSeparator();
+		filepath += "results/filter/";
 		filepath += filename;
 		String filter = null;
 		try {
