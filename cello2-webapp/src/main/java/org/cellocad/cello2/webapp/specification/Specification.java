@@ -74,7 +74,7 @@ public abstract class Specification extends CObject {
 		for (String key : value.keySet()) {
 			str += key;
 			str += ",";
-			str += '"' + value.getString(key) + '"';
+			str += '"' + value.get(key).toString() + '"';
 			str += Utils.getNewLine();
 		}
 		String file = "";

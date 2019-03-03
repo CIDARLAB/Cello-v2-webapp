@@ -123,16 +123,21 @@ public class MainController {
 	@ResponseBody
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
 	public void signup(@RequestBody String request, HttpServletResponse response) throws UnsupportedEncodingException, IOException {
-		String institution;
-		String password;
+		String name = "";
+		String institution = "";
 		String email;
-		String name;
+		String password;
+
 		try {
 			JSONObject json = new JSONObject(request);
-			institution = json.getString("institution");
-			password = json.getString("password");
+			try {
+				institution = json.getString("institution");
+			} catch (JSONException e) {}
+			try {
+				name = json.getString("name");
+			} catch (JSONException e) {}
 			email = json.getString("email");
-			name = json.getString("name");
+			password = json.getString("password");
 		} catch (JSONException e) {
 			Logger.getLogger(MainController.class.getName()).log(Level.FINE, "Error parsing request.", e);
 			return;
