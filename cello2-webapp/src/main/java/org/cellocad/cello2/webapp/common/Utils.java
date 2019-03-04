@@ -58,6 +58,7 @@ final public class Utils {
 		String line;
 		while ((line = br.readLine()) != null) {
 			sb.append(line);
+			sb.append(Utils.getNewLine());
 		}
 		rtn = sb.toString();
 		return rtn;

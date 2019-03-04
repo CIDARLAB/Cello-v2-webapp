@@ -43,29 +43,29 @@ public class Session {
     private String token;
 
     public Session() {
-        this.userId = null;
-        this.createdOn = null;
+    	this.userId = null;
+    	this.createdOn = null;
     }
 
-    public Session(User user,ObjectId key) {
-        this.userId = user.getId();
-        this.createdOn = new Date();
-        this.token = BCrypt.hashpw(key.toString(), BCrypt.gensalt());
+    public Session(User user, ObjectId key) {
+    	this.userId = user.getId();
+    	this.createdOn = new Date();
+    	this.token = BCrypt.hashpw(key.toString(), BCrypt.gensalt());
     }
-    
-    private static boolean validateSession(Session session,String key) {
-        return BCrypt.checkpw(key, session.getToken());
+
+    private static boolean validateSession(Session session, String key) {
+    	return BCrypt.checkpw(key, session.getToken());
     }
-    
-    public static Session findByCredentials(String id,String key) {
-        
-        Session session = Database.getInstance().getDatastore().get(Session.class,new ObjectId(id));
-        if(session != null) {
-           if(Session.validateSession(session, key)) {
-            return session;
-            } 
-        }
-        return null;
+
+    public static Session findByCredentials(String id, String key) {
+
+    	Session session = Database.getInstance().getDatastore().get(Session.class,new ObjectId(id));
+    	if(session != null) {
+    		if(Session.validateSession(session, key)) {
+    			return session;
+    		} 
+    	}
+    	return null;
     }
     
     public static User getUser(Session session) {

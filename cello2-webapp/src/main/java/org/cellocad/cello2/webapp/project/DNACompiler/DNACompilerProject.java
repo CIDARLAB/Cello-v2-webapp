@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.apache.logging.log4j.ThreadContext;
 import org.cellocad.cello2.DNACompiler.runtime.Main;
 import org.cellocad.cello2.DNACompiler.runtime.environment.DNACompilerArgString;
 import org.cellocad.cello2.common.CelloException;
@@ -46,9 +47,11 @@ public class DNACompilerProject extends Project {
 	public class DNACompilerMainCallable implements Callable<Void> {
 		
 		private String[] args;
+		private String outputDir;
 		
-		public DNACompilerMainCallable(final String[] args) {
+		public DNACompilerMainCallable(final String[] args, final String outputDir) {
 	        this.args = args;
+	        this.outputDir = outputDir;
 	    }
 
 		/* (non-Javadoc)
@@ -56,25 +59,13 @@ public class DNACompilerProject extends Project {
 		 */
 		@Override
 		public Void call() throws CelloException {
+			ThreadContext.put("logFilepath", outputDir);
 			Main.main(this.args);
 			return null;
 		}
 		
 	}
 	
-//	public class MainRunnable implements Runnable {
-//
-//	    private String[] args;
-//
-//	    public MainRunnable(final String[] args) {
-//	        this.args = args;
-//	    }
-//
-//	    public void run() {
-//	    	Main.main(this.args);
-//	    }
-//	}
-
 	/**
 	 * @param userId
 	 * @param directory
@@ -101,17 +92,15 @@ public class DNACompilerProject extends Project {
 		args.add("-" + DNACompilerArgString.OUTPUTDIR);
 		args.add(this.getDirectory());
 		// main
-		DNACompilerMainCallable main = new DNACompilerMainCallable(args.toArray(new String[1]));
+		DNACompilerMainCallable main = new DNACompilerMainCallable(args.toArray(new String[1]),this.getDirectory());
 		ExecutorService executor = new ScheduledThreadPoolExecutor(5);
 		Future<Void> future = executor.submit(main);
-        //Thread t = new Thread(main);
-        //t.start();
 		try {
 			future.get();
 		} catch (Exception e) {
-			//e.printStackTrace();
-			throw new CelloWebException();
-		}		
+			throw new CelloWebException(e);
+		}
+		executor.shutdown();
 	}
 
 }

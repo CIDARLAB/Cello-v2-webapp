@@ -114,5 +114,13 @@ public class ResultsUtils {
 		rtn = new JSONArray(results);
 		return rtn;
 	}
+	
+	public static String getResultFilePath(String userId, String name, String resultName) {
+		String rtn = "";
+		rtn += ProjectUtils.getProjectDirectory(userId,name);
+		rtn += Utils.getFileSeparator();
+		rtn += resultName;
+		return rtn;
+	}
 
 }
