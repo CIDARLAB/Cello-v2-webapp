@@ -34,6 +34,9 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Random;
 
+import org.springframework.boot.system.ApplicationHome;
+import org.cellocad.cello2.webapp.Application;
+
 /**
  * The Utils class is class with utility methods for the Poros framework.
  * @author Vincent Mirian
@@ -96,17 +99,16 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns the path of the ClassLoader
+	 * Returns the path of the Application
 	 * 
-	 * @return the path of the ClassLoader
+	 * @return the path of the Application
 	 *
 	 */
 	static public String getFilepath(){
 		String rtn = "";
-		// System.out.println();
-		rtn = (new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().getPath())).getParent();
+		ApplicationHome home = new ApplicationHome(Application.class);
+		rtn += home.getDir().getPath();
 		rtn += Utils.getFileSeparator();
-		// rtn = Utils.class.getClassLoader().getResource(".").getPath();
 		return rtn;
 	}
 

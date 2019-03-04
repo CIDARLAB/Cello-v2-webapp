@@ -40,9 +40,9 @@ public class ApplicationUtils {
 	 * @return
 	 */
 	public static String getProjectsDirectory() {
-	    String rtn = "";
-	    rtn = Utils.getFilepath() + "projects";
-	    return rtn;
+		String rtn = "";
+		rtn = Utils.getFilepath() + "projects";
+		return rtn;
 	}
 
 	/**
@@ -66,8 +66,9 @@ public class ApplicationUtils {
 	 */
 	public static void createUsersFile() {
 		String filepath = getUsersFile();
-	    JSONArray arr = new JSONArray();
-	    Utils.writeToFile(arr.toString(),filepath);
+		Utils.createFile(filepath);
+		JSONArray arr = new JSONArray();
+		Utils.writeToFile(arr.toString(),filepath);
 	}
 
 	/**
