@@ -25,6 +25,8 @@ import org.cellocad.cello2.webapp.common.CObject;
 import org.cellocad.cello2.webapp.specification.DNACompiler.DNACompilerSpecification;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  *
  *
@@ -35,7 +37,7 @@ import org.json.JSONObject;
  */
 public class SpecificationFactory extends CObject {
 	
-	public Specification getSpecification(final String type, final String name, final String directory, final JSONObject specification) throws CelloWebException {
+	public Specification getSpecification(final String type, final String name, final String directory, final JsonNode specification) throws CelloWebException {
 		Specification rtn = null;
 		if (type.equals("DNACompiler")) {
 			rtn = new DNACompilerSpecification(name,directory,specification);

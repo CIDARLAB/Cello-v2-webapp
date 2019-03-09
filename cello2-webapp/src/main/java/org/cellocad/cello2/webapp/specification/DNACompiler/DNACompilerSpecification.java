@@ -24,6 +24,8 @@ import org.cellocad.cello2.webapp.CelloWebException;
 import org.cellocad.cello2.webapp.specification.Specification;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  *
  *
@@ -44,7 +46,7 @@ public class DNACompilerSpecification extends Specification {
 		super(netlistConstraintFile, targetDataFile, optionsFile, verilogFile);
 	}
 	
-	public DNACompilerSpecification(String name, String directory, JSONObject jObj) throws CelloWebException {
+	public DNACompilerSpecification(String name, String directory, JsonNode jObj) throws CelloWebException {
 		super(name,directory,jObj);
 	}
 

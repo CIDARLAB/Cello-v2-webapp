@@ -21,6 +21,8 @@
 package org.cellocad.cello2.webapp.specification;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.cellocad.cello2.webapp.CelloWebException;
 import org.cellocad.cello2.webapp.adaptors.SynBioHubAdaptor;
@@ -28,9 +30,14 @@ import org.cellocad.cello2.webapp.common.CObject;
 import org.cellocad.cello2.webapp.common.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.sbolstandard.core2.SBOLValidationException;
 import org.synbiohub.frontend.SynBioHubException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -67,14 +74,16 @@ public abstract class Specification extends CObject {
 	 * @param directory
 	 * @param jObj
 	 */
-	private void parseParameters(String name, String directory, JSONObject jObj) {
-		JSONObject value = null;
-		value = jObj.getJSONObject(S_SETTINGS).getJSONObject(S_PARAMETERS);
+	private void parseParameters(String name, String directory, JsonNode jObj) throws NullPointerException {
+		JsonNode node = jObj.get(S_SETTINGS).get(S_PARAMETERS);
 		String str = "";
-		for (String key : value.keySet()) {
+		Iterator<Map.Entry<String, JsonNode>> it = node.fields();
+		while (it.hasNext()) {
+			Map.Entry<String, JsonNode> entry = it.next();
+			String key = entry.getKey();
 			str += key;
 			str += ",";
-			str += '"' + value.get(key).toString() + '"';
+			str += '"' + entry.getValue().asText() + '"';
 			str += Utils.getNewLine();
 		}
 		String file = "";
@@ -96,15 +105,13 @@ public abstract class Specification extends CObject {
 	 * @throws JSONException 
 	 * @throws SynBioHubException 
 	 */
-	private void parseLibrary(String name, String directory, JSONObject jObj) throws JSONException, IOException, SBOLValidationException, SynBioHubException {
-		// TODO get UCF from SBOL
-		JSONObject value = null;
-		value = jObj.getJSONObject(S_LIBRARY);
-		boolean useRegistry = value.getBoolean("use_registry");
+	private void parseLibrary(String name, String directory, JsonNode jObj) throws NullPointerException, IOException, SBOLValidationException, SynBioHubException {
+		JsonNode node = jObj.get(S_LIBRARY);
+		boolean useRegistry = node.get("use_registry").asBoolean();
 		String str = "";
 		if (useRegistry) {
-			String registry = value.getString("registry");
-			String collection = value.getString("collection");
+			String registry = node.get("registry").asText();
+			String collection = node.get("collection").asText();
 			SynBioHubAdaptor adaptor = null;
 			adaptor = new SynBioHubAdaptor(registry,collection);
 			str = adaptor.getTargetData().toString(2);
@@ -124,9 +131,9 @@ public abstract class Specification extends CObject {
 	 * @param directory
 	 * @param jObj
 	 */
-	private void parseVerilog(String name, String directory, JSONObject jObj) {
+	private void parseVerilog(String name, String directory, JsonNode jObj) {
 		String str = "";
-		str = jObj.getString(S_VERILOG);
+		str = jObj.get(S_VERILOG).asText();
 		String file = "";
 		file += directory;
 		file += Utils.getFileSeparator();
@@ -141,24 +148,25 @@ public abstract class Specification extends CObject {
 	 * @param name
 	 * @param directory
 	 * @param jObj
+	 * @throws JsonProcessingException 
 	 */
-	private void parseConstraints(String name, String directory, JSONObject jObj) {
-		JSONObject value = null;
-		value = jObj.getJSONObject(S_CONSTRAINTS);
-		JSONArray constraints = new JSONArray();
-		JSONObject temp = null;
+	private void parseConstraints(String name, String directory, JsonNode jObj) throws NullPointerException, JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode node = jObj.get(S_CONSTRAINTS);
+		ArrayNode constraints = mapper.createArrayNode();
+		ObjectNode temp;
 		// input
-		JSONObject input = value.getJSONObject(S_INPUTCONSTRAINTS);
-		temp = new JSONObject();
+		JsonNode input = node.get(S_INPUTCONSTRAINTS);
+		temp = mapper.createObjectNode();
 		temp.put("collection",S_INPUTCONSTRAINTS);
-		temp.put("sensor_map",input);
-		constraints.put(temp);
+		temp.set("sensor_map",input);
+		constraints.add(temp);
 		// output
-		JSONObject output = value.getJSONObject(S_OUTPUTCONSTRAINTS);
-		temp = new JSONObject();
+		JsonNode output = node.get(S_OUTPUTCONSTRAINTS);
+		temp = mapper.createObjectNode();
 		temp.put("collection",S_OUTPUTCONSTRAINTS);
-		temp.put("reporter_map",output);
-		constraints.put(temp);
+		temp.set("reporter_map",output);
+		constraints.add(temp);
 		// file
 		String file = "";
 		file += directory;
@@ -166,21 +174,21 @@ public abstract class Specification extends CObject {
 		file += name;
 		file += "_netlistconstraints.json";
 		Utils.createFile(file);
-		Utils.writeToFile(constraints.toString(2),file);
+		Utils.writeToFile(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(constraints),file);
 		this.setNetlistConstraintFile(file);
 	}
 
-	private void parseSpecification(String name, String directory, JSONObject jObj) throws JSONException, IOException, SBOLValidationException, SynBioHubException {
+	private void parseSpecification(String name, String directory, JsonNode jObj) throws NullPointerException, IOException, SBOLValidationException, SynBioHubException {
 		this.parseParameters(name,directory,jObj);
 		this.parseLibrary(name,directory,jObj);
 		this.parseVerilog(name,directory,jObj);
 		this.parseConstraints(name,directory,jObj);
 	}
 
-	public Specification(String name, String directory, JSONObject jObj) throws CelloWebException {
+	public Specification(String name, String directory, JsonNode jObj) throws CelloWebException {
 		try {
 			this.parseSpecification(name,directory,jObj);
-		} catch (JSONException | IOException | SBOLValidationException | SynBioHubException e) {
+		} catch (NullPointerException | IOException | SBOLValidationException | SynBioHubException e) {
 			throw new CelloWebException(e);
 		}
 	}
