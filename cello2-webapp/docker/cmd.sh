@@ -9,7 +9,7 @@ if [ $status -ne 0 ]; then
 fi
 
 # Start the second process
-java -Djava.security.egd=file:/dev/./urandom -jar /app.jar &
+java -Djava.security.egd=file:/dev/./urandom -jar /root/app.jar &
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start Cello2: $status"
