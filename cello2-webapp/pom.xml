@@ -21,7 +21,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <start-class>org.cellocad.cello2.webapp.Application</start-class>
-    <docker.image.prefix>springio</docker.image.prefix>
+    <docker.image.prefix>cidarlab</docker.image.prefix>
   </properties>
 
   <repositories>
