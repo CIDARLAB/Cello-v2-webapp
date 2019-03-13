@@ -70,10 +70,16 @@ public class SynBioHubAdaptor {
 	private SBOLDocument sbol;
 	
 	public SynBioHubAdaptor(String registry, String collection) throws SynBioHubException {
-		this.sbh = new SynBioHubFrontend(registry);
-		this.setSbh(sbh);
+		this.setSbh(new SynBioHubFrontend(registry));
         URI uri = URI.create(collection);
         SBOLDocument sbol = sbh.getSBOL(uri);
+        String arr[] = collection.split("/");
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < arr.length - 2; i++) {
+        	list.add(arr[i]);
+        }
+        String prefix = String.join("/",list);
+        sbol.setDefaultURIprefix(prefix);
         this.setSbol(sbol);
 	}
 	
@@ -124,6 +130,11 @@ public class SynBioHubAdaptor {
 		}
 		for (Object obj : this.getGatesJSON()) {
 			rtn.put((JSONObject)obj);
+		}
+		ComponentDefinition cd = this.getSbol().getComponentDefinition("backbone", "1");
+		if (cd != null) {
+			JSONObject backbone = this.getPartJSON(cd);
+			rtn.put(backbone);
 		}
 		return rtn;
 	}
@@ -347,6 +358,8 @@ public class SynBioHubAdaptor {
             roleString = "ribozyme";
         if (role.equals(URI.create("http://identifiers.org/so/SO:0001953")))
             roleString = "scar";
+        if (cd.getDisplayId().equals("backbone"))
+        	roleString = "backbone";
         rtn.put("type",roleString);
         rtn.put("name",cd.getDisplayId());
 		rtn.put("dnasequence",cd.getSequences().iterator().next().getElements());
