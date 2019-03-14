@@ -31,9 +31,12 @@ import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.schemas.User;
 import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.specification.SpecificationUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -72,12 +75,11 @@ public class ProjectUtils {
 	/**
 	 * @param userId
 	 * @return
-	 * @throws IOException 
-	 * @throws JSONException 
 	 */
-	public static JSONArray getProjects(String userId) throws JSONException	{
-		JSONArray rtn = null;
-		rtn = new JSONArray();
+	public static JsonNode getProjects(String userId) {
+        ArrayNode rtn = null;
+        ObjectMapper mapper = new ObjectMapper();
+        rtn = mapper.createArrayNode();
 		String filepath = ProjectUtils.getUserDirectory(userId) + Utils.getFileSeparator();
 		File root = new File(filepath);
 		File[] list = root.listFiles();
@@ -88,7 +90,8 @@ public class ProjectUtils {
 					project += Utils.getFileSeparator();
 				}
 				try {
-					rtn.put(new JSONObject(Utils.getFileContentAsString(project + "details.json")));
+					JsonNode obj = mapper.readTree(new File(project + "details.json"));
+					rtn.add(obj);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -106,23 +109,20 @@ public class ProjectUtils {
 	public static Project getProject(String userId, String project) throws CelloWebException {
 		Project rtn = null;
 		ProjectFactory projectFactory = new ProjectFactory();
-		JSONArray projects = ProjectUtils.getProjects(userId);
+		JsonNode projects = ProjectUtils.getProjects(userId);
 		String name = null;
 		String type = null;
 		String jobId = null;
 		String directory = null;
-		for (Object obj : projects) {
-			JSONObject json = (JSONObject) obj;
+		for (JsonNode json : projects) {
 			try {
-				name = json.getString("name");
-				type = json.getString("application");
-				jobId = json.getString("job_id");
-			} catch (JSONException e) {
+				name = json.get("name").asText();
+				type = json.get("application").asText();
+				jobId = json.get("job_id").asText();
+			} catch (NullPointerException e) {
 				throw new CelloWebException("Error with project.");
 			}
 			if (name.equals(project)) {
-				type = json.getString("application");
-				jobId = json.getString("job_id");
 				directory = ProjectUtils.getProjectDirectory(userId,project);
 				rtn = projectFactory.getProject(type,userId,jobId,directory);
 				break;
@@ -138,16 +138,12 @@ public class ProjectUtils {
 	public static String getProjectApplication(String userId, String name) throws CelloWebException {
 		String rtn = "";
 		String filepath = ProjectUtils.getDetailsFile(userId,name);
-		String content = null;
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode node = null;
 		try {
-			content = Utils.getFileContentAsString(filepath);
-		} catch (IOException e) {
-			throw new CelloWebException("Error with project.");
-		}
-		try {
-			JSONObject obj = new JSONObject(content);
-			rtn = obj.getString(S_APPLICATION);
-		} catch (JSONException e) {
+			node = mapper.readTree(new File(filepath));
+			rtn = node.get(S_APPLICATION).asText();
+		} catch (Exception e) {
 			throw new CelloWebException("Error with project.");
 		}
 		return rtn;
@@ -185,7 +181,8 @@ public class ProjectUtils {
 		Utils.makeDirectory(rtn);
 		String details = getDetailsFile(userId,name);
 		Utils.createFile(details);
-		JSONObject obj = new JSONObject();
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode obj = mapper.createObjectNode();
 		Utils.writeToFile(obj.toString(),details);
 		return rtn;
 	}
@@ -208,15 +205,23 @@ public class ProjectUtils {
 	 * @param name
 	 * @param application
 	 * @param jobId
+	 * @throws CelloWebException 
 	 */
-	public static void writeDetailsFile(String userId, String name, String application, String jobId) {
+	public static void writeDetailsFile(String userId, String name, String application, String jobId) throws CelloWebException {
 		String details = getDetailsFile(userId,name);
-		JSONObject obj = new JSONObject();
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode obj = mapper.createObjectNode();
 		obj.put(S_APPLICATION,application);
 		obj.put(S_JOBID,jobId);
 		obj.put(S_NAME,name);
 		obj.put(S_TIMESTAMP, (new Date()).toString());
-		Utils.writeToFile(obj.toString(),details);
+		String json;
+		try {
+			json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+			Utils.writeToFile(json,details);
+		} catch (JsonProcessingException e) {
+			throw new CelloWebException("Error writing project details.");
+		}
 	}
 
 }

@@ -23,7 +23,6 @@ package org.cellocad.cello2.webapp.specification;
 import org.cellocad.cello2.webapp.CelloWebException;
 import org.cellocad.cello2.webapp.common.CObject;
 import org.cellocad.cello2.webapp.specification.DNACompiler.DNACompilerSpecification;
-import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

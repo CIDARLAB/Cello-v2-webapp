@@ -42,9 +42,6 @@ import org.cellocad.cello2.webapp.schemas.User;
 import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.specification.SpecificationFactory;
 import org.cellocad.cello2.webapp.specification.SpecificationUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -206,7 +203,7 @@ public class MainController {
 			deauth(response);
 			return;
 		}
-		JSONArray projectList = ProjectUtils.getProjects(userId);
+		JsonNode projectList = ProjectUtils.getProjects(userId);
 		response.setStatus(HttpServletResponse.SC_OK);
 		writeMessage(projectList.toString(),response);
 	}
@@ -262,7 +259,7 @@ public class MainController {
 			ResultsUtils.createResultsFile(userId,projectName);
 		} catch (CelloWebException e) {
 			getLogger().warn(e);
-			response.setStatus(HttpServletResponse.SC_ACCEPTED);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			MainController.writeMessage(e.getMessage(),response);
 			return;
 		}
@@ -318,7 +315,14 @@ public class MainController {
 		}
 		String directory = ProjectUtils.createProjectDirectory(userId,projectName);
 		String jobId = ProjectUtils.newJobId();
-		ProjectUtils.writeDetailsFile(userId,projectName,application.asText(),jobId);
+		try {
+			ProjectUtils.writeDetailsFile(userId,projectName,application.asText(),jobId);
+		} catch (CelloWebException e) {
+			getLogger().warn(e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			MainController.writeMessage(e.getCause().getLocalizedMessage(),response);
+			return;
+		}
 		ProjectFactory projFactory = new ProjectFactory();
 		project = projFactory.getProject(application.asText(),userId,jobId,directory);
 
@@ -425,7 +429,7 @@ public class MainController {
 
 		User user = Session.getUser(session);
 		String userId = user.getId().toString();
-		JSONArray results;
+		JsonNode results;
 		try {
 			results = ResultsUtils.getResults(userId,projectName);
 		} catch (CelloWebException e) {

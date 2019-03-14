@@ -23,9 +23,12 @@ package org.cellocad.cello2.webapp.specification.DNACompiler.data;
 import java.io.File;
 import java.io.IOException;
 
+import org.cellocad.cello2.webapp.CelloWebException;
 import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.common.JSON.JSONUtils;
-import org.json.JSONObject;
+import org.cellocad.cello2.webapp.common.JSON.JsonUtils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -37,22 +40,18 @@ import org.json.JSONObject;
  */
 public class TargetDataUtils {
 	
-	public static File writeTargetData(File UCF, File PartitionProfile, String filename) {
+	public static File writeTargetData(File UCF, File PartitionProfile, String filename) throws CelloWebException {
 		File rtn = null;
-		String str = "";
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode json1;
+		JsonNode json2;
 		try {
-			str = Utils.getFileContentAsString(UCF.getPath());
+			json1 = mapper.readTree(new File(UCF.getPath()));
+			json2 = mapper.readTree(PartitionProfile.getPath());
 		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
+			throw new CelloWebException("Error with file.");
 		}
-		JSONObject json1 = new JSONObject(str);
-		try {
-			str = Utils.getFileContentAsString(PartitionProfile.getPath());
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
-		}
-		JSONObject json2 = new JSONObject(str);
-		JSONObject json = JSONUtils.mergeJSONObjects(json1, json2);
+		JsonNode json = JsonUtils.mergeJsonNodes(json1, json2);
 		Utils.writeToFile(json.toString(), filename);
 		return rtn;
 	}

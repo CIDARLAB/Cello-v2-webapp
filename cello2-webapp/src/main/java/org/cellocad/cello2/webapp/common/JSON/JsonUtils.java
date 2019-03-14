@@ -20,8 +20,10 @@
  */
 package org.cellocad.cello2.webapp.common.JSON;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.Iterator;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -31,28 +33,38 @@ import org.json.JSONObject;
  * @date Feb 16, 2019
  *
  */
-public class JSONUtils {
+public class JsonUtils {
 	
 	
 	/**
 	 * Returns a <i>JSONObject</i> formed by merging the contents of <i>json1</i> and <i>json2</i>
-	 * Ref: https://crunchify.com/how-to-merge-concat-multiple-jsonobjects-in-java-best-way-to-combine-two-jsonobjects/
+	 * Ref: https://stackoverflow.com/questions/9895041/merging-two-json-documents-using-jackson
 	 * 
-	 * @param json1 the <i>JSONObject</i> to merge
-	 * @param json2 the <i>JSONObject</i> to merge
+	 * @param json1 the <i>JsonNode</i> to merge
+	 * @param json2 the <i>JsonNode</i> to merge
 	 * @return the <i>JSONObject</i> formed by merging the contents of <i>json1</i> and <i>json2</i>
 	 */
-	public static JSONObject mergeJSONObjects(JSONObject json1, JSONObject json2) {
-		JSONObject rtn = new JSONObject();
-		try {
-			rtn = new JSONObject(json1, JSONObject.getNames(json1));
-			for (String key : JSONObject.getNames(json2)) {
-				rtn.put(key, json2.get(key));
+	public static JsonNode mergeJsonNodes(JsonNode json1, JsonNode json2) {
+		Iterator<String> fieldNames = json2.fieldNames();
+		while (fieldNames.hasNext()) {
+
+			String fieldName = fieldNames.next();
+			JsonNode jsonNode = json1.get(fieldName);
+			// if field exists and is an embedded object
+			if (jsonNode != null && jsonNode.isObject()) {
+				mergeJsonNodes(jsonNode, json2.get(fieldName));
 			}
-		} catch (JSONException e) {
-			e.printStackTrace();
+			else {
+				if (json1 instanceof ObjectNode) {
+					// Overwrite field
+					JsonNode value = json2.get(fieldName);
+					((ObjectNode) json1).set(fieldName, value);
+				}
+			}
+
 		}
-		return rtn;
+
+		return json1;
 	}
-	
+
 }

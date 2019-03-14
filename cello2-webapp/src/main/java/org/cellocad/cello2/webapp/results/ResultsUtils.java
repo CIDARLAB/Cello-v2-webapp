@@ -29,8 +29,11 @@ import org.bson.types.ObjectId;
 import org.cellocad.cello2.webapp.CelloWebException;
 import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.project.ProjectUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -51,19 +54,19 @@ public class ResultsUtils {
 		return rtn;
 	}
 
-	public static JSONArray getResultsFilter(String application) throws CelloWebException {
-		JSONArray rtn = null;
+	public static JsonNode getResultsFilter(String application) throws CelloWebException {
+		JsonNode rtn = null;
 		String filename = application + ".json";
 		String filepath = "";
 		filepath += "results/filter/";
 		filepath += filename;
-		String filter = null;
+		ObjectMapper mapper = new ObjectMapper();
 		try {
-			filter = Utils.getResourceAsString(filepath);
+			String str = Utils.getResourceAsString(filepath);
+			rtn = mapper.readTree(str);
 		} catch (IOException e) {
 			throw new CelloWebException("Error with file " + filename + ".");
 		}
-		rtn = new JSONArray(filter);
 		return rtn;
 	}
 
@@ -77,24 +80,25 @@ public class ResultsUtils {
 
 	public static void createResultsFile(String userId, String name) throws CelloWebException {
 		String application = ProjectUtils.getProjectApplication(userId,name);
-		JSONArray filter = ResultsUtils.getResultsFilter(application);
-		JSONArray results = new JSONArray();
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode filter = ResultsUtils.getResultsFilter(application);
+		ArrayNode results = mapper.createArrayNode();
 		String filepath = ResultsUtils.getResultsFile(userId,name);
 		Utils.createFile(filepath);
 		File root = new File(ProjectUtils.getProjectDirectory(userId,name));
 		File[] list = root.listFiles();
 		if (list != null) {
 			for (File file : list) {
-				for (int i = 0; i < filter.length(); i++) {
-					JSONObject f = filter.getJSONObject(i);
-					Pattern p = Pattern.compile(f.getString("pattern").replaceAll("\\\\+", "\\\\"));
+				for (JsonNode node : filter) {
+					String pattern = node.get("pattern").asText();
+					Pattern p = Pattern.compile(pattern.replaceAll("\\\\+", "\\\\"));
 					Matcher m = p.matcher(file.getName());
 					if (m.matches()) {
-						JSONObject result = new JSONObject();
+						ObjectNode result = mapper.createObjectNode();
 						result.put("name",file.getName());
-						result.put("type",f.getString("name"));
+						result.put("type",node.get("name").asText());
 						result.put("id",ResultsUtils.newResultId());
-						results.put(result);
+						results.add(result);
 					}
 				}
 			}
@@ -102,16 +106,15 @@ public class ResultsUtils {
 		Utils.writeToFile(results.toString(),filepath);
 	}
 
-	public static JSONArray getResults(String userId, String name) throws CelloWebException {
-		JSONArray rtn = null;
+	public static JsonNode getResults(String userId, String name) throws CelloWebException {
+		JsonNode rtn = null;
 		String filepath = ResultsUtils.getResultsFile(userId,name);
-		String results;
+		ObjectMapper mapper = new ObjectMapper();
 		try {
-			results = Utils.getFileContentAsString(filepath);
+			rtn = mapper.readTree(new File(filepath));
 		} catch (IOException e) {
 			throw new CelloWebException("Error with results.");
 		}
-		rtn = new JSONArray(results);
 		return rtn;
 	}
 	

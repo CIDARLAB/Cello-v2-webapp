@@ -39,8 +39,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sbolstandard.core2.Annotation;
 import org.sbolstandard.core2.Attachment;
 import org.sbolstandard.core2.Component;
@@ -55,6 +53,11 @@ import org.sbolstandard.core2.SequenceOntology;
 import org.sbolstandard.core2.SystemsBiologyOntology;
 import org.synbiohub.frontend.SynBioHubException;
 import org.synbiohub.frontend.SynBioHubFrontend;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -98,8 +101,10 @@ public class SynBioHubAdaptor {
 		return rtn;
 	}
 
-	private JSONArray getTopLevelJSON() throws IOException {
-		JSONArray rtn = new JSONArray();
+	private JsonNode getTopLevelJson() throws IOException {
+		ArrayNode rtn = null;
+		ObjectMapper mapper = new ObjectMapper();
+		rtn = mapper.createArrayNode();
 		Set<Attachment> attachments = this.getSbol().getAttachments();
 		// TODO move
 		final List<String> S_VALIDSECTIONS = Arrays.asList(
@@ -111,30 +116,31 @@ public class SynBioHubAdaptor {
 				// TODO motif library
 		);
 		for (Attachment a : attachments) {
-			//if (a.getDisplayId().endsWith(".json")) {
 			if (S_VALIDSECTIONS.contains(a.getName())) {
 				URL source = null;
 				source = a.getSource().toURL();
-				String str = this.getURLContentsAsString(source);
-				JSONObject obj = new JSONObject(str);
-				rtn.put(obj);
+				String str = getURLContentsAsString(source);
+				JsonNode obj = mapper.readTree(str);
+				rtn.add(obj);
 			}
 		}
 		return rtn;
 	}
 
-	public JSONArray getTargetData() throws IOException, SBOLValidationException {
-		JSONArray rtn = new JSONArray();
-		for (Object obj : this.getTopLevelJSON()) {
-			rtn.put((JSONObject)obj);
+	public JsonNode getTargetData() throws IOException, SBOLValidationException {
+		ArrayNode rtn = null;
+		ObjectMapper mapper = new ObjectMapper();
+		rtn = mapper.createArrayNode();
+		for (JsonNode obj : this.getTopLevelJson()) {
+			rtn.add(obj);
 		}
-		for (Object obj : this.getGatesJSON()) {
-			rtn.put((JSONObject)obj);
+		for (JsonNode obj : this.getGatesJson()) {
+			rtn.add(obj);
 		}
 		ComponentDefinition cd = this.getSbol().getComponentDefinition("backbone", "1");
 		if (cd != null) {
-			JSONObject backbone = this.getPartJSON(cd);
-			rtn.put(backbone);
+			JsonNode backbone = this.getPartJson(cd);
+			rtn.add(backbone);
 		}
 		return rtn;
 	}
@@ -153,30 +159,32 @@ public class SynBioHubAdaptor {
 	 * @throws SBOLValidationException 
 	 * @throws IOException 
 	 */
-	private JSONArray getGatesJSON() throws SBOLValidationException, IOException {
-		JSONArray rtn = new JSONArray();
-		Set<JSONObject> parts = new HashSet<>();
-		Collection<JSONObject> gates = new ArrayList<>();
+	private JsonNode getGatesJson() throws SBOLValidationException, IOException {
+		ArrayNode rtn = null;
+		ObjectMapper mapper = new ObjectMapper();
+		rtn = mapper.createArrayNode();
+		Set<JsonNode> parts = new HashSet<>();
+		Collection<JsonNode> gates = new ArrayList<>();
 		for (ComponentDefinition cd : this.getSbol().getRootComponentDefinitions()) {
 			if (this.getCelloAnnotationString(cd,"group_name") != null) {
-				gates.addAll(this.getGateJSON(cd));
-				parts.addAll(this.getPartsJSON(cd));
+				gates.addAll(this.getGateJson(cd));
+				parts.addAll(this.getPartsJson(cd));
 			}
 			String type = this.getCelloAnnotationString(cd,"gateType");
 			if (type != null && type.equals("input_sensor")) {
-				gates.addAll(this.getSensorJSON(cd));
-				parts.addAll(this.getPartsJSON(cd));		
+				gates.addAll(this.getSensorJson(cd));
+				parts.addAll(this.getPartsJson(cd));		
 			}
 			if (type != null && type.equals("output_reporter")) {
-				gates.add(this.getReporterJSON(cd));
-				parts.addAll(this.getPartsJSON(cd));
+				gates.add(this.getReporterJson(cd));
+				parts.addAll(this.getPartsJson(cd));
 			}
 		}
-		for (JSONObject obj : parts) {
-			rtn.put(obj);
+		for (JsonNode obj : parts) {
+			rtn.add(obj);
 		}
-		for (JSONObject obj : gates) {
-			rtn.put(obj);
+		for (JsonNode obj : gates) {
+			rtn.add(obj);
 		}
 		return rtn;
 	}
@@ -282,9 +290,10 @@ public class SynBioHubAdaptor {
 	 * @return
 	 * @throws SBOLValidationException 
 	 */
-	private Collection<JSONObject> getSensorJSON(ComponentDefinition cd) throws SBOLValidationException {
-		Collection<JSONObject> rtn = new HashSet<>();
-		JSONObject sensor = new JSONObject();
+	private Collection<JsonNode> getSensorJson(ComponentDefinition cd) throws SBOLValidationException {
+		Collection<JsonNode> rtn = new HashSet<>();
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode sensor = mapper.createObjectNode();
 		ComponentDefinition cds = null;
 		for (Component c : cd.getComponents()) {
 			ComponentDefinition def = c.getDefinition();
@@ -301,15 +310,15 @@ public class SynBioHubAdaptor {
 		sensor.put("signal_low",Double.valueOf(this.getCelloAnnotationString(regulation,"ymin")));
 		ComponentDefinition promoter = this.getRegulated(cds).iterator().next();
 		sensor.put("promoter",promoter.getDisplayId());
-		JSONArray parts = new JSONArray();
+		ArrayNode parts = mapper.createArrayNode();
 		List<Component> temp = cd.getSortedComponents();
 		for (Component c : temp) {
-			parts.put(c.getDefinition().getDisplayId());
+			parts.add(c.getDefinition().getDisplayId());
 		}
-		sensor.put("parts",parts);
-		sensor.put("uri",cd.getIdentity());
+		sensor.set("parts",parts);
+		sensor.put("uri",cd.getIdentity().toString());
 		rtn.add(sensor);
-		rtn.add(this.getPartJSON(promoter));
+		rtn.add(this.getPartJson(promoter));
 		return rtn;
 	}
 
@@ -318,31 +327,35 @@ public class SynBioHubAdaptor {
 	 * @return
 	 * @throws SBOLValidationException 
 	 */
-	private JSONObject getReporterJSON(ComponentDefinition cd) throws SBOLValidationException {
-		JSONObject rtn = new JSONObject();
+	private JsonNode getReporterJson(ComponentDefinition cd) throws SBOLValidationException {
+		ObjectNode rtn = null;
+		ObjectMapper mapper = new ObjectMapper();
+		rtn = mapper.createObjectNode();
 		rtn.put("collection","output_reporters");
 		rtn.put("name",cd.getDisplayId());
-		JSONArray parts = new JSONArray();
+		ArrayNode parts = mapper.createArrayNode();
 		List<Component> temp = cd.getSortedComponents();
 		for (Component c : temp) {
-			parts.put(c.getDefinition().getDisplayId());
+			parts.add(c.getDefinition().getDisplayId());
 		}
-		rtn.put("parts",parts);
-		rtn.put("uri",cd.getIdentity());
+		rtn.set("parts",parts);
+		rtn.put("uri",cd.getIdentity().toString());
 		return rtn;
 	}
 
-	private Collection<JSONObject> getPartsJSON(ComponentDefinition cd) {
-		Collection<JSONObject> rtn = new HashSet<>();
+	private Collection<JsonNode> getPartsJson(ComponentDefinition cd) {
+		Collection<JsonNode> rtn = new HashSet<>();
 		for (Component c : cd.getComponents()) {
-			JSONObject part = this.getPartJSON(c.getDefinition());
+			JsonNode part = this.getPartJson(c.getDefinition());
             rtn.add(part);
 		}
 		return rtn;
 	}
 	
-	private JSONObject getPartJSON(ComponentDefinition cd) {
-		JSONObject rtn = new JSONObject();
+	private JsonNode getPartJson(ComponentDefinition cd) {
+		ObjectNode rtn = null;
+		ObjectMapper mapper = new ObjectMapper();
+		rtn = mapper.createObjectNode();
 		rtn.put("collection","parts");
 		URI role = cd.getRoles().iterator().next();
 		String roleString = "";
@@ -363,7 +376,7 @@ public class SynBioHubAdaptor {
         rtn.put("type",roleString);
         rtn.put("name",cd.getDisplayId());
 		rtn.put("dnasequence",cd.getSequences().iterator().next().getElements());
-        rtn.put("uri",cd.getIdentity());
+        rtn.put("uri",cd.getIdentity().toString());
         return rtn;
 	}
 
@@ -372,10 +385,11 @@ public class SynBioHubAdaptor {
 	 * @throws SBOLValidationException 
 	 * @throws IOException 
 	 */
-	private Collection<JSONObject> getGateJSON(ComponentDefinition cd) throws SBOLValidationException, IOException {
-		Collection<JSONObject> rtn = new ArrayList<>();
+	private Collection<JsonNode> getGateJson(ComponentDefinition cd) throws SBOLValidationException, IOException {
+		Collection<JsonNode> rtn = new ArrayList<>();
+		ObjectMapper mapper = new ObjectMapper();
 		// gate
-		JSONObject gate = new JSONObject();
+		ObjectNode gate = mapper.createObjectNode();
 		gate.put("collection","gates");
 		gate.put("regulator",this.getCelloAnnotationString(cd,"group_name"));
 		gate.put("group_name",this.getCelloAnnotationString(cd,"group_name"));
@@ -383,7 +397,7 @@ public class SynBioHubAdaptor {
 		gate.put("gate_type",this.getCelloAnnotationString(cd,"gate_type"));
 		gate.put("system",this.getCelloAnnotationString(cd,"family"));
 		gate.put("color_hexcode",this.getCelloAnnotationString(cd,"color_hexcode"));
-		gate.put("uri",cd.getIdentity());
+		gate.put("uri",cd.getIdentity().toString());
 		rtn.add(gate);
 		// attachment
 		Set<Attachment> attachments = cd.getAttachments();
@@ -395,47 +409,47 @@ public class SynBioHubAdaptor {
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
-				String str = this.getURLContentsAsString(url);
-				JSONObject obj = new JSONObject(str);
+				String str = getURLContentsAsString(url);
+				JsonNode obj = mapper.readTree(str);
 				rtn.add(obj);
 			}
 		}
 		// response function
-		JSONObject rf = new JSONObject();
+		ObjectNode rf = mapper.createObjectNode();
 		rf.put("collection","response_functions");
 		rf.put("gate_name",cd.getDisplayId());
 		rf.put("equation",this.getCelloAnnotationString(cd,"response_function"));
-		JSONArray variables = new JSONArray();
-		JSONObject x = new JSONObject();
+		ArrayNode variables = mapper.createArrayNode();
+		ObjectNode x = mapper.createObjectNode();
 		x.put("name","x");
 		x.put("on_threshold",Double.valueOf(this.getCelloAnnotationString(cd,"x_on_threshold")));
 		x.put("off_threshold",Double.valueOf(this.getCelloAnnotationString(cd,"x_off_threshold")));
-		variables.put(x);
-		rf.put("variables",variables);
-		JSONArray parameters = new JSONArray();
+		variables.add(x);
+		rf.set("variables",variables);
+		ArrayNode parameters = mapper.createArrayNode();
 		for (String name : new String[]{"ymax","ymin","K","n"}) {
-			JSONObject parameter = new JSONObject();
+			ObjectNode parameter = mapper.createObjectNode();
 			parameter.put("name",name);
 			parameter.put("value",Double.valueOf(this.getCelloAnnotationString(cd,name)));
-			parameters.put(parameter);
+			parameters.add(parameter);
 		}
-		rf.put("parameters",parameters);
+		rf.set("parameters",parameters);
 		rtn.add(rf);
 		// gate parts
-		JSONObject gateParts = new JSONObject();
+		ObjectNode gateParts = mapper.createObjectNode();
 		gateParts.put("collection","gate_parts");
 		gateParts.put("gate_name",cd.getDisplayId());
-		JSONArray cassettes = new JSONArray();
-		JSONObject cassette = new JSONObject();
+		ArrayNode cassettes = mapper.createArrayNode();
+		ObjectNode cassette = mapper.createObjectNode();
 		cassette.put("maps_to_variable","x");
-		JSONArray cassetteParts = new JSONArray();
+		ArrayNode cassetteParts = mapper.createArrayNode();
 		List<Component> parts = cd.getSortedComponents();
 		for (Component c : parts) {
-			cassetteParts.put(c.getDefinition().getDisplayId());
+			cassetteParts.add(c.getDefinition().getDisplayId());
 		}
-		cassette.put("cassette_parts",cassetteParts);
-		cassettes.put(cassette);
-		gateParts.put("expression_cassettes",cassettes);
+		cassette.set("cassette_parts",cassetteParts);
+		cassettes.add(cassette);
+		gateParts.set("expression_cassettes",cassettes);
 		ComponentDefinition cds = null;
 		for (Component c : cd.getComponents()) {
 			ComponentDefinition def = c.getDefinition();
@@ -447,7 +461,7 @@ public class SynBioHubAdaptor {
 		ComponentDefinition promoter = this.getRegulated(cds).iterator().next();
 		gateParts.put("promoter",promoter.getDisplayId());
 		rtn.add(gateParts);
-		rtn.add(this.getPartJSON(promoter));
+		rtn.add(this.getPartJson(promoter));
 		return rtn;
 	}
 

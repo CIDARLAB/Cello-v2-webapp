@@ -20,13 +20,16 @@
  */
 package org.cellocad.cello2.webapp.specification;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.cellocad.cello2.webapp.CelloWebException;
 import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.project.ProjectUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -56,23 +59,23 @@ public class SpecificationUtils {
 		Specification rtn = null;
 		String specificationFile = getSpecificationFile(userId,name);
 		if (Utils.isValidFilepath(specificationFile)) {
-			String specificationString;
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode json;
 			try {
-				specificationString = Utils.getFileContentAsString(specificationFile);
+				json = mapper.readTree(new File(specificationFile));
 			} catch (IOException e) {
 				throw new CelloWebException("Error with specification.");
 			}
-			JSONObject json = new JSONObject(specificationString);
 			String netlistConstraintFile;
 			String targetDataFile;
 			String optionsFile;
 			String verilogFile;
 			try {
-				netlistConstraintFile = json.getString(S_NETLISTCONSTRAINT);
-				targetDataFile = json.getString(S_TARGETDATA);
-				optionsFile = json.getString(S_OPTIONS);
-				verilogFile = json.getString(S_VERILOG);
-			} catch (JSONException e) {
+				netlistConstraintFile = json.get(S_NETLISTCONSTRAINT).asText();
+				targetDataFile = json.get(S_TARGETDATA).asText();
+				optionsFile = json.get(S_OPTIONS).asText();
+				verilogFile = json.get(S_VERILOG).asText();
+			} catch (NullPointerException e) {
 				throw new CelloWebException("Error with specification.");
 			}
 			SpecificationFactory specificationFactory = new SpecificationFactory();
@@ -108,7 +111,8 @@ public class SpecificationUtils {
 	 */
 	public static void writeSpecificationFile(String userId, String name, String netlistConstraintFile, String targetDataFile, String optionsFile, String verilogFile) {
 	    String specification = SpecificationUtils.getSpecificationFile(userId,name);
-	    JSONObject obj = new JSONObject();
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode obj = mapper.createObjectNode();
 	    obj.put(S_NETLISTCONSTRAINT,netlistConstraintFile);
 	    obj.put(S_TARGETDATA,targetDataFile);
 	    obj.put(S_OPTIONS,optionsFile);
@@ -125,7 +129,8 @@ public class SpecificationUtils {
 	 */
 	public static void writeSpecificationFile(String userId, String name, Specification specification) {
 	    String specificationFile = SpecificationUtils.getSpecificationFile(userId,name);
-	    JSONObject obj = new JSONObject();
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode obj = mapper.createObjectNode();
 	    obj.put(S_NETLISTCONSTRAINT,specification.getNetlistConstraintFile());
 	    obj.put(S_TARGETDATA,specification.getTargetDataFile());
 	    obj.put(S_OPTIONS,specification.getOptionsFile());

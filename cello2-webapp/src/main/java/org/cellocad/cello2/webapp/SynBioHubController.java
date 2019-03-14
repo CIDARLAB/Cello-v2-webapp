@@ -23,14 +23,11 @@ package org.cellocad.cello2.webapp;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 
 import javax.annotation.PostConstruct;
@@ -38,49 +35,33 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.bson.types.ObjectId;
 import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.database.Database;
-import org.cellocad.cello2.webapp.project.Project;
-import org.cellocad.cello2.webapp.project.ProjectFactory;
-import org.cellocad.cello2.webapp.project.ProjectUtils;
 import org.cellocad.cello2.webapp.results.ResultsUtils;
 import org.cellocad.cello2.webapp.schemas.Session;
 import org.cellocad.cello2.webapp.schemas.User;
-import org.cellocad.cello2.webapp.specification.Specification;
-import org.cellocad.cello2.webapp.specification.SpecificationFactory;
-import org.cellocad.cello2.webapp.specification.SpecificationUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * 
@@ -154,16 +135,16 @@ public class SynBioHubController {
 			headers.set("X-authorization", sbhToken);
 			HttpEntity<String> entity = new HttpEntity<>(headers);
 			ResponseEntity<String> result = rest.exchange(endpoint, HttpMethod.GET, entity, String.class);
-			JSONArray collections = new JSONArray();
+			ObjectMapper mapper = new ObjectMapper();
+			ArrayNode collections = mapper.createArrayNode();
 			try {
-				JSONArray arr = new JSONArray(result.getBody());
-				for (int i = 0; i < arr.length(); i++) {
-					JSONObject obj = arr.getJSONObject(i);
-					if (obj.getString("uri").contains("/public/"))
+				JsonNode arr = mapper.readTree(result.getBody());
+				for (JsonNode obj : arr) {
+					if (obj.get("uri").asText().contains("/public/"))
 						continue;
-					collections.put(obj);
+					collections.add(obj);
 				}
-			} catch (JSONException e) {
+			} catch (NullPointerException | IOException e) {
 				return;
 			}
 			response.setStatus(HttpServletResponse.SC_OK);

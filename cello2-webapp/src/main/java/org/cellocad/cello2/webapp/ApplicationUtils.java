@@ -20,11 +20,14 @@
  */
 package org.cellocad.cello2.webapp;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.cellocad.cello2.webapp.common.Utils;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -67,7 +70,8 @@ public class ApplicationUtils {
 	public static void createUsersFile() {
 		String filepath = getUsersFile();
 		Utils.createFile(filepath);
-		JSONArray arr = new JSONArray();
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode arr = mapper.createArrayNode();
 		Utils.writeToFile(arr.toString(),filepath);
 	}
 
@@ -76,17 +80,16 @@ public class ApplicationUtils {
 	 */
 	public static void appendToUsersFile(String userId, String email) {
 		String filepath = getUsersFile();
-		String str;
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode node = null;
 		try {
-			str = Utils.getFileContentAsString(filepath);
+			node = (ArrayNode) mapper.readTree(new File(filepath));
 		} catch (IOException e) {
 			throw new RuntimeException("Error with file.");
 		}
-		JSONArray arr = new JSONArray(str);
-		JSONObject obj = new JSONObject();
+		ObjectNode obj = mapper.createObjectNode();
 		obj.put(email,userId);
-		arr.put(obj);
-		Utils.writeToFile(arr.toString(),filepath);
+		Utils.writeToFile(node.toString(),filepath);
 	}
 
 }

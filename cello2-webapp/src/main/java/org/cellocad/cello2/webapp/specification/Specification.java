@@ -28,8 +28,6 @@ import org.cellocad.cello2.webapp.CelloWebException;
 import org.cellocad.cello2.webapp.adaptors.SynBioHubAdaptor;
 import org.cellocad.cello2.webapp.common.CObject;
 import org.cellocad.cello2.webapp.common.Utils;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.sbolstandard.core2.SBOLValidationException;
 import org.synbiohub.frontend.SynBioHubException;
 
@@ -102,7 +100,6 @@ public abstract class Specification extends CObject {
 	 * @param jObj
 	 * @throws SBOLValidationException 
 	 * @throws IOException 
-	 * @throws JSONException 
 	 * @throws SynBioHubException 
 	 */
 	private void parseLibrary(String name, String directory, JsonNode jObj) throws NullPointerException, IOException, SBOLValidationException, SynBioHubException {
@@ -114,7 +111,7 @@ public abstract class Specification extends CObject {
 			String collection = node.get("collection").asText();
 			SynBioHubAdaptor adaptor = null;
 			adaptor = new SynBioHubAdaptor(registry,collection);
-			str = adaptor.getTargetData().toString(2);
+			str = adaptor.getTargetData().toString();
 		}
 		String file = "";
 		file += directory;
