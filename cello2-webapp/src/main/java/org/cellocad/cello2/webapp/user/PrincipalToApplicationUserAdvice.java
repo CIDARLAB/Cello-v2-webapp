@@ -18,31 +18,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.user;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.security.Principal;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
+@ControllerAdvice
+public class PrincipalToApplicationUserAdvice {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+	@Autowired
+	private ApplicationUserRepository applicationUserRepository;
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	@ModelAttribute
+	public ApplicationUser getUser(Principal principal) {
+		if (principal == null)
+			return null;
+		return applicationUserRepository.findByUsername(principal.getName());
 	}
 
 }

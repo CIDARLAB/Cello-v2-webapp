@@ -18,31 +18,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.specification.settings;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.io.IOException;
+import java.util.Map;
+
+import org.cellocad.cello2.webapp.specification.settings.serialization.SettingsDeserializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-18
  *
  */
-@SpringBootApplication
-public class Application {
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+@JsonDeserialize(using = SettingsDeserializer.class)
+public class Settings {
+	
+	private String application;
+	private Map<String,String> settings;
+	
+	public Settings(Map<String,String> settings, String application) {
+		this.application = application;
+		this.settings = settings;
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	/**
+	 * Getter for <i>application</i>
+	 * @return value of <i>application</i>
+	 */
+	public String getApplication() {
+		return application;
+	}
+
+	/**
+	 * Getter for <i>settings</i>
+	 * @return value of <i>settings</i>
+	 */
+	public Map<String, String> getSettings() {
+		return settings;
+	}
+
+	public String toCSV() throws IOException {
+		CsvMapper mapper = new CsvMapper();
+		CsvSchema schema = mapper.schemaFor(Settings.class);
+		return mapper.writer(schema).writeValueAsString(this.getSettings());
 	}
 
 }

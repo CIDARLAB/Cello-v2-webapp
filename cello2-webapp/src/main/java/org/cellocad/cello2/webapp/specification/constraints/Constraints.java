@@ -18,31 +18,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.specification.constraints;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Map;
+
+import org.cellocad.cello2.webapp.specification.constraints.serialization.ConstraintsDeserializer;
+import org.cellocad.cello2.webapp.specification.constraints.serialization.ConstraintsSerializer;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
+@JsonDeserialize(using = ConstraintsDeserializer.class)
+@JsonSerialize(using = ConstraintsSerializer.class)
+public class Constraints {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+	Map<String,String> sensors;
+	Map<String,String> reporters;
+
+	public Constraints(Map<String,String> sensors, Map<String,String> reporters) {
+		this.sensors = sensors;
+		this.reporters = reporters;
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	/**
+	 * Getter for <i>sensors</i>
+	 * @return value of <i>sensors</i>
+	 */
+	public Map<String,String> getSensors() {
+		return sensors;
+	}
+
+	/**
+	 * Getter for <i>reporters</i>
+	 * @return value of <i>reporters</i>
+	 */
+	public Map<String,String> getReporters() {
+		return reporters;
 	}
 
 }

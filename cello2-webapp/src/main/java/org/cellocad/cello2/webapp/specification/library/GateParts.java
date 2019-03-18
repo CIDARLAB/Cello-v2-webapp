@@ -18,31 +18,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.specification.library;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Map;
+
+import org.cellocad.cello2.webapp.exception.LibraryException;
+import org.sbolstandard.core2.ComponentDefinition;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
+public class GateParts {
+	
+	private Map<String,CassetteParts> expressionCassettes;
+	private Part promoter;
+	
+	public GateParts(Map<String,CassetteParts> expressionCassettes, Part promoter) {
+		this.expressionCassettes = expressionCassettes;
+		this.promoter = promoter;
+	}
+	
+	/**
+	 * @param cd
+	 * @throws LibraryException 
+	 */
+	public GateParts(ComponentDefinition cd) throws LibraryException {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	public CassetteParts getCassetteParts(String variable) {
+		return this.getExpressionCassettes().get(variable);
 	}
 
+	/**
+	 * Getter for <i>expressionCassettes</i>
+	 * @return value of <i>expressionCassettes</i>
+	 */
+	private Map<String, CassetteParts> getExpressionCassettes() {
+		return expressionCassettes;
+	}
+
+	/**
+	 * Getter for <i>promoter</i>
+	 * @return value of <i>promoter</i>
+	 */
+	public Part getPromoter() {
+		return promoter;
+	}
+	
 }

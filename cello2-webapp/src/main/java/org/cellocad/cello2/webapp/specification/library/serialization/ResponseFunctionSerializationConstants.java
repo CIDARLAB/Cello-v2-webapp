@@ -18,31 +18,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.specification.library.serialization;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
+public class ResponseFunctionSerializationConstants {
+	
+	public static final String S_UCF_COLLECTION = "response_functions";
+	public static final String S_UCF_GATE_NAME = "gate_name";
+	public static final String S_UCF_EQUATION = "equation";
+	public static final String S_UCF_VARIABLES = "variables";
+	public static final String S_UCF_VARIABLE_NAME = "name";
+	public static final String S_UCF_VARIABLE_OFF_THRESHOLD = "off_threshold";
+	public static final String S_UCF_VARIABLE_ON_THRESHOLD = "on_threshold";
+	public static final String S_UCF_PARAMETERS = "parameters";
+	public static final String S_UCF_PARAMETER_NAME = "name";
+	public static final String S_UCF_PARAMETER_VALUE = "value";
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+	public static final String S_SYNBIOHUB_EQUATION = "response_function";
 
 }

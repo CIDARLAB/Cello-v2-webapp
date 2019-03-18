@@ -31,11 +31,20 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Random;
 
-import org.springframework.boot.system.ApplicationHome;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.cellocad.cello2.webapp.Application;
+import org.cellocad.cello2.webapp.exception.ResourceNotFoundException;
+import org.springframework.boot.system.ApplicationHome;
 
 /**
  * The Utils class is class with utility methods for the Poros framework.
@@ -45,6 +54,36 @@ import org.cellocad.cello2.webapp.Application;
  *
  */
 final public class Utils {
+	
+    /**
+     * @return the URL contents (uncompressed) as a String
+     * @throws IOException 
+     * @throws ClientProtocolException 
+     */
+	public static String getURLContentsAsString(URL url) throws IOException {
+		String rtn = null;
+		HttpClientBuilder builder = HttpClientBuilder.create();
+		CloseableHttpClient httpClient = builder.build();
+		HttpGet httpGet = new HttpGet(url.toString());
+		HttpResponse httpResponse = httpClient.execute(httpGet);
+		rtn = EntityUtils.toString(httpResponse.getEntity());
+		return rtn;
+	}
+
+	public static <T extends CObject> T findCObjectByName(String name, Collection<T> collection) throws ResourceNotFoundException {
+		T rtn = null;
+		Iterator<T> it = collection.iterator();
+		while (it.hasNext()) {
+			T obj = it.next();
+			if (obj.getName().equals(name)) {
+				rtn = obj;
+				break;
+			}
+		}
+		if (rtn == null)
+			throw new ResourceNotFoundException();
+		return rtn;
+	}
 
 	public static URL getResource(String resource) {
 		URL rtn = null;

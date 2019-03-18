@@ -18,31 +18,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.specification.library;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.io.File;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
+public class UCFLibraryResource extends LibraryResource {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+	private File file;
+	
+	public UCFLibraryResource(File file) {
+		this.file = file;
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	/* (non-Javadoc)
+	 * @see org.cellocad.cello2.webapp.specification.library.LibraryTemplate#getLibrary()
+	 */
+	@Override
+	public Library getLibrary() {
+		Library rtn = null;
+		return rtn;
 	}
 
+	/**
+	 * Getter for <i>file</i>
+	 * @return value of <i>file</i>
+	 */
+	public File getFile() {
+		return file;
+	}
+	
 }

@@ -18,31 +18,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.specification.library.serialization;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+public class GatePartsSerializationConstants {
+	
+	public static final String S_UCF_COLLECTION = "gate_parts";
+	public static final String S_UCF_GATE_NAME = "gate_name";
+	public static final String S_UCF_EXPRESSION_CASSETTES = "equation";
+	public static final String S_UCF_MAPS_TO_VARIABLE = "equation";
+	public static final String S_UCF_CASSETTE_PARTS = "cassette_parts";
+	public static final String S_UCF_PROMOTER = "promoter";
 
 }

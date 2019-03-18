@@ -18,31 +18,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.specification.library;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Collection;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-21
  *
  */
-@SpringBootApplication
-public class Application {
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+public class CassetteParts {
+	
+	private Collection<Part> parts;
+	
+	public CassetteParts(Collection<Part> parts) {
+		this.parts = parts;
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	/**
+	 * Getter for <i>parts</i>
+	 * @return value of <i>parts</i>
+	 */
+	public Collection<Part> getParts() {
+		return parts;
 	}
-
+	
 }

@@ -18,31 +18,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.test.synbiohub;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+
+import org.cellocad.cello2.webapp.exception.LibraryException;
+import org.cellocad.cello2.webapp.specification.library.SynBioHubLibraryResource;
+import org.junit.Test;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-22
  *
  */
-@SpringBootApplication
-public class Application {
+public class SynBioHubTest {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	@Test
+	public void test() throws MalformedURLException, LibraryException, JsonProcessingException {
+		URL url = new URL("https://synbiohub.programmingbiology.org");
+		URI uri = URI.create("https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/Eco1C1G1T1_collection/1");
+		SynBioHubLibraryResource resource = new SynBioHubLibraryResource(url,uri);
+		resource.getLibrary();
+		// Library library = resource.getLibrary();
+		// ObjectMapper mapper = new ObjectMapper();
+		// System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(library));
 	}
 
 }

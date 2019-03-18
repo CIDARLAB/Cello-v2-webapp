@@ -18,31 +18,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.specification.constraints.serialization;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+public class ConstraintsSerializationConstants {
+	
+	public static final String S_COLLECTION = "collection";
+	public static final String S_SENSORS = "input_sensors";
+	public static final String S_SENSOR_MAP = "sensor_map";
+	public static final String S_REPORTERS = "reporters";
+	public static final String S_REPORTER_MAP = "reporter_map";
 
 }

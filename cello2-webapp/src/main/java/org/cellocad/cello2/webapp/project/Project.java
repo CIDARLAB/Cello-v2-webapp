@@ -20,11 +20,26 @@
  */
 package org.cellocad.cello2.webapp.project;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cellocad.cello2.webapp.CelloWebException;
+import org.bson.types.ObjectId;
 import org.cellocad.cello2.webapp.common.CObject;
+import org.cellocad.cello2.webapp.common.Utils;
+import org.cellocad.cello2.webapp.exception.CelloWebException;
+import org.cellocad.cello2.webapp.exception.LibraryException;
+import org.cellocad.cello2.webapp.exception.ProjectException;
+import org.cellocad.cello2.webapp.results.Result;
 import org.cellocad.cello2.webapp.specification.Specification;
+import org.cellocad.cello2.webapp.user.ApplicationUser;
+import org.cidarlab.eugene.util.FileUtils;
+import org.springframework.data.annotation.Id;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -36,58 +51,143 @@ import org.cellocad.cello2.webapp.specification.Specification;
  */
 public abstract class Project extends CObject {
 
-    private String userId;
-    private String jobId;
-    private String directory;
-    private Specification specification;
+	@Id
+    private ObjectId id;
+    private File filepath;
+    private Date created;
+    
+    private File verilogFile;
+    private File optionsFile;
+    private File netlistConstraintFile;
+    private File targetDataFile;
+
+    private Collection<Result> results;
     private static final Logger logger = LogManager.getLogger(Project.class.getSimpleName());
     
-    public Project(String userId, String jobId, String directory) {
-    	this.userId = userId;
-    	this.jobId = jobId;
-    	this.directory = directory;
+    public Project(ApplicationUser user, String name, Specification specification) throws ProjectException {
+    	super(name,-1,-1);
+    	ObjectMapper mapper = new ObjectMapper();
+    	ProjectUtils.createProjectDirectory(user,name);
+    	this.id = new ObjectId();
+    	this.filepath = new File(ProjectUtils.getProjectDirectory(user,name));
+    	// verilog
+    	String verilogFilepath = filepath.toString() + Utils.getFileSeparator() + name + ".v";
+    	Utils.createFile(verilogFilepath);
+    	Utils.writeToFile(specification.getVerilog(), verilogFilepath);
+    	this.verilogFile = new File(verilogFilepath);
+    	// options
+    	String optionsFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_options.csv";
+    	Utils.createFile(optionsFilepath);
+    	try {
+			Utils.writeToFile(specification.getSettings().toCSV(), optionsFilepath);
+		} catch (IOException e) {
+			throw new ProjectException(e);
+		}
+    	this.optionsFile = new File(optionsFilepath);
+    	// netlist constraint
+    	String netlistConstraintFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_netlistconstraints.json";
+    	Utils.createFile(netlistConstraintFilepath);
+    	try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(netlistConstraintFilepath), specification.getConstraints());
+		} catch (IOException e) {
+			throw new ProjectException(e);
+		}
+    	this.netlistConstraintFile = new File(netlistConstraintFilepath);
+    	// target data
+    	String targetDataFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_targetdata.json";
+    	Utils.createFile(targetDataFilepath);
+    	try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(targetDataFilepath), specification.getLibraryResource().getLibrary());
+		} catch (IOException | LibraryException e) {
+			throw new ProjectException(e);
+		}
+    	this.targetDataFile = new File(targetDataFilepath);
     }
     
 	public abstract void execute() throws CelloWebException;
-
-	/**
-	 * Getter for <i>userid</i>
-	 * @return value of <i>userid</i>
-	 */
-	public String getUserId() {
-		return userId;
-	}
-
-	/**
-	 * Getter for <i>jobId</i>
-	 * @return value of <i>jobId</i>
-	 */
-	public String getJobId() {
-		return jobId;
+	
+	public void delete() throws IOException {
+		FileUtils.deleteDirectory(this.getFilepath());
 	}
 	
 	/**
-	 * Getter for <i>directory</i>
-	 * @return value of <i>directory</i>
+	 * Getter for <i>id</i>
+	 * @return value of <i>id</i>
 	 */
-	public String getDirectory() {
-		return directory;
-	}
-	
-	/**
-	 * Getter for <i>specification</i>
-	 * @return value of <i>specification</i>
-	 */
-	public Specification getSpecification() {
-		return specification;
+	public ObjectId getId() {
+		return id;
 	}
 
 	/**
-	 * Setter for <i>specification</i>
-	 * @param specification the value to set <i>specification</i>
+	 * Getter for <i>filepath</i>
+	 * @return value of <i>filepath</i>
 	 */
-	public void setSpecification(Specification specification) {
-		this.specification = specification;
+	public File getFilepath() {
+		return filepath;
+	}
+
+	/**
+	 * Getter for <i>created</i>
+	 * @return value of <i>created</i>
+	 */
+	public Date getCreated() {
+		return created;
+	}
+
+	/**
+	 * Setter for <i>created</i>
+	 * @param created the value to set <i>created</i>
+	 */
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	/**
+	 * Getter for <i>verilogFile</i>
+	 * @return value of <i>verilogFile</i>
+	 */
+	public File getVerilogFile() {
+		return verilogFile;
+	}
+
+	/**
+	 * Getter for <i>optionsFile</i>
+	 * @return value of <i>optionsFile</i>
+	 */
+	public File getOptionsFile() {
+		return optionsFile;
+	}
+
+	/**
+	 * Getter for <i>netlistConstraintFile</i>
+	 * @return value of <i>netlistConstraintFile</i>
+	 */
+	public File getNetlistConstraintFile() {
+		return netlistConstraintFile;
+	}
+
+	/**
+	 * Getter for <i>targetDataFile</i>
+	 * @return value of <i>targetDataFile</i>
+	 */
+	public File getTargetDataFile() {
+		return targetDataFile;
+	}
+
+	/**
+	 * Getter for <i>results</i>
+	 * @return value of <i>results</i>
+	 */
+	public Collection<Result> getResults() {
+		return results;
+	}
+
+	/**
+	 * Setter for <i>results</i>
+	 * @param results the value to set <i>results</i>
+	 */
+	public void setResults(Collection<Result> results) {
+		this.results = results;
 	}
 
 	/**

@@ -18,62 +18,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp.project;
+package org.cellocad.cello2.webapp.specification.library;
 
-import org.cellocad.cello2.webapp.ApplicationUtils;
-import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.user.ApplicationUser;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+
+import org.cellocad.cello2.webapp.exception.LibraryException;
+import org.synbiohub.frontend.SynBioHubException;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * @date 2019-02-16
+ * @date 2019-03-19
  *
  */
-public class ProjectUtils {
+public class SynBioHubLibraryResource extends LibraryResource {
+	
+	private URL registry;
+	private URI collection;
 
-	/**
-	 * @param userId
-	 * @return
+	public SynBioHubLibraryResource(URL registry, URI collection) {
+		this.registry = registry;
+		this.collection = collection;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.cellocad.cello2.webapp.specification.library.LibraryTemplate#getLibrary()
 	 */
-	public static String getUserDirectory(ApplicationUser user) {
-		String rtn = "";
-		rtn += ApplicationUtils.getProjectsDirectory() + Utils.getFileSeparator() + user.getUsername().toString();
+	@Override
+	public Library getLibrary() throws LibraryException {
+		Library rtn = null;
+		SynBioHubLibraryBuilder builder = null;
+		try {
+			builder = new SynBioHubLibraryBuilder(this.getRegistry(),this.getCollection());
+			rtn = builder.build();
+		} catch (IOException | SynBioHubException e) {
+			throw new LibraryException(e);
+		}
 		return rtn;
 	}
 
 	/**
-	 * @param user
+	 * Getter for <i>registry</i>
+	 * @return value of <i>registry</i>
 	 */
-	public static void createUserDirectory(ApplicationUser user) {
-		String path = ProjectUtils.getUserDirectory(user);
-		Utils.makeDirectory(path);
+	public URL getRegistry() {
+		return registry;
 	}
 
 	/**
-	 * @param userId
-	 * @param name
-	 * @return
+	 * Getter for <i>collection</i>
+	 * @return value of <i>collection</i>
 	 */
-	public static String getProjectDirectory(ApplicationUser user, String name) {
-		String rtn = "";
-		rtn += ProjectUtils.getUserDirectory(user);
-		rtn += Utils.getFileSeparator();
-		rtn += name;
-		return rtn;
-	}
-
-	/**
-	 * @param userId
-	 * @param name
-	 * @return
-	 */
-	public static String createProjectDirectory(ApplicationUser user, String name) {
-		String rtn = ProjectUtils.getProjectDirectory(user,name);
-		Utils.makeDirectory(rtn);
-		return rtn;
+	public URI getCollection() {
+		return collection;
 	}
 
 }

@@ -31,8 +31,11 @@ import org.apache.logging.log4j.ThreadContext;
 import org.cellocad.cello2.DNACompiler.runtime.Main;
 import org.cellocad.cello2.DNACompiler.runtime.environment.DNACompilerArgString;
 import org.cellocad.cello2.common.CelloException;
-import org.cellocad.cello2.webapp.CelloWebException;
+import org.cellocad.cello2.webapp.exception.CelloWebException;
+import org.cellocad.cello2.webapp.exception.ProjectException;
 import org.cellocad.cello2.webapp.project.Project;
+import org.cellocad.cello2.webapp.specification.Specification;
+import org.cellocad.cello2.webapp.user.ApplicationUser;
 
 /**
  * 
@@ -70,9 +73,10 @@ public class DNACompilerProject extends Project {
 	 * @param userId
 	 * @param directory
 	 * @param jobId
+	 * @throws ProjectException 
 	 */
-	public DNACompilerProject(String userId, String jobId, String directory) {
-		super(userId, jobId, directory);
+	public DNACompilerProject(final ApplicationUser user, final String name, final Specification specification) throws ProjectException {
+		super(user,name,specification);
 	}
 
 	/* (non-Javadoc)
@@ -82,17 +86,17 @@ public class DNACompilerProject extends Project {
 	public void execute() throws CelloWebException {
 		List<String> args = new ArrayList<>();
 		args.add("-" + DNACompilerArgString.INPUTNETLIST);
-		args.add(this.getSpecification().getVerilogFile());
+		args.add(this.getVerilogFile().getAbsolutePath());
 		args.add("-" + DNACompilerArgString.TARGETDATAFILE);
-		args.add(this.getSpecification().getTargetDataFile());
+		args.add(this.getTargetDataFile().getAbsolutePath());
 		args.add("-" + DNACompilerArgString.NETLISTCONSTRAINTFILE);
-		args.add(this.getSpecification().getNetlistConstraintFile());
+		args.add(this.getNetlistConstraintFile().getAbsolutePath());
 		args.add("-" + DNACompilerArgString.OPTIONS);
-		args.add(this.getSpecification().getOptionsFile());
+		args.add(this.getOptionsFile().getAbsolutePath());
 		args.add("-" + DNACompilerArgString.OUTPUTDIR);
-		args.add(this.getDirectory());
+		args.add(this.getFilepath().toString());
 		// main
-		DNACompilerMainCallable main = new DNACompilerMainCallable(args.toArray(new String[1]),this.getDirectory());
+		DNACompilerMainCallable main = new DNACompilerMainCallable(args.toArray(new String[1]),this.getFilepath().toString());
 		ExecutorService executor = new ScheduledThreadPoolExecutor(5);
 		Future<Void> future = executor.submit(main);
 		try {

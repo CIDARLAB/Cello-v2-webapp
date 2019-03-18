@@ -18,31 +18,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.specification.library;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+public class ResponseFunctionParameter {
+	
+	private String name;
+	private Double value;
+	
+	public ResponseFunctionParameter(String name, Double value) {
+		this.name = name;
+		this.value = value;
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	/**
+	 * Getter for <i>name</i>
+	 * @return value of <i>name</i>
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Getter for <i>value</i>
+	 * @return value of <i>value</i>
+	 */
+	public Double getValue() {
+		return value;
 	}
 
 }

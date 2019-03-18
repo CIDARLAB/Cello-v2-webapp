@@ -18,31 +18,66 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.specification.library;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+public class ResponseFunctionVariable {
+	
+	private String name;
+	private Double offThreshold;
+	private Double onThreshold;
+	
+	public ResponseFunctionVariable(String name, Double offThreshold, Double onThreshold) {
+		this.name = name;
+		this.offThreshold = offThreshold;
+		this.onThreshold = onThreshold;
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	/**
+	 * Getter for <i>name</i>
+	 * @return value of <i>name</i>
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Getter for <i>offThreshold</i>
+	 * @return value of <i>offThreshold</i>
+	 */
+	public Double getOffThreshold() {
+		return offThreshold;
+	}
+
+	/**
+	 * Setter for <i>offThreshold</i>
+	 * @param offThreshold the value to set <i>offThreshold</i>
+	 */
+	public void setOffThreshold(Double offThreshold) {
+		this.offThreshold = offThreshold;
+	}
+
+	/**
+	 * Getter for <i>onThreshold</i>
+	 * @return value of <i>onThreshold</i>
+	 */
+	public Double getOnThreshold() {
+		return onThreshold;
+	}
+
+	/**
+	 * Setter for <i>onThreshold</i>
+	 * @param onThreshold the value to set <i>onThreshold</i>
+	 */
+	public void setOnThreshold(Double onThreshold) {
+		this.onThreshold = onThreshold;
 	}
 
 }

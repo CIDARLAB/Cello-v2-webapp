@@ -18,12 +18,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.user;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Collections;
+
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 /**
  *
@@ -33,16 +36,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * 2019-03-17
  *
  */
-@SpringBootApplication
-public class Application {
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+	private ApplicationUserRepository applicationUserRepository;
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+	public UserDetailsServiceImpl(ApplicationUserRepository applicationUserRepository) {
+		this.applicationUserRepository = applicationUserRepository;
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		ApplicationUser applicationUser = applicationUserRepository.findByUsername(username);
+		if (applicationUser == null) {
+			throw new UsernameNotFoundException(username);
+		}
+		return new User(applicationUser.getUsername(), applicationUser.getPassword(), Collections.emptyList());
 	}
-
 }

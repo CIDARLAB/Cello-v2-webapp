@@ -18,31 +18,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.exception;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-18
  *
  */
-@SpringBootApplication
-public class Application {
+public class ResourceNotFoundException extends Exception {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6378548144845862662L;
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+	public ResourceNotFoundException() {
+		super();
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	public ResourceNotFoundException(String message) {
+		super(message);
+	}
+
+	public ResourceNotFoundException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
+	public ResourceNotFoundException(Throwable cause) {
+		super(cause);
 	}
 
 }

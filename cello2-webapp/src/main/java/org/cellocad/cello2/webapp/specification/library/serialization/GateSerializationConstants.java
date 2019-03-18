@@ -18,31 +18,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.specification.library.serialization;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-19
  *
  */
-@SpringBootApplication
-public class Application {
-
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+public class GateSerializationConstants {
+	
+	public static final String S_UCF_COLLECTION = "gates";
+	public static final String S_UCF_REGULATOR = "regulator";
+	public static final String S_UCF_GROUP_NAME = "group_name";
+	public static final String S_UCF_GATE_NAME = "gate_name";
+	public static final String S_UCF_GATE_TYPE = "gate_type";
+	public static final String S_UCF_SYSTEM = "system";
+	public static final String S_UCF_COLOR_HEXCODE = "color_hexcode";
+	public static final String S_UCF_URI = "uri";
+	
+	public static final String S_SYNBIOHUB_REGULATOR = "group_name";
+	public static final String S_SYNBIOHUB_GROUP_NAME = "group_name";
+	public static final String S_SYNBIOHUB_GATE_TYPE = "gate_type";
+	public static final String S_SYNBIOHUB_SYSTEM = "family";
+	public static final String S_SYNBIOHUB_COLOR_HEXCODE = "color_hexcode";
 
 }

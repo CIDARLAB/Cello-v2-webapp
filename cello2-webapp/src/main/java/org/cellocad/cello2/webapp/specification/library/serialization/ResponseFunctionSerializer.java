@@ -18,62 +18,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp.project;
+package org.cellocad.cello2.webapp.specification.library.serialization;
 
-import org.cellocad.cello2.webapp.ApplicationUtils;
-import org.cellocad.cello2.webapp.common.Utils;
-import org.cellocad.cello2.webapp.user.ApplicationUser;
+import java.io.IOException;
+
+import org.cellocad.cello2.webapp.specification.library.ResponseFunction;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * @date 2019-02-16
+ * @date 2019-03-18
  *
  */
-public class ProjectUtils {
+public class ResponseFunctionSerializer extends StdSerializer<ResponseFunction> {
+	
+	private static final long serialVersionUID = -6137334978863944991L;
 
-	/**
-	 * @param userId
-	 * @return
-	 */
-	public static String getUserDirectory(ApplicationUser user) {
-		String rtn = "";
-		rtn += ApplicationUtils.getProjectsDirectory() + Utils.getFileSeparator() + user.getUsername().toString();
-		return rtn;
+	public ResponseFunctionSerializer() {
+		this(null);
 	}
 
 	/**
-	 * @param user
+	 * @param t
 	 */
-	public static void createUserDirectory(ApplicationUser user) {
-		String path = ProjectUtils.getUserDirectory(user);
-		Utils.makeDirectory(path);
+	public ResponseFunctionSerializer(Class<ResponseFunction> t) {
+		super(t);
+		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @param userId
-	 * @param name
-	 * @return
+	/* (non-Javadoc)
+	 * @see com.fasterxml.jackson.databind.ser.std.StdSerializer#serialize(java.lang.Object, com.fasterxml.jackson.core.JsonGenerator, com.fasterxml.jackson.databind.SerializerProvider)
 	 */
-	public static String getProjectDirectory(ApplicationUser user, String name) {
-		String rtn = "";
-		rtn += ProjectUtils.getUserDirectory(user);
-		rtn += Utils.getFileSeparator();
-		rtn += name;
-		return rtn;
-	}
-
-	/**
-	 * @param userId
-	 * @param name
-	 * @return
-	 */
-	public static String createProjectDirectory(ApplicationUser user, String name) {
-		String rtn = ProjectUtils.getProjectDirectory(user,name);
-		Utils.makeDirectory(rtn);
-		return rtn;
+	@Override
+	public void serialize(ResponseFunction value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+		gen.writeStartObject();
+		gen.writeStringField("collection", ResponseFunctionSerializationConstants.S_UCF_COLLECTION);
+		
+		gen.writeEndObject();
 	}
 
 }

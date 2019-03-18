@@ -18,12 +18,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
+package org.cellocad.cello2.webapp.security;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.apache.commons.lang3.RandomStringUtils;
 
 /**
  *
@@ -33,16 +30,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * 2019-03-17
  *
  */
-@SpringBootApplication
-public class Application {
+public class SecurityConstants {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
-
+    public static final String SECRET = RandomStringUtils.randomAscii(64);
+    public static final long EXPIRATION_TIME = 86_400_000; // 1 day
+    public static final String TOKEN_PREFIX = "Bearer ";
+    public static final String HEADER_STRING = "Authorization";
+    public static final String SIGN_UP_URL = "/users/signup";
+	
 }

@@ -18,31 +18,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.cello2.webapp;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+package org.cellocad.cello2.webapp.exception;
 
 /**
  *
  *
  * @author Timothy Jones
  *
- * 2019-03-17
+ * @date 2019-03-25
  *
  */
-@SpringBootApplication
-public class Application {
+public class ProjectException extends Exception {
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
+	private static final long serialVersionUID = 4296345331473607087L;
+	
+	public ProjectException() {
+		super();
 	}
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+	public ProjectException(String message) {
+		super(message);
+	}
+
+	public ProjectException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
+	public ProjectException(Throwable cause) {
+		super(cause);
 	}
 
 }
