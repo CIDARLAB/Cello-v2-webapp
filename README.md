@@ -25,8 +25,10 @@ Download and install Docker.
   
 Pull and run the image:
 
-    docker run -p 8080:8080 -t cidarlab/cello2-webapp
+    docker run -p 8080:8080 -v /local/path/to/db:/data/db -v /local/path/to/projects:/root/projects -t cidarlab/cello2-webapp
 	
+Note the two `/local/path/to` directories. You will need to replace these with folders on your machine of your choosing. You can omit these `-v` clauses, but then the user database and projects storage will be destroyed when you stop the container.
+
 Navigate to <http://localhost:8080> to use.
 
 ## (Option 2) Prepackaged JAR file
