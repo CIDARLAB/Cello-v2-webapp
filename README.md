@@ -21,7 +21,7 @@ Download and install Docker.
 
   + Linux: check your package manager / distribution instructions.
   + Mac: [Instructions](https://docs.docker.com/docker-for-mac/install/)
-  + Windows: [Instructions](https://docs.docker.com/docker-for-windows/install/)
+  + Windows: [Instructions](https://docs.docker.com/docker-for-windows/install/) (Windows 10) / [Instructions](https://docs.docker.com/toolbox/toolbox_install_windows/) (Windows 7/8)
   
 Pull and run the image:
 
