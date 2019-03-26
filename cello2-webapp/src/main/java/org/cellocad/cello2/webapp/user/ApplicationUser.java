@@ -48,6 +48,7 @@ public class ApplicationUser {
 	@NotNull(message = "Missing password.")
     private String password;
 	private String institution;
+	private String name;
 
 	private Collection<UCFLibraryResource> ucfLibraryResources = new ArrayList<UCFLibraryResource>();
 	private Collection<Project> projects = new LinkedList<Project>();
@@ -86,6 +87,22 @@ public class ApplicationUser {
 	 */
 	public void setInstitution(String institution) {
 		this.institution = institution;
+	}
+
+	/**
+	 * Getter for <i>name</i>
+	 * @return value of <i>name</i>
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Setter for <i>name</i>
+	 * @param name the value to set <i>name</i>
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

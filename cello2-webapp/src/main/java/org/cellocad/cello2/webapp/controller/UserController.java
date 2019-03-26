@@ -21,10 +21,13 @@
 package org.cellocad.cello2.webapp.controller;
 
 import java.util.Collection;
+import java.util.Date;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.cellocad.cello2.webapp.project.ProjectUtils;
+import org.cellocad.cello2.webapp.security.SecurityConstants;
 import org.cellocad.cello2.webapp.specification.library.UCFLibraryResource;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.cellocad.cello2.webapp.user.ApplicationUserRepository;
@@ -38,6 +41,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -63,14 +68,24 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public void signup(@Valid @RequestBody JsonNode node) {
+    public void signup(@Valid @RequestBody JsonNode node, HttpServletResponse res) {
     	ObjectMapper mapper = new ObjectMapper();
-    	ApplicationUser user = mapper.convertValue(node, ApplicationUser.class);
+    	ApplicationUser user;
+		try {
+			user = mapper.convertValue(node, ApplicationUser.class);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         if (applicationUserRepository.findByUsername(user.getUsername()) != null)
         	throw new ResponseStatusException(HttpStatus.CONFLICT, "User exists.");
         applicationUserRepository.save(user);
         ProjectUtils.createUserDirectory(user);
+        String token = JWT.create()
+                .withSubject(user.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
+                .sign(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()));
+        res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
     }
     
     @GetMapping("/ucfs")
