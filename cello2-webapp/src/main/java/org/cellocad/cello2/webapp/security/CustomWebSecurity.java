@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -42,12 +43,29 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  *
  */
 @EnableWebSecurity
-public class WebSecurity extends WebSecurityConfigurerAdapter {
+public class CustomWebSecurity extends WebSecurityConfigurerAdapter {
+	
+	private static final String[] ALLOWED_RESOURCES = {
+			"/",
+			"/index.html",
+			"/favicon.ico",
+			"/config.xml",
+			"/*.css",
+			"/*.js",
+			"/*.svg",
+			"/*.woff",
+			"/*.eot",
+			"/assets/**",
+			"/platforms/**",
+			"/plugins/**",
+			"/svg/**",
+			"/cordova-js-src/**"
+	};
 
 	private UserDetailsServiceImpl userDetailsService;
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+	public CustomWebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userDetailsService = userDetailsService;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
@@ -56,6 +74,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable().authorizeRequests()
 		.antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
+		.antMatchers(HttpMethod.GET, ALLOWED_RESOURCES).permitAll()
 		.anyRequest().authenticated()
 		.and()
 		.addFilter(new JWTAuthenticationFilter(authenticationManager()))
