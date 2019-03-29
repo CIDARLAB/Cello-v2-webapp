@@ -36,6 +36,8 @@ import org.cellocad.cello2.webapp.exception.ProjectException;
 import org.cellocad.cello2.webapp.project.Project;
 import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * 
@@ -45,6 +47,8 @@ import org.cellocad.cello2.webapp.user.ApplicationUser;
  * @date 2019-02-16
  *
  */
+@Document(collection = "projects")
+@TypeAlias("dnacompilerproject")
 public class DNACompilerProject extends Project {
 	
 	public class DNACompilerMainCallable implements Callable<Void> {

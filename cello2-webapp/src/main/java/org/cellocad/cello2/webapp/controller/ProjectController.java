@@ -32,6 +32,7 @@ import org.cellocad.cello2.webapp.exception.ProjectException;
 import org.cellocad.cello2.webapp.exception.ResourceNotFoundException;
 import org.cellocad.cello2.webapp.project.Project;
 import org.cellocad.cello2.webapp.project.ProjectFactory;
+import org.cellocad.cello2.webapp.project.ProjectRepository;
 import org.cellocad.cello2.webapp.results.Result;
 import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
@@ -57,9 +58,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProjectController {
 	
 	private ApplicationUserRepository applicationUserRepository;
+	private ProjectRepository projectRepository;
 	
-    public ProjectController(ApplicationUserRepository applicationUserRepository) {
+    public ProjectController(ApplicationUserRepository applicationUserRepository, ProjectRepository projectRepository) {
     	this.applicationUserRepository = applicationUserRepository;
+    	this.projectRepository = projectRepository;
     }
 	
 	private static Logger getLogger() {
@@ -90,6 +93,7 @@ public class ProjectController {
 		} catch (ProjectException e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
 		}
+		projectRepository.save(project);
 		user.getProjects().add(project);
 		applicationUserRepository.save(user);
 	}

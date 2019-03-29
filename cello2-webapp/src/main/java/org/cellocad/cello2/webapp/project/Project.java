@@ -38,6 +38,7 @@ import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.cidarlab.eugene.util.FileUtils;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,6 +50,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @date Feb 16, 2019
  *
  */
+@Document(collection = "projects")
 public abstract class Project extends CObject {
 
 	@Id
