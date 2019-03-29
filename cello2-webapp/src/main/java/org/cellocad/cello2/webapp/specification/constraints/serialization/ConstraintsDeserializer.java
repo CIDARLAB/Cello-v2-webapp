@@ -67,13 +67,11 @@ public class ConstraintsDeserializer extends StdDeserializer<Constraints> {
 		JsonNode node = p.getCodec().readTree(p);
 		Map<String,String> sensors = null;
 		Map<String,String> reporters = null;
-		for (JsonNode obj : node) {
-			if (obj.get(ConstraintsSerializationConstants.S_COLLECTION).asText().equals(ConstraintsSerializationConstants.S_SENSORS)) {
-				sensors = mapper.convertValue(obj.get(ConstraintsSerializationConstants.S_SENSOR_MAP), new TypeReference<Map<String,String>>(){});
-			}
-			if (obj.get(ConstraintsSerializationConstants.S_COLLECTION).asText().equals(ConstraintsSerializationConstants.S_REPORTERS)) {
-				sensors = mapper.convertValue(obj.get(ConstraintsSerializationConstants.S_REPORTER_MAP), new TypeReference<Map<String,String>>(){});
-			}
+		if (node.has(ConstraintsSerializationConstants.S_INPUT_CONSTRAINTS)) {
+			sensors = mapper.convertValue(node.get(ConstraintsSerializationConstants.S_INPUT_CONSTRAINTS), new TypeReference<Map<String,String>>(){});
+		}
+		if (node.has(ConstraintsSerializationConstants.S_OUTPUT_CONSTRAINTS)) {
+			reporters = mapper.convertValue(node.get(ConstraintsSerializationConstants.S_OUTPUT_CONSTRAINTS), new TypeReference<Map<String,String>>(){});
 		}
 		rtn = new Constraints(sensors,reporters);
 		return rtn;

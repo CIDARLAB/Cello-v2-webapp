@@ -97,7 +97,7 @@ public class SynBioHubController {
 		if (token == null) {
 			URL url = null;
 			try {
-				url = new URL(url,"rootCollections");
+				url = new URL(registry,"rootCollections");
 			} catch (MalformedURLException e) {
 				throw new RuntimeException("Error with SynBioHub url.");
 			}

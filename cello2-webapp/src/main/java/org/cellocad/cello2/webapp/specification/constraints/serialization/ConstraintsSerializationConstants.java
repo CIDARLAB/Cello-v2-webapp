@@ -35,5 +35,8 @@ public class ConstraintsSerializationConstants {
 	public static final String S_SENSOR_MAP = "sensor_map";
 	public static final String S_REPORTERS = "reporters";
 	public static final String S_REPORTER_MAP = "reporter_map";
+	
+	public static final String S_INPUT_CONSTRAINTS = "input_constraints";
+	public static final String S_OUTPUT_CONSTRAINTS = "output_constraints";
 
 }
