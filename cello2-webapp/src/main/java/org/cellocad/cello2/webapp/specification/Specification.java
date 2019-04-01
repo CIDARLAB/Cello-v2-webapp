@@ -20,7 +20,6 @@
  */
 package org.cellocad.cello2.webapp.specification;
 
-import org.cellocad.cello2.webapp.common.CObject;
 import org.cellocad.cello2.webapp.specification.constraints.Constraints;
 import org.cellocad.cello2.webapp.specification.library.LibraryResource;
 import org.cellocad.cello2.webapp.specification.settings.Settings;

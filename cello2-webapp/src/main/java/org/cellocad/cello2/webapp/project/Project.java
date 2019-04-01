@@ -25,10 +25,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
-import org.cellocad.cello2.webapp.common.CObject;
 import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.exception.CelloWebException;
 import org.cellocad.cello2.webapp.exception.LibraryException;
@@ -38,6 +35,8 @@ import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.cidarlab.eugene.util.FileUtils;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,32 +50,48 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 @Document(collection = "projects")
-public abstract class Project extends CObject {
-
+@TypeAlias("project")
+public abstract class Project {
+	
 	@Id
     private ObjectId id;
-    private File filepath;
+	private String name;
+    private String filepath;
     private Date created;
-    
-    private File verilogFile;
-    private File optionsFile;
-    private File netlistConstraintFile;
-    private File targetDataFile;
 
+    private String verilogFile;
+    private String optionsFile;
+    private String netlistConstraintFile;
+    private String targetDataFile;
+
+    @Transient
     private Collection<Result> results;
-    private static final Logger logger = LogManager.getLogger(Project.class.getSimpleName());
+    
+    public Project() {
+    	
+    }
+    
+    public Project(String name, String filepath, Date created, String verilogFile, String optionsFile, String netlistConstraintFile, String targetDataFile) {
+    	this.name = name;
+    	this.filepath = filepath;
+    	this.created = created;
+    	this.verilogFile = verilogFile;
+    	this.optionsFile = optionsFile;
+    	this.netlistConstraintFile = netlistConstraintFile;
+    	this.targetDataFile = targetDataFile;
+    }
     
     public Project(ApplicationUser user, String name, Specification specification) throws ProjectException {
-    	super(name,-1,-1);
+    	this.name = name;
     	ObjectMapper mapper = new ObjectMapper();
     	ProjectUtils.createProjectDirectory(user,name);
     	this.id = new ObjectId();
-    	this.filepath = new File(ProjectUtils.getProjectDirectory(user,name));
+    	this.filepath = (new File(ProjectUtils.getProjectDirectory(user,name))).getAbsolutePath();
     	// verilog
     	String verilogFilepath = filepath.toString() + Utils.getFileSeparator() + name + ".v";
     	Utils.createFile(verilogFilepath);
     	Utils.writeToFile(specification.getVerilog(), verilogFilepath);
-    	this.verilogFile = new File(verilogFilepath);
+    	this.verilogFile = verilogFilepath;
     	// options
     	String optionsFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_options.csv";
     	Utils.createFile(optionsFilepath);
@@ -85,7 +100,7 @@ public abstract class Project extends CObject {
 		} catch (IOException e) {
 			throw new ProjectException(e);
 		}
-    	this.optionsFile = new File(optionsFilepath);
+    	this.optionsFile = optionsFilepath;
     	// netlist constraint
     	String netlistConstraintFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_netlistconstraints.json";
     	Utils.createFile(netlistConstraintFilepath);
@@ -94,7 +109,7 @@ public abstract class Project extends CObject {
 		} catch (IOException e) {
 			throw new ProjectException(e);
 		}
-    	this.netlistConstraintFile = new File(netlistConstraintFilepath);
+    	this.netlistConstraintFile = netlistConstraintFilepath;
     	// target data
     	String targetDataFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_targetdata.json";
     	Utils.createFile(targetDataFilepath);
@@ -103,13 +118,13 @@ public abstract class Project extends CObject {
 		} catch (IOException | LibraryException e) {
 			throw new ProjectException(e);
 		}
-    	this.targetDataFile = new File(targetDataFilepath);
+    	this.targetDataFile = targetDataFilepath;
     }
     
 	public abstract void execute() throws CelloWebException;
 	
 	public void delete() throws IOException {
-		FileUtils.deleteDirectory(this.getFilepath());
+		FileUtils.deleteDirectory(new File(this.getFilepath()));
 	}
 	
 	/**
@@ -121,11 +136,43 @@ public abstract class Project extends CObject {
 	}
 
 	/**
+	 * Setter for <i>id</i>
+	 * @param id the value to set <i>id</i>
+	 */
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
+
+	/**
+	 * Getter for <i>name</i>
+	 * @return value of <i>name</i>
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Setter for <i>name</i>
+	 * @param name the value to set <i>name</i>
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
 	 * Getter for <i>filepath</i>
 	 * @return value of <i>filepath</i>
 	 */
-	public File getFilepath() {
+	public String getFilepath() {
 		return filepath;
+	}
+
+	/**
+	 * Setter for <i>filepath</i>
+	 * @param filepath the value to set <i>filepath</i>
+	 */
+	public void setFilepath(String filepath) {
+		this.filepath = filepath;
 	}
 
 	/**
@@ -148,32 +195,64 @@ public abstract class Project extends CObject {
 	 * Getter for <i>verilogFile</i>
 	 * @return value of <i>verilogFile</i>
 	 */
-	public File getVerilogFile() {
+	public String getVerilogFile() {
 		return verilogFile;
+	}
+
+	/**
+	 * Setter for <i>verilogFile</i>
+	 * @param verilogFile the value to set <i>verilogFile</i>
+	 */
+	public void setVerilogFile(String verilogFile) {
+		this.verilogFile = verilogFile;
 	}
 
 	/**
 	 * Getter for <i>optionsFile</i>
 	 * @return value of <i>optionsFile</i>
 	 */
-	public File getOptionsFile() {
+	public String getOptionsFile() {
 		return optionsFile;
+	}
+
+	/**
+	 * Setter for <i>optionsFile</i>
+	 * @param optionsFile the value to set <i>optionsFile</i>
+	 */
+	public void setOptionsFile(String optionsFile) {
+		this.optionsFile = optionsFile;
 	}
 
 	/**
 	 * Getter for <i>netlistConstraintFile</i>
 	 * @return value of <i>netlistConstraintFile</i>
 	 */
-	public File getNetlistConstraintFile() {
+	public String getNetlistConstraintFile() {
 		return netlistConstraintFile;
+	}
+
+	/**
+	 * Setter for <i>netlistConstraintFile</i>
+	 * @param netlistConstraintFile the value to set <i>netlistConstraintFile</i>
+	 */
+	public void setNetlistConstraintFile(String netlistConstraintFile) {
+		this.netlistConstraintFile = netlistConstraintFile;
 	}
 
 	/**
 	 * Getter for <i>targetDataFile</i>
 	 * @return value of <i>targetDataFile</i>
 	 */
-	public File getTargetDataFile() {
+	public String getTargetDataFile() {
 		return targetDataFile;
+	}
+
+	/**
+	 * Setter for <i>targetDataFile</i>
+	 * @param targetDataFile the value to set <i>targetDataFile</i>
+	 */
+	public void setTargetDataFile(String targetDataFile) {
+		this.targetDataFile = targetDataFile;
 	}
 
 	/**
@@ -190,14 +269,6 @@ public abstract class Project extends CObject {
 	 */
 	public void setResults(Collection<Result> results) {
 		this.results = results;
-	}
-
-	/**
-	 *  Returns the Logger instance for the class
-	 *  @return the Logger instance for the class
-	 */
-	protected Logger getLogger() {
-		return Project.logger;
 	}
 
 }

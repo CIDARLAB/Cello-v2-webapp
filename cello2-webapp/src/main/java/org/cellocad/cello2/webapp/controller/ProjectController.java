@@ -37,13 +37,14 @@ import org.cellocad.cello2.webapp.results.Result;
 import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.cellocad.cello2.webapp.user.ApplicationUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -54,10 +55,12 @@ import org.springframework.web.server.ResponseStatusException;
  * @date 2019-03-18
  *
  */
-@Controller
+@RestController
 public class ProjectController {
 	
+	@Autowired
 	private ApplicationUserRepository applicationUserRepository;
+	@Autowired
 	private ProjectRepository projectRepository;
 	
     public ProjectController(ApplicationUserRepository applicationUserRepository, ProjectRepository projectRepository) {
@@ -93,7 +96,7 @@ public class ProjectController {
 		} catch (ProjectException e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
 		}
-		projectRepository.save(project);
+		projectRepository.insert(project);
 		user.getProjects().add(project);
 		applicationUserRepository.save(user);
 	}
@@ -101,7 +104,14 @@ public class ProjectController {
 	@ResponseBody
 	@GetMapping("/project/{name}/execute")
 	public void execute(ApplicationUser user, @PathVariable(value="name") String name) throws CelloWebException, ResourceNotFoundException {
-		Project project = Utils.findCObjectByName(name,user.getProjects());
+		Project project = null; // = Utils.findCObjectByName(name,user.getProjects());
+		Iterator<Project> it = user.getProjects().iterator();
+		while (it.hasNext()) {
+			Project p = it.next();
+			if (p.getName().equals(name)) {
+				project = p;
+			}
+		};
 		getLogger().info(String.format("Executing job '%s' for user '%s'.", name, user.getUsername()));
 		project.execute();
 		getLogger().info(String.format("Completed job '%s' for user '%s'.", name, user.getUsername()));
@@ -123,7 +133,14 @@ public class ProjectController {
 	@ResponseBody
 	@GetMapping("/project/{name}/results")
 	public Collection<Result> results(ApplicationUser user, @PathVariable(value="name") String name) throws ResourceNotFoundException {
-		Project project = Utils.findCObjectByName(name,user.getProjects());
+		Project project = null;
+		Iterator<Project> it = user.getProjects().iterator();
+		while (it.hasNext()) {
+			Project p = it.next();
+			if (p.getName().equals(name)) {
+				project = p;
+			}
+		};
 		return project.getResults();
 	}
 
@@ -131,7 +148,14 @@ public class ProjectController {
 	@GetMapping("/project/{name}/result/{result}")
 	public Result result(ApplicationUser user, @PathVariable(value="name") String name, @PathVariable(value="result") String result) throws ResourceNotFoundException {
 		Result rtn = null;
-		Project project = Utils.findCObjectByName(name,user.getProjects());
+		Project project = null;
+		Iterator<Project> it = user.getProjects().iterator();
+		while (it.hasNext()) {
+			Project p = it.next();
+			if (p.getName().equals(name)) {
+				project = p;
+			}
+		};
 		rtn = Utils.findCObjectByName(result,project.getResults()); 
 		return rtn;
 	}

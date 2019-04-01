@@ -21,6 +21,7 @@
 package org.cellocad.cello2.webapp.project.DNACompiler;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -48,7 +49,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  *
  */
 @Document(collection = "projects")
-@TypeAlias("dnacompilerproject")
+@TypeAlias("dnaCompilerProject")
 public class DNACompilerProject extends Project {
 	
 	public class DNACompilerMainCallable implements Callable<Void> {
@@ -73,6 +74,17 @@ public class DNACompilerProject extends Project {
 		
 	}
 	
+    public DNACompilerProject() {
+    	super();
+    }
+    
+    public DNACompilerProject(String name, String filepath, Date created, String verilogFile, String optionsFile, String netlistConstraintFile, String targetDataFile) {
+    	super(name,filepath,created,verilogFile,optionsFile,netlistConstraintFile,targetDataFile);
+    }
+//    protected DNACompilerProject(Path filepath, Date created, Path verilogFile, Path optionsFile, Path netlistConstraintFile, Path targetDataFile) {
+//    	super(filepath,created,verilogFile,optionsFile,netlistConstraintFile,targetDataFile);
+//    }
+	
 	/**
 	 * @param userId
 	 * @param directory
@@ -90,13 +102,13 @@ public class DNACompilerProject extends Project {
 	public void execute() throws CelloWebException {
 		List<String> args = new ArrayList<>();
 		args.add("-" + DNACompilerArgString.INPUTNETLIST);
-		args.add(this.getVerilogFile().getAbsolutePath());
+		args.add(this.getVerilogFile());
 		args.add("-" + DNACompilerArgString.TARGETDATAFILE);
-		args.add(this.getTargetDataFile().getAbsolutePath());
+		args.add(this.getTargetDataFile());
 		args.add("-" + DNACompilerArgString.NETLISTCONSTRAINTFILE);
-		args.add(this.getNetlistConstraintFile().getAbsolutePath());
+		args.add(this.getNetlistConstraintFile());
 		args.add("-" + DNACompilerArgString.OPTIONS);
-		args.add(this.getOptionsFile().getAbsolutePath());
+		args.add(this.getOptionsFile());
 		args.add("-" + DNACompilerArgString.OUTPUTDIR);
 		args.add(this.getFilepath().toString());
 		// main

@@ -30,8 +30,8 @@ import org.bson.types.ObjectId;
 import org.cellocad.cello2.webapp.project.Project;
 import org.cellocad.cello2.webapp.specification.library.UCFLibraryResource;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Persistent;
 import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
@@ -41,7 +41,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 2019-03-17
  *
  */
-@Document
+@Persistent
 public class ApplicationUser {
 
 	@Id
@@ -54,6 +54,7 @@ public class ApplicationUser {
 	private String name;
 
 	private Collection<UCFLibraryResource> ucfLibraryResources = new ArrayList<UCFLibraryResource>();
+
 	@DBRef
 	private Collection<Project> projects = new LinkedList<Project>();
 
