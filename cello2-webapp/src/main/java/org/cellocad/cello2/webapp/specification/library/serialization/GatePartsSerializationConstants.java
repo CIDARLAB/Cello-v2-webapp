@@ -32,8 +32,8 @@ public class GatePartsSerializationConstants {
 	
 	public static final String S_UCF_COLLECTION = "gate_parts";
 	public static final String S_UCF_GATE_NAME = "gate_name";
-	public static final String S_UCF_EXPRESSION_CASSETTES = "equation";
-	public static final String S_UCF_MAPS_TO_VARIABLE = "equation";
+	public static final String S_UCF_EXPRESSION_CASSETTES = "expression_cassettes";
+	public static final String S_UCF_MAPS_TO_VARIABLE = "maps_to_variable";
 	public static final String S_UCF_CASSETTE_PARTS = "cassette_parts";
 	public static final String S_UCF_PROMOTER = "promoter";
 

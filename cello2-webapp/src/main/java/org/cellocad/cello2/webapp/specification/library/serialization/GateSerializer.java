@@ -29,6 +29,7 @@ import org.cellocad.cello2.webapp.specification.library.ResponseFunctionParamete
 import org.cellocad.cello2.webapp.specification.library.ResponseFunctionVariable;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
@@ -114,6 +115,9 @@ public class GateSerializer extends StdSerializer<Gate> {
 		gen.writeEndArray();
 		gen.writeStringField(GatePartsSerializationConstants.S_UCF_PROMOTER, gateParts.getPromoter().getName());
 		gen.writeEndObject();
+		for (JsonNode obj : value.getObjects()) {
+			gen.writeObject(obj);
+		}
 	}
 
 }

@@ -20,22 +20,28 @@
  */
 package org.cellocad.cello2.webapp.specification.library;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.exception.LibraryException;
 import org.cellocad.cello2.webapp.specification.library.serialization.GateSerializationConstants;
 import org.cellocad.cello2.webapp.specification.library.serialization.GateSerializer;
+import org.sbolstandard.core2.Attachment;
 import org.sbolstandard.core2.Component;
 import org.sbolstandard.core2.ComponentDefinition;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLValidationException;
 import org.sbolstandard.core2.SequenceOntology;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -59,6 +65,8 @@ public class Gate {
 	
 	private GateParts gateParts;
 	private ResponseFunction responseFunction;
+	
+	public Collection<JsonNode> objects;
 
 	public Gate(SBOLDocument document, ComponentDefinition cd) throws LibraryException {
 		this.regulator = SBOLUtils.getCelloAnnotationString(cd,GateSerializationConstants.S_SYNBIOHUB_REGULATOR);
@@ -93,6 +101,21 @@ public class Gate {
 		}
 		ComponentDefinition promoter = SBOLUtils.getRegulated(document,cds).iterator().next();
 		this.gateParts = new GateParts(gateParts,new Part(promoter));
+		this.objects = new ArrayList<>();
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			for (Attachment a : cd.getAttachments()) {
+				if (a.getName().endsWith(".json")) {
+					URL source = null;
+					source = a.getSource().toURL();
+					String str = Utils.getURLContentsAsString(source);
+					JsonNode obj = mapper.readTree(str);
+					objects.add(obj);
+				}
+			}
+		} catch (IOException e) {
+			throw new LibraryException(e);
+		}
 	}
 
 	/**
@@ -117,6 +140,14 @@ public class Gate {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * Getter for <i>objects</i>
+	 * @return value of <i>objects</i>
+	 */
+	public Collection<JsonNode> getObjects() {
+		return objects;
 	}
 
 	/**
