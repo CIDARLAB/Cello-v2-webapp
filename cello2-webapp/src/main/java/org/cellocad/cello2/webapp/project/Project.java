@@ -62,7 +62,9 @@ public abstract class Project {
     private String verilogFile;
     private String optionsFile;
     private String netlistConstraintFile;
-    private String targetDataFile;
+    private String userConstraintsFile;
+	private String inputSensorFile;
+	private String outputDeviceFile;
 
     @Transient
     private Collection<Result> results;
@@ -78,7 +80,7 @@ public abstract class Project {
     	this.verilogFile = verilogFile;
     	this.optionsFile = optionsFile;
     	this.netlistConstraintFile = netlistConstraintFile;
-    	this.targetDataFile = targetDataFile;
+    	this.userConstraintsFile = targetDataFile;
     }
     
     public Project(ApplicationUser user, String name, Specification specification) throws ProjectException {
@@ -118,7 +120,7 @@ public abstract class Project {
 		} catch (IOException | LibraryException e) {
 			throw new ProjectException(e);
 		}
-    	this.targetDataFile = targetDataFilepath;
+    	this.userConstraintsFile = targetDataFilepath;
     }
     
 	public abstract void execute() throws CelloWebException;
@@ -240,19 +242,53 @@ public abstract class Project {
 	}
 
 	/**
-	 * Getter for <i>targetDataFile</i>
-	 * @return value of <i>targetDataFile</i>
+	 * Getter for <i>userConstraintsFile</i>
+	 * 
+	 * @return value of <i>userConstraintsFile</i>
 	 */
-	public String getTargetDataFile() {
-		return targetDataFile;
+	public String getUserConstraintsFile() {
+		return userConstraintsFile;
 	}
 
 	/**
-	 * Setter for <i>targetDataFile</i>
-	 * @param targetDataFile the value to set <i>targetDataFile</i>
+	 * Setter for <i>userConstraintsFile</i>
+	 * 
+	 * @param userConstraintsFile the value to set <i>userConstraintsFile</i>
 	 */
-	public void setTargetDataFile(String targetDataFile) {
-		this.targetDataFile = targetDataFile;
+	public void setUserConstraintsFile(String userConstraintsFile) {
+		this.userConstraintsFile = userConstraintsFile;
+	}
+
+	/**
+	 * Getter for <i>inputSensorFile</i>
+	 * @return value of <i>inputSensorFile</i>
+	 */
+	public String getInputSensorFile() {
+		return inputSensorFile;
+	}
+
+	/**
+	 * Setter for <i>inputSensorFile</i>
+	 * @param inputSensorFile the value to set <i>inputSensorFile</i>
+	 */
+	public void setInputSensorFile(String inputSensorFile) {
+		this.inputSensorFile = inputSensorFile;
+	}
+
+	/**
+	 * Getter for <i>outputDeviceFile</i>
+	 * @return value of <i>outputDeviceFile</i>
+	 */
+	public String getOutputDeviceFile() {
+		return outputDeviceFile;
+	}
+
+	/**
+	 * Setter for <i>outputDeviceFile</i>
+	 * @param outputDeviceFile the value to set <i>outputDeviceFile</i>
+	 */
+	public void setOutputDeviceFile(String outputDeviceFile) {
+		this.outputDeviceFile = outputDeviceFile;
 	}
 
 	/**

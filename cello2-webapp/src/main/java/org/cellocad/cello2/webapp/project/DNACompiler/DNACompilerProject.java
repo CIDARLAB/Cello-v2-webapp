@@ -103,8 +103,12 @@ public class DNACompilerProject extends Project {
 		List<String> args = new ArrayList<>();
 		args.add("-" + DNACompilerArgString.INPUTNETLIST);
 		args.add(this.getVerilogFile());
-		args.add("-" + DNACompilerArgString.TARGETDATAFILE);
-		args.add(this.getTargetDataFile());
+		args.add("-" + DNACompilerArgString.USERCONSTRAINTSFILE);
+		args.add(this.getUserConstraintsFile());
+		args.add("-" + DNACompilerArgString.INPUTSENSORFILE);
+		args.add(this.getInputSensorFile());
+		args.add("-" + DNACompilerArgString.OUTPUTDEVICEFILE);
+		args.add(this.getOutputDeviceFile());
 		args.add("-" + DNACompilerArgString.NETLISTCONSTRAINTFILE);
 		args.add(this.getNetlistConstraintFile());
 		args.add("-" + DNACompilerArgString.OPTIONS);
