@@ -73,6 +73,12 @@ Ensure that MongoDB is running, and then run the JAR file with:
 Clone the repository.
 
     git clone https://github.com/CIDARLAB/Cello2-webapp.git
+	
+Initialize GUI submodule.
+
+    cd Cello2-webapp/cello2-webapp/src/main/resources/static
+	git submodule init
+	git submodule update
 
 Build.
 

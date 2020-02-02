@@ -21,7 +21,10 @@
 package org.cellocad.cello2.webapp.project;
 
 import org.cellocad.cello2.webapp.common.CObject;
+import org.cellocad.cello2.webapp.exception.ProjectException;
 import org.cellocad.cello2.webapp.project.DNACompiler.DNACompilerProject;
+import org.cellocad.cello2.webapp.specification.Specification;
+import org.cellocad.cello2.webapp.user.ApplicationUser;
 
 /**
  *
@@ -33,10 +36,10 @@ import org.cellocad.cello2.webapp.project.DNACompiler.DNACompilerProject;
  */
 public class ProjectFactory extends CObject {
 	
-	public Project getProject(final String type, final String userId, final String jobId, final String directory) {
+	public Project getProject(final ApplicationUser user, final String name, final Specification specification) throws ProjectException {
 		Project rtn = null;
-		if (type.equals("DNACompiler")) {
-			rtn = new DNACompilerProject(userId,jobId,directory);
+		if (specification.getSettings().getApplication().equals("DNACompiler")) {
+			rtn = new DNACompilerProject(user,name,specification);
 		}
 		return rtn;
 	}
