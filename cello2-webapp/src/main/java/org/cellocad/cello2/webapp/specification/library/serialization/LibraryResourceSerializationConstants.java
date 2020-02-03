@@ -29,9 +29,11 @@ package org.cellocad.cello2.webapp.specification.library.serialization;
  *
  */
 public class LibraryResourceSerializationConstants {
-	
-	public static final String S_UCF = "ucf";
+
 	public static final String S_REGISTRY = "registry";
 	public static final String S_COLLECTION = "collection";
+	public static final String S_USERCONSTRAINTSFILE = "user_constraints_file";
+	public static final String S_INPUTSENSORFILE = "input_sensor_file";
+	public static final String S_OUTPUTDEVICEFILE = "output_device_file";
 
 }

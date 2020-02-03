@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -51,18 +52,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "projects")
 @TypeAlias("dnaCompilerProject")
 public class DNACompilerProject extends Project {
-	
+
 	public class DNACompilerMainCallable implements Callable<Void> {
-		
+
 		private String[] args;
 		private String outputDir;
-		
-		public DNACompilerMainCallable(final String[] args, final String outputDir) {
-	        this.args = args;
-	        this.outputDir = outputDir;
-	    }
 
-		/* (non-Javadoc)
+		public DNACompilerMainCallable(final String[] args, final String outputDir) {
+			this.args = args;
+			this.outputDir = outputDir;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.util.concurrent.Callable#call()
 		 */
 		@Override
@@ -71,31 +74,35 @@ public class DNACompilerProject extends Project {
 			Main.main(this.args);
 			return null;
 		}
-		
+
 	}
-	
-    public DNACompilerProject() {
-    	super();
-    }
-    
-    public DNACompilerProject(String name, String filepath, Date created, String verilogFile, String optionsFile, String netlistConstraintFile, String targetDataFile) {
-    	super(name,filepath,created,verilogFile,optionsFile,netlistConstraintFile,targetDataFile);
-    }
+
+	public DNACompilerProject() {
+		super();
+	}
+
+	public DNACompilerProject(String name, String filepath, Date created, String verilogFile, String optionsFile,
+			String netlistConstraintFile, String targetDataFile) {
+		super(name, filepath, created, verilogFile, optionsFile, netlistConstraintFile, targetDataFile);
+	}
 //    protected DNACompilerProject(Path filepath, Date created, Path verilogFile, Path optionsFile, Path netlistConstraintFile, Path targetDataFile) {
 //    	super(filepath,created,verilogFile,optionsFile,netlistConstraintFile,targetDataFile);
 //    }
-	
+
 	/**
 	 * @param userId
 	 * @param directory
 	 * @param jobId
-	 * @throws ProjectException 
+	 * @throws ProjectException
 	 */
-	public DNACompilerProject(final ApplicationUser user, final String name, final Specification specification) throws ProjectException {
-		super(user,name,specification);
+	public DNACompilerProject(final ApplicationUser user, final String name, final Specification specification)
+			throws ProjectException {
+		super(user, name, specification);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.cellocad.cello2.webapp.project.Project#execute()
 	 */
 	@Override
@@ -115,14 +122,18 @@ public class DNACompilerProject extends Project {
 		args.add(this.getOptionsFile());
 		args.add("-" + DNACompilerArgString.OUTPUTDIR);
 		args.add(this.getFilepath().toString());
+		args.add("-" + DNACompilerArgString.PYTHONENV);
+		// FIXME
+		args.add("python");
 		// main
-		DNACompilerMainCallable main = new DNACompilerMainCallable(args.toArray(new String[1]),this.getFilepath().toString());
+		DNACompilerMainCallable main = new DNACompilerMainCallable(args.toArray(new String[1]),
+				this.getFilepath().toString());
 		ExecutorService executor = new ScheduledThreadPoolExecutor(5);
 		Future<Void> future = executor.submit(main);
 		try {
 			future.get();
-		} catch (Exception e) {
-			throw new CelloWebException(e);
+		} catch (ExecutionException | InterruptedException e) {
+			throw new CelloWebException(e.getCause());
 		}
 		executor.shutdown();
 	}

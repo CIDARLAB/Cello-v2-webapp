@@ -27,7 +27,7 @@ import java.net.URL;
 
 import org.cellocad.cello2.webapp.specification.library.LibraryResource;
 import org.cellocad.cello2.webapp.specification.library.SynBioHubLibraryResource;
-import org.cellocad.cello2.webapp.specification.library.UCFLibraryResource;
+import org.cellocad.cello2.webapp.specification.library.TargetDataLibraryResource;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -58,21 +58,32 @@ public class LibraryResourceDeserializer extends StdDeserializer<LibraryResource
 		super(t);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.fasterxml.jackson.databind.JsonDeserializer#deserialize(com.fasterxml.jackson.core.JsonParser, com.fasterxml.jackson.databind.DeserializationContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.fasterxml.jackson.databind.JsonDeserializer#deserialize(com.fasterxml.
+	 * jackson.core.JsonParser,
+	 * com.fasterxml.jackson.databind.DeserializationContext)
 	 */
 	@Override
 	public LibraryResource deserialize(JsonParser p, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		LibraryResource rtn = null;
 		JsonNode node = p.getCodec().readTree(p);
-		JsonNode ucf = node.get(LibraryResourceSerializationConstants.S_UCF);
+		JsonNode userConstraintsFileName = node.get(LibraryResourceSerializationConstants.S_USERCONSTRAINTSFILE);
+		JsonNode inputSensorFileName = node.get(LibraryResourceSerializationConstants.S_INPUTSENSORFILE);
+		JsonNode outputDeviceFileName = node.get(LibraryResourceSerializationConstants.S_OUTPUTDEVICEFILE);
 		JsonNode registry = node.get(LibraryResourceSerializationConstants.S_REGISTRY);
 		JsonNode collection = node.get(LibraryResourceSerializationConstants.S_COLLECTION);
-		if (ucf != null) {
-			rtn = new UCFLibraryResource(new File(ucf.asText()));
+
+		if ((userConstraintsFileName != null) && (inputSensorFileName != null) && (outputDeviceFileName != null)) {
+			File userConstraintsFile = new File(userConstraintsFileName.asText());
+			File inputSensorFile = new File(inputSensorFileName.asText());
+			File outputDeviceFile = new File(outputDeviceFileName.asText());
+			rtn = new TargetDataLibraryResource(userConstraintsFile, inputSensorFile, outputDeviceFile);
 		} else {
-			rtn = new SynBioHubLibraryResource(new URL(registry.asText()),URI.create(collection.asText()));
+			rtn = new SynBioHubLibraryResource(new URL(registry.asText()), URI.create(collection.asText()));
 		}
 		return rtn;
 	}

@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
 import org.cellocad.cello2.webapp.project.Project;
-import org.cellocad.cello2.webapp.specification.library.UCFLibraryResource;
+import org.cellocad.cello2.webapp.specification.library.TargetDataLibraryResource;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Persistent;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -53,7 +53,7 @@ public class ApplicationUser {
 	private String institution;
 	private String name;
 
-	private Collection<UCFLibraryResource> ucfLibraryResources = new ArrayList<UCFLibraryResource>();
+	private Collection<TargetDataLibraryResource> ucfLibraryResources = new ArrayList<TargetDataLibraryResource>();
 
 	@DBRef
 	private Collection<Project> projects = new LinkedList<Project>();
@@ -114,7 +114,7 @@ public class ApplicationUser {
 	 * Getter for <i>ucfs</i>
 	 * @return value of <i>ucfs</i>
 	 */
-	public Collection<UCFLibraryResource> getUcfLibraryResources() {
+	public Collection<TargetDataLibraryResource> getUcfLibraryResources() {
 		return ucfLibraryResources;
 	}
 

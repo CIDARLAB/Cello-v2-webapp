@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2017 Massachusetts Institute of Technology (MIT)
+ * Copyright (C) 2020
+ * Massachusetts Institute of Technology (MIT)
+ * Boston University (BU)
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -48,18 +50,26 @@ import org.springframework.boot.system.ApplicationHome;
 
 /**
  * The Utils class is class with utility methods for the Poros framework.
+ * 
  * @author Vincent Mirian
+ * @author Timothy Jones
  * 
  * @date Oct 28, 2017
  *
  */
 final public class Utils {
-	
-    /**
-     * @return the URL contents (uncompressed) as a String
-     * @throws IOException 
-     * @throws ClientProtocolException 
-     */
+
+	public static InputStream getResourceAsStream(final String resource) {
+		InputStream rtn = null;
+		rtn = Utils.class.getClassLoader().getResourceAsStream(resource);
+		return rtn;
+	}
+
+	/**
+	 * @return the URL contents (uncompressed) as a String
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 */
 	public static String getURLContentsAsString(URL url) throws IOException {
 		String rtn = null;
 		HttpClientBuilder builder = HttpClientBuilder.create();
@@ -70,7 +80,8 @@ final public class Utils {
 		return rtn;
 	}
 
-	public static <T extends CObject> T findCObjectByName(String name, Collection<T> collection) throws ResourceNotFoundException {
+	public static <T extends CObject> T findCObjectByName(String name, Collection<T> collection)
+			throws ResourceNotFoundException {
 		T rtn = null;
 		Iterator<T> it = collection.iterator();
 		while (it.hasNext()) {
@@ -124,14 +135,14 @@ final public class Utils {
 		return rtn;
 	}
 
-	public static boolean makeDirectory(String filepath){
+	public static boolean makeDirectory(String filepath) {
 		boolean rtn = false;
 		File file = new File(filepath);
 		rtn = file.mkdir();
 		return rtn;
 	}
 
-	public static boolean isValidFilepath(String filepath){
+	public static boolean isValidFilepath(String filepath) {
 		boolean rtn = false;
 		File file = new File(filepath);
 		rtn = file.exists();
@@ -144,7 +155,7 @@ final public class Utils {
 	 * @return the path of the Application
 	 *
 	 */
-	static public String getFilepath(){
+	static public String getFilepath() {
 		String rtn = "";
 		ApplicationHome home = new ApplicationHome(Application.class);
 		rtn += home.getDir().getPath();
@@ -158,7 +169,7 @@ final public class Utils {
 	 * @return the path of the Resources directory
 	 *
 	 */
-	static public String getResourcesFilepath(){
+	static public String getResourcesFilepath() {
 		String rtn = "";
 		rtn += Utils.getFilepath();
 		rtn += "resources-";
@@ -172,15 +183,15 @@ final public class Utils {
 	 * @return the filename of the path in parameter <i>name<i>
 	 *
 	 */
-	static public String getFilename(final String name){
+	static public String getFilename(final String name) {
 		String rtn = name;
 		int index = 0;
 		index = rtn.lastIndexOf(Utils.getFileSeparator());
-		if (index != -1){
+		if (index != -1) {
 			rtn = rtn.substring(index + 1);
 		}
 		index = rtn.lastIndexOf(".");
-		if ((index != -1) && (rtn.length() > 1)){
+		if ((index != -1) && (rtn.length() > 1)) {
 			rtn = rtn.substring(0, index);
 		}
 		return rtn;
@@ -189,7 +200,8 @@ final public class Utils {
 	/**
 	 * Create the file referenced by <i>filename<i>
 	 * 
-	 * @return true if the file was created by this method; false if the file could not be created because the named file already exists
+	 * @return true if the file was created by this method; false if the file could
+	 *         not be created because the named file already exists
 	 *
 	 */
 	static public boolean createFile(String filename) {
@@ -197,8 +209,7 @@ final public class Utils {
 		try {
 			File file = new File(filename);
 			rtn = file.createNewFile();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return rtn;
@@ -206,7 +217,7 @@ final public class Utils {
 
 	/**
 	 * Append String referenced by <i>str</i> to file referenced by <i>filename<i>
-	 */	
+	 */
 	static public void appendToFile(String str, String filename) {
 		try {
 			OutputStream outputStream = new FileOutputStream(filename, true);
@@ -221,7 +232,7 @@ final public class Utils {
 
 	/**
 	 * Write String referenced by <i>str</i> to file referenced by <i>filename<i>
-	 */	
+	 */
 	static public void writeToFile(String str, String filename) {
 		try {
 			OutputStream outputStream = new FileOutputStream(filename);
@@ -237,10 +248,11 @@ final public class Utils {
 	/**
 	 * Delete the file referenced by <i>name<i>
 	 * 
-	 * @return true if the file was deleted by this method; false if the file could not be deleted because it did not exist.
+	 * @return true if the file was deleted by this method; false if the file could
+	 *         not be deleted because it did not exist.
 	 *
 	 */
-	static public boolean deleteFilename(final String name){
+	static public boolean deleteFilename(final String name) {
 		boolean rtn = false;
 		File file = new File(name);
 		rtn = file.delete();
@@ -248,7 +260,7 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a boolean flag signifying the Operating System being Windows-based. 
+	 * Returns a boolean flag signifying the Operating System being Windows-based.
 	 * 
 	 * @return true if the Operating System is Windows-based, otherwise false.
 	 *
@@ -258,7 +270,7 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a boolean flag signifying the Operating System being Mac-based. 
+	 * Returns a boolean flag signifying the Operating System being Mac-based.
 	 * 
 	 * @return true if the Operating System is Mac-based, otherwise false.
 	 *
@@ -268,7 +280,7 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a boolean flag signifying the Operating System being Unix-based. 
+	 * Returns a boolean flag signifying the Operating System being Unix-based.
 	 * 
 	 * @return true if the Operating System is Unix-based, otherwise false.
 	 *
@@ -278,9 +290,9 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a string containing the operating system name 
+	 * Returns a string containing the operating system name
 	 * 
-	 * @return a string containing the operating system name 
+	 * @return a string containing the operating system name
 	 *
 	 */
 	private static String getOS() {
@@ -296,30 +308,32 @@ final public class Utils {
 	}
 
 	private static boolean isUnix(final String OS) {
-		return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
+		return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0);
 	}
 
 	/**
-	 * Executes and waits for the command in parameter <i>cmd</i>.
-	 * Returns the ExecCommand instance that executed the command.
+	 * Executes and waits for the command in parameter <i>cmd</i>. Returns the
+	 * ExecCommand instance that executed the command.
 	 * 
 	 * @param cmd the command
 	 * @return the ExecCommand instance that executed the command.
 	 *
 	 */
-	public static ExecCommand executeAndWaitForCommand(final String cmd){
+	public static ExecCommand executeAndWaitForCommand(final String cmd) {
 		ExecCommand rtn = null;
 		rtn = new ExecCommand(cmd);
 		return rtn;
 	}
 
 	/**
-	 * Returns a string representing the number of milliseconds since January 1, 1970, 00:00:00 GMT.
+	 * Returns a string representing the number of milliseconds since January 1,
+	 * 1970, 00:00:00 GMT.
 	 * 
-	 * @return a string representing the number of milliseconds since January 1, 1970, 00:00:00 GMT.
+	 * @return a string representing the number of milliseconds since January 1,
+	 *         1970, 00:00:00 GMT.
 	 *
 	 */
-	static public String getTimeString(){
+	static public String getTimeString() {
 		String rtn;
 		Date date = new Date();
 		rtn = String.valueOf(date.getTime());
@@ -349,9 +363,11 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a string representing the elements in the parameter <i>folders</i> separated by the File Separator of the System
+	 * Returns a string representing the elements in the parameter <i>folders</i>
+	 * separated by the File Separator of the System
 	 * 
-	 * @return a string representing the elements in the parameter <i>folders</i> separated by the File Separator of the System
+	 * @return a string representing the elements in the parameter <i>folders</i>
+	 *         separated by the File Separator of the System
 	 *
 	 */
 	static public String getPath(String[] folders) {
@@ -364,19 +380,23 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a string representing the elements in the parameter <i>folders</i> separated by the File Separator of the System omitting the last File Separator
+	 * Returns a string representing the elements in the parameter <i>folders</i>
+	 * separated by the File Separator of the System omitting the last File
+	 * Separator
 	 * 
-	 * @return a string representing the elements in the parameter <i>folders</i> separated by the File Separator of the System omitting the last File Separator
+	 * @return a string representing the elements in the parameter <i>folders</i>
+	 *         separated by the File Separator of the System omitting the last File
+	 *         Separator
 	 *
 	 */
 	static public String getPathFile(String[] folders) {
 		String rtn = "";
 		rtn = Utils.getPath(folders);
-		if (rtn.length() > 0){
+		if (rtn.length() > 0) {
 			int length = rtn.length();
-			String lastChar = rtn.substring(length-1, length);
+			String lastChar = rtn.substring(length - 1, length);
 			if (lastChar.contentEquals(Utils.getFileSeparator())) {
-				rtn = rtn.substring(0, length -1);
+				rtn = rtn.substring(0, length - 1);
 			}
 		}
 		return rtn;
@@ -394,11 +414,13 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a string representing the parameter <i>str</i> indented with parameter <i>numIndent</i> tabulator character(s).
+	 * Returns a string representing the parameter <i>str</i> indented with
+	 * parameter <i>numIndent</i> tabulator character(s).
 	 * 
 	 * @param numIndent number of indentation(s)
-	 * @param str the string to indent
-	 * @return a string representing the parameter <i>str</i> indented with parameter <i>numIndent</i> tabulator character(s).
+	 * @param str       the string to indent
+	 * @return a string representing the parameter <i>str</i> indented with
+	 *         parameter <i>numIndent</i> tabulator character(s).
 	 *
 	 */
 	static public String addIndent(int numIndent, final String str) {
@@ -409,7 +431,7 @@ final public class Utils {
 		if (!str.isEmpty()) {
 			rtn = numTab + str.replace(Utils.getNewLine(), replace);
 		}
-		return rtn;		
+		return rtn;
 	}
 
 	/**
@@ -424,22 +446,25 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a string representing the tabulator character repeated <i>num</i> number of times.
+	 * Returns a string representing the tabulator character repeated <i>num</i>
+	 * number of times.
 	 * 
-	 * @return a string representing the tabulator character repeated <i>num</i> number of times.
+	 * @return a string representing the tabulator character repeated <i>num</i>
+	 *         number of times.
 	 *
 	 */
 	static public String getTabCharacterRepeat(int num) {
 		String rtn = "";
 		String tab = Utils.getTabCharacter();
 		for (int i = 0; i < num; i++) {
-			rtn = rtn + tab;	
-		}		
+			rtn = rtn + tab;
+		}
 		return rtn;
 	}
 
 	/**
-	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an instance of the Boolean class.
+	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an
+	 * instance of the Boolean class.
 	 * 
 	 * @return true if Obj is an instance of the Boolean class, otherwise false.
 	 *
@@ -451,7 +476,8 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an instance of the Long class.
+	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an
+	 * instance of the Long class.
 	 * 
 	 * @return true if Obj is an instance of the Long class, otherwise false.
 	 *
@@ -463,7 +489,8 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an instance of the Double class.
+	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an
+	 * instance of the Double class.
 	 * 
 	 * @return true if Obj is an instance of the Double class, otherwise false.
 	 *
@@ -475,7 +502,8 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an instance of the String class.
+	 * Returns a boolean flag signifying that the parameter <i>Obj</i> is an
+	 * instance of the String class.
 	 * 
 	 * @return true if Obj is an instance of the String class, otherwise false.
 	 *
@@ -504,12 +532,13 @@ final public class Utils {
 		return rtn;
 	}
 
-
 	/**
-	 * Returns a Boolean instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Boolean instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Boolean value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Boolean value, otherwise an instance with
+	 *         the value equivalent to the parameter <i>str</i> content.
 	 *
 	 */
 	static public Boolean getBoolean(final String str) {
@@ -524,27 +553,31 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a Byte instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Byte instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Byte value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Byte value, otherwise an instance with the
+	 *         value equivalent to the parameter <i>str</i> content.
 	 *
 	 */
 	static public Byte getByte(final String str) {
 		Byte rtn = null;
 		try {
 			rtn = Byte.valueOf(str);
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			rtn = null;
 		}
 		return rtn;
 	}
+
 	/**
-	 * Returns a Character instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Character instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Character value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Character value, otherwise an instance
+	 *         with the value equivalent to the parameter <i>str</i> content.
 	 *
 	 */
 	static public Character getCharacter(final String str) {
@@ -556,102 +589,109 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a Short instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Short instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Short value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Short value, otherwise an instance with
+	 *         the value equivalent to the parameter <i>str</i> content.
 	 *
 	 */
 	static public Short getShort(final String str) {
 		Short rtn = null;
 		try {
 			rtn = Short.valueOf(str);
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			rtn = null;
 		}
 		return rtn;
 	}
 
 	/**
-	 * Returns a Integer instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Integer instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Integer value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Integer value, otherwise an instance with
+	 *         the value equivalent to the parameter <i>str</i> content.
 	 *
 	 */
 	static public Integer getInteger(final String str) {
 		Integer rtn = null;
 		try {
 			rtn = Integer.valueOf(str);
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			rtn = null;
 		}
 		return rtn;
 	}
 
 	/**
-	 * Returns a Long instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Long instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Long value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Long value, otherwise an instance with the
+	 *         value equivalent to the parameter <i>str</i> content.
 	 *
 	 */
 	static public Long getLong(final String str) {
 		Long rtn = null;
 		try {
 			rtn = Long.valueOf(str);
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			rtn = null;
 		}
 		return rtn;
 	}
 
 	/**
-	 * Returns a Float instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Float instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Float value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Float value, otherwise an instance with
+	 *         the value equivalent to the parameter <i>str</i> content.
 	 *
-	 */	
+	 */
 	static public Float getFloat(final String str) {
 		Float rtn = null;
 		try {
 			rtn = Float.valueOf(str);
-		}
-		catch(NumberFormatException | NullPointerException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			rtn = null;
 		}
 		return rtn;
 	}
 
 	/**
-	 * Returns a Double instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a Double instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid Double value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid Double value, otherwise an instance with
+	 *         the value equivalent to the parameter <i>str</i> content.
 	 *
-	 */	
+	 */
 	static public Double getDouble(final String str) {
 		Double rtn = null;
 		try {
 			rtn = Double.valueOf(str);
-		}
-		catch(NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			rtn = null;
 		}
 		return rtn;
 	}
 
 	/**
-	 * Returns a String instance where the value is retrieved from the content of parameter <i>str</i>.
+	 * Returns a String instance where the value is retrieved from the content of
+	 * parameter <i>str</i>.
 	 * 
 	 * @param str string where its content is the value
-	 * @return null if str is not a valid String value, otherwise an instance with the value equivalent to the parameter <i>str</i> content.
+	 * @return null if str is not a valid String value, otherwise an instance with
+	 *         the value equivalent to the parameter <i>str</i> content.
 	 *
-	 */	
+	 */
 	static public String getString(final String str) {
 		String rtn = null;
 		rtn = str;
@@ -659,7 +699,8 @@ final public class Utils {
 	}
 
 	/**
-	 * Exits the current executable with exit code equivalent to parameter <i>exit</i>.
+	 * Exits the current executable with exit code equivalent to parameter
+	 * <i>exit</i>.
 	 * 
 	 * @param exit exit code
 	 *
@@ -669,15 +710,16 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a random integer value between a minimum value defined by parameter <i>min</i> and
-	 * a maximum value defined by parameter <i>max</i>
+	 * Returns a random integer value between a minimum value defined by parameter
+	 * <i>min</i> and a maximum value defined by parameter <i>max</i>
 	 * 
 	 * @param min minimum value
 	 * @param max maximum value
-	 * @return a random integer value between a minimum value defined by parameter <i>min</i> and a maximum value defined by parameter <i>max</i>
+	 * @return a random integer value between a minimum value defined by parameter
+	 *         <i>min</i> and a maximum value defined by parameter <i>max</i>
 	 *
 	 */
-	static public int random (int min, int max) {
+	static public int random(int min, int max) {
 		int rtn = 0;
 		Random random = new Random();
 		rtn = random.nextInt(max - min + 1) + min;
@@ -685,16 +727,19 @@ final public class Utils {
 	}
 
 	/**
-	 * Returns a random integer value between a minimum value defined by parameter <i>min</i> and
-	 * a maximum value defined by parameter <i>max</i> using the seed defined by parameter <i>seed</i>
+	 * Returns a random integer value between a minimum value defined by parameter
+	 * <i>min</i> and a maximum value defined by parameter <i>max</i> using the seed
+	 * defined by parameter <i>seed</i>
 	 * 
-	 * @param min minimum value
-	 * @param max maximum value
+	 * @param min  minimum value
+	 * @param max  maximum value
 	 * @param seed the seed
-	 * @return a random integer value between a minimum value defined by parameter <i>min</i> and a maximum value defined by parameter <i>max</i> using the seed defined by parameter <i>seed</i>
+	 * @return a random integer value between a minimum value defined by parameter
+	 *         <i>min</i> and a maximum value defined by parameter <i>max</i> using
+	 *         the seed defined by parameter <i>seed</i>
 	 *
 	 */
-	static public int random (int min, int max, long seed) {
+	static public int random(int min, int max, long seed) {
 		int rtn = 0;
 		Random random = new Random(seed);
 		rtn = random.nextInt(max - min + 1) + min;

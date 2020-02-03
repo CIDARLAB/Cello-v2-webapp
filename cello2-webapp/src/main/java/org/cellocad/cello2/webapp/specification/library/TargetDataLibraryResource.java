@@ -30,16 +30,50 @@ import java.io.File;
  * @date 2019-03-19
  *
  */
-public class UCFLibraryResource extends LibraryResource {
+public class TargetDataLibraryResource extends LibraryResource {
 
-	private File file;
-	
-	public UCFLibraryResource(File file) {
-		this.file = file;
+	private File userConstraintsFile;
+	private File inputSensorFile;
+	private File outputDeviceFile;
+
+	public TargetDataLibraryResource(File userConstraintsFile, File inputSensorFile, File outputDeviceFile) {
+		this.userConstraintsFile = userConstraintsFile;
+		this.inputSensorFile = inputSensorFile;
+		this.outputDeviceFile = outputDeviceFile;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.cellocad.cello2.webapp.specification.library.LibraryTemplate#getLibrary()
+	/**
+	 * Getter for <i>userConstraintsFile</i>
+	 * 
+	 * @return value of <i>userConstraintsFile</i>
+	 */
+	public File getUserConstraintsFile() {
+		return userConstraintsFile;
+	}
+
+	/**
+	 * Getter for <i>inputSensorFile</i>
+	 * 
+	 * @return value of <i>inputSensorFile</i>
+	 */
+	public File getInputSensorFile() {
+		return inputSensorFile;
+	}
+
+	/**
+	 * Getter for <i>outputDeviceFile</i>
+	 * 
+	 * @return value of <i>outputDeviceFile</i>
+	 */
+	public File getOutputDeviceFile() {
+		return outputDeviceFile;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.cellocad.cello2.webapp.specification.library.LibraryTemplate#getLibrary()
 	 */
 	@Override
 	public Library getLibrary() {
@@ -47,12 +81,4 @@ public class UCFLibraryResource extends LibraryResource {
 		return rtn;
 	}
 
-	/**
-	 * Getter for <i>file</i>
-	 * @return value of <i>file</i>
-	 */
-	public File getFile() {
-		return file;
-	}
-	
 }

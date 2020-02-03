@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,16 +47,50 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 @RequestMapping("/resources")
 public class ResourcesController {
 
-	@GetMapping(value = "/ucfs", produces = { MediaType.APPLICATION_JSON_VALUE })
+//	private static String[] userConstraintsFiles = new String[] { "Eco/Eco1C1T1G1.UCF.json",
+//			"Bth/Bth1C1T1G1.UCF.json" };
+//	private static String[] inputSensorFiles = new String[] { "Eco/Eco1C1T1G1.input.json",
+//			"Bth/Bth1C1T1G1.input.json" };
+//	private static String[] outputDeviceFiles = new String[] { "Eco/Eco1C1T1G1.output.json",
+//			"Bth/Bth1C1T1G1.output.json" };
+
+	@GetMapping(value = "/user_constraints_files", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public JsonNode ucfs(HttpServletResponse res) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
-		ArrayNode ucfs = mapper.createArrayNode();
+		ArrayNode rtn = mapper.createArrayNode();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-//		Resource resources[] = resolver.getResources("classpath:*");
-//		for (Resource r : resources) {
-//			ucfs.add(r.getFilename());
+		Resource resources[] = resolver.getResources("classpath:/input/*.UCF.json");
+		for (Resource r : resources) {
+			rtn.add(r.getFilename());
+		}
+//		for (String ucf : userConstraintsFiles) {
+//			rtn.add(ucf);
 //		}
-		return ucfs;
+		return rtn;
+	}
+
+	@GetMapping(value = "/input_sensor_files", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public JsonNode inputSensorFiles(HttpServletResponse res) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode rtn = mapper.createArrayNode();
+		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+		Resource resources[] = resolver.getResources("classpath:/input/*.input.json");
+		for (Resource r : resources) {
+			rtn.add(r.getFilename());
+		}
+		return rtn;
+	}
+
+	@GetMapping(value = "/output_device_files", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public JsonNode outputDeviceFiles(HttpServletResponse res) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode rtn = mapper.createArrayNode();
+		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+		Resource resources[] = resolver.getResources("classpath:/input/*.output.json");
+		for (Resource r : resources) {
+			rtn.add(r.getFilename());
+		}
+		return rtn;
 	}
 
 }

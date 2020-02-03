@@ -28,7 +28,7 @@ import javax.validation.Valid;
 
 import org.cellocad.cello2.webapp.project.ProjectUtils;
 import org.cellocad.cello2.webapp.security.SecurityConstants;
-import org.cellocad.cello2.webapp.specification.library.UCFLibraryResource;
+import org.cellocad.cello2.webapp.specification.library.TargetDataLibraryResource;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.cellocad.cello2.webapp.user.ApplicationUserRepository;
 import org.springframework.http.HttpStatus;
@@ -88,7 +88,7 @@ public class UserController {
     }
     
     @GetMapping("/ucfs")
-    public Collection<UCFLibraryResource> ucfs(ApplicationUser user) {
+    public Collection<TargetDataLibraryResource> ucfs(ApplicationUser user) {
     	return user.getUcfLibraryResources();
     }
 	

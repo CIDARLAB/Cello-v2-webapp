@@ -22,18 +22,20 @@ package org.cellocad.cello2.webapp.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 
+import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.exception.CelloWebException;
-import org.cellocad.cello2.webapp.exception.LibraryException;
 import org.cellocad.cello2.webapp.exception.ProjectException;
 import org.cellocad.cello2.webapp.results.Result;
 import org.cellocad.cello2.webapp.specification.Specification;
+import org.cellocad.cello2.webapp.specification.library.SynBioHubLibraryResource;
+import org.cellocad.cello2.webapp.specification.library.TargetDataLibraryResource;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
-import org.cidarlab.eugene.util.FileUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.TypeAlias;
@@ -52,85 +54,114 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Document(collection = "projects")
 @TypeAlias("project")
 public abstract class Project {
-	
-	@Id
-    private ObjectId id;
-	private String name;
-    private String filepath;
-    private Date created;
 
-    private String verilogFile;
-    private String optionsFile;
-    private String netlistConstraintFile;
-    private String userConstraintsFile;
+	@Id
+	private ObjectId id;
+	private String name;
+	private String filepath;
+	private Date created;
+
+	private String verilogFile;
+	private String optionsFile;
+	private String netlistConstraintFile;
+	private String userConstraintsFile;
 	private String inputSensorFile;
 	private String outputDeviceFile;
 
-    @Transient
-    private Collection<Result> results;
-    
-    public Project() {
-    	
-    }
-    
-    public Project(String name, String filepath, Date created, String verilogFile, String optionsFile, String netlistConstraintFile, String targetDataFile) {
-    	this.name = name;
-    	this.filepath = filepath;
-    	this.created = created;
-    	this.verilogFile = verilogFile;
-    	this.optionsFile = optionsFile;
-    	this.netlistConstraintFile = netlistConstraintFile;
-    	this.userConstraintsFile = targetDataFile;
-    }
-    
-    public Project(ApplicationUser user, String name, Specification specification) throws ProjectException {
-    	this.name = name;
-    	ObjectMapper mapper = new ObjectMapper();
-    	ProjectUtils.createProjectDirectory(user,name);
-    	this.id = new ObjectId();
-    	this.filepath = (new File(ProjectUtils.getProjectDirectory(user,name))).getAbsolutePath();
-    	// verilog
-    	String verilogFilepath = filepath.toString() + Utils.getFileSeparator() + name + ".v";
-    	Utils.createFile(verilogFilepath);
-    	Utils.writeToFile(specification.getVerilog(), verilogFilepath);
-    	this.verilogFile = verilogFilepath;
-    	// options
-    	String optionsFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_options.csv";
-    	Utils.createFile(optionsFilepath);
-    	try {
-			Utils.writeToFile(specification.getSettings().toCSV(), optionsFilepath);
+	@Transient
+	private Collection<Result> results;
+
+	public Project() {
+
+	}
+
+	public Project(String name, String filepath, Date created, String verilogFile, String optionsFile,
+			String netlistConstraintFile, String targetDataFile) {
+		this.name = name;
+		this.filepath = filepath;
+		this.created = created;
+		this.verilogFile = verilogFile;
+		this.optionsFile = optionsFile;
+		this.netlistConstraintFile = netlistConstraintFile;
+		this.userConstraintsFile = targetDataFile;
+	}
+
+	public Project(ApplicationUser user, String name, Specification specification) throws ProjectException {
+		this.name = name;
+		ObjectMapper mapper = new ObjectMapper();
+		ProjectUtils.createProjectDirectory(user, name);
+		this.id = new ObjectId();
+		this.filepath = (new File(ProjectUtils.getProjectDirectory(user, name))).getAbsolutePath();
+		// verilog
+		String verilogFilepath = filepath.toString() + Utils.getFileSeparator() + name + ".v";
+		Utils.createFile(verilogFilepath);
+		Utils.writeToFile(specification.getVerilog(), verilogFilepath);
+		this.verilogFile = verilogFilepath;
+		// options
+		String optionsFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_options.csv";
+		Utils.createFile(optionsFilepath);
+		Utils.writeToFile(specification.getSettings().toCSV(), optionsFilepath);
+		this.optionsFile = optionsFilepath;
+		// netlist constraint
+		String netlistConstraintFilepath = filepath.toString() + Utils.getFileSeparator() + name
+				+ "_netlistconstraints.json";
+		Utils.createFile(netlistConstraintFilepath);
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(netlistConstraintFilepath),
+					specification.getConstraints());
 		} catch (IOException e) {
 			throw new ProjectException(e);
 		}
-    	this.optionsFile = optionsFilepath;
-    	// netlist constraint
-    	String netlistConstraintFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_netlistconstraints.json";
-    	Utils.createFile(netlistConstraintFilepath);
-    	try {
-			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(netlistConstraintFilepath), specification.getConstraints());
-		} catch (IOException e) {
-			throw new ProjectException(e);
+		this.netlistConstraintFile = netlistConstraintFilepath;
+
+//		// user constraints file
+//    	String userConstraintsFilePath = filepath.toString() + Utils.getFileSeparator() + name + ".UCF.json";
+//    	Utils.createFile(userConstraintsFilePath);
+//    	try {
+//			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(userConstraintsFilePath), specification.getLibraryResource().getLibrary());
+//		} catch (IOException | LibraryException e) {
+//			throw new ProjectException(e);
+//		}
+//    	this.userConstraintsFile = userConstraintsFilePath;
+		if (specification.getLibraryResource() instanceof TargetDataLibraryResource) {
+			TargetDataLibraryResource library = (TargetDataLibraryResource) specification.getLibraryResource();
+			// FIXME
+			String path = "input/";
+			File userConstraintsFile = new File(library.getUserConstraintsFile().toString());
+			File inputSensorFile = new File(library.getInputSensorFile().toString());
+			File outputDeviceFile = new File(library.getOutputDeviceFile().toString());
+			InputStream is = null;
+			try {
+				is = Utils.getResourceAsStream(path + userConstraintsFile.toString());
+				userConstraintsFile = new File(filepath, userConstraintsFile.toString());
+				FileUtils.copyInputStreamToFile(is, userConstraintsFile);
+				is = Utils.getResourceAsStream(path + inputSensorFile.toString());
+				inputSensorFile = new File(filepath, inputSensorFile.toString());
+				FileUtils.copyInputStreamToFile(is, inputSensorFile);
+				is = Utils.getResourceAsStream(path + outputDeviceFile.toString());
+				outputDeviceFile = new File(filepath, outputDeviceFile.toString());
+				FileUtils.copyInputStreamToFile(is, outputDeviceFile);
+			} catch (IOException e) {
+				throw new ProjectException(e);
+			}
+			this.userConstraintsFile = userConstraintsFile.toString();
+			this.inputSensorFile = inputSensorFile.toString();
+			this.outputDeviceFile = outputDeviceFile.toString();
 		}
-    	this.netlistConstraintFile = netlistConstraintFilepath;
-    	// target data
-    	String targetDataFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_targetdata.json";
-    	Utils.createFile(targetDataFilepath);
-    	try {
-			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(targetDataFilepath), specification.getLibraryResource().getLibrary());
-		} catch (IOException | LibraryException e) {
-			throw new ProjectException(e);
+		if (specification.getLibraryResource() instanceof SynBioHubLibraryResource) {
+			SynBioHubLibraryResource library = (SynBioHubLibraryResource) specification.getLibraryResource();
 		}
-    	this.userConstraintsFile = targetDataFilepath;
-    }
-    
+	}
+
 	public abstract void execute() throws CelloWebException;
-	
+
 	public void delete() throws IOException {
 		FileUtils.deleteDirectory(new File(this.getFilepath()));
 	}
-	
+
 	/**
 	 * Getter for <i>id</i>
+	 * 
 	 * @return value of <i>id</i>
 	 */
 	public ObjectId getId() {
@@ -139,6 +170,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>id</i>
+	 * 
 	 * @param id the value to set <i>id</i>
 	 */
 	public void setId(ObjectId id) {
@@ -147,6 +179,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>name</i>
+	 * 
 	 * @return value of <i>name</i>
 	 */
 	public String getName() {
@@ -155,6 +188,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>name</i>
+	 * 
 	 * @param name the value to set <i>name</i>
 	 */
 	public void setName(String name) {
@@ -163,6 +197,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>filepath</i>
+	 * 
 	 * @return value of <i>filepath</i>
 	 */
 	public String getFilepath() {
@@ -171,6 +206,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>filepath</i>
+	 * 
 	 * @param filepath the value to set <i>filepath</i>
 	 */
 	public void setFilepath(String filepath) {
@@ -179,6 +215,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>created</i>
+	 * 
 	 * @return value of <i>created</i>
 	 */
 	public Date getCreated() {
@@ -187,6 +224,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>created</i>
+	 * 
 	 * @param created the value to set <i>created</i>
 	 */
 	public void setCreated(Date created) {
@@ -195,6 +233,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>verilogFile</i>
+	 * 
 	 * @return value of <i>verilogFile</i>
 	 */
 	public String getVerilogFile() {
@@ -203,6 +242,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>verilogFile</i>
+	 * 
 	 * @param verilogFile the value to set <i>verilogFile</i>
 	 */
 	public void setVerilogFile(String verilogFile) {
@@ -211,6 +251,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>optionsFile</i>
+	 * 
 	 * @return value of <i>optionsFile</i>
 	 */
 	public String getOptionsFile() {
@@ -219,6 +260,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>optionsFile</i>
+	 * 
 	 * @param optionsFile the value to set <i>optionsFile</i>
 	 */
 	public void setOptionsFile(String optionsFile) {
@@ -227,6 +269,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>netlistConstraintFile</i>
+	 * 
 	 * @return value of <i>netlistConstraintFile</i>
 	 */
 	public String getNetlistConstraintFile() {
@@ -235,6 +278,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>netlistConstraintFile</i>
+	 * 
 	 * @param netlistConstraintFile the value to set <i>netlistConstraintFile</i>
 	 */
 	public void setNetlistConstraintFile(String netlistConstraintFile) {
@@ -261,6 +305,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>inputSensorFile</i>
+	 * 
 	 * @return value of <i>inputSensorFile</i>
 	 */
 	public String getInputSensorFile() {
@@ -269,6 +314,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>inputSensorFile</i>
+	 * 
 	 * @param inputSensorFile the value to set <i>inputSensorFile</i>
 	 */
 	public void setInputSensorFile(String inputSensorFile) {
@@ -277,6 +323,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>outputDeviceFile</i>
+	 * 
 	 * @return value of <i>outputDeviceFile</i>
 	 */
 	public String getOutputDeviceFile() {
@@ -285,6 +332,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>outputDeviceFile</i>
+	 * 
 	 * @param outputDeviceFile the value to set <i>outputDeviceFile</i>
 	 */
 	public void setOutputDeviceFile(String outputDeviceFile) {
@@ -293,6 +341,7 @@ public abstract class Project {
 
 	/**
 	 * Getter for <i>results</i>
+	 * 
 	 * @return value of <i>results</i>
 	 */
 	public Collection<Result> getResults() {
@@ -301,6 +350,7 @@ public abstract class Project {
 
 	/**
 	 * Setter for <i>results</i>
+	 * 
 	 * @param results the value to set <i>results</i>
 	 */
 	public void setResults(Collection<Result> results) {

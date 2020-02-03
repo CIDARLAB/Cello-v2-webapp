@@ -20,14 +20,12 @@
  */
 package org.cellocad.cello2.webapp.specification.settings;
 
-import java.io.IOException;
 import java.util.Map;
 
+import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.specification.settings.serialization.SettingsDeserializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 /**
  *
@@ -39,17 +37,18 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
  */
 @JsonDeserialize(using = SettingsDeserializer.class)
 public class Settings {
-	
+
 	private String application;
-	private Map<String,String> settings;
-	
-	public Settings(Map<String,String> settings, String application) {
+	private Map<String, String> settings;
+
+	public Settings(Map<String, String> settings, String application) {
 		this.application = application;
 		this.settings = settings;
 	}
 
 	/**
 	 * Getter for <i>application</i>
+	 * 
 	 * @return value of <i>application</i>
 	 */
 	public String getApplication() {
@@ -58,16 +57,25 @@ public class Settings {
 
 	/**
 	 * Getter for <i>settings</i>
+	 * 
 	 * @return value of <i>settings</i>
 	 */
 	public Map<String, String> getSettings() {
 		return settings;
 	}
 
-	public String toCSV() throws IOException {
-		CsvMapper mapper = new CsvMapper();
-		CsvSchema schema = mapper.schemaFor(Settings.class);
-		return mapper.writer(schema).writeValueAsString(this.getSettings());
+	public String toCSV() {
+		// FIXME
+//		CsvMapper mapper = new CsvMapper();
+//		CsvSchema schema = mapper.schemaFor(Map.class);
+//		return mapper.writer(schema).writeValueAsString(this.getSettings());
+		String rtn = "";
+		for (String key : this.getSettings().keySet()) {
+			String value = this.getSettings().get(key);
+			rtn += String.format("%s,%s", key, value);
+			rtn += Utils.getNewLine();
+		}
+		return rtn;
 	}
 
 }
