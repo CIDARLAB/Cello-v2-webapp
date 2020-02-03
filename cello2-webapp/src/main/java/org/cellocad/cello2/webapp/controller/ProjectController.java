@@ -20,10 +20,13 @@
  */
 package org.cellocad.cello2.webapp.controller;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cellocad.cello2.webapp.common.Utils;
@@ -39,6 +42,7 @@ import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.cellocad.cello2.webapp.user.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,17 +61,17 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @RestController
 public class ProjectController {
-	
+
 	@Autowired
 	private ApplicationUserRepository applicationUserRepository;
 	@Autowired
 	private ProjectRepository projectRepository;
-	
-    public ProjectController(ApplicationUserRepository applicationUserRepository, ProjectRepository projectRepository) {
-    	this.applicationUserRepository = applicationUserRepository;
-    	this.projectRepository = projectRepository;
-    }
-	
+
+	public ProjectController(ApplicationUserRepository applicationUserRepository, ProjectRepository projectRepository) {
+		this.applicationUserRepository = applicationUserRepository;
+		this.projectRepository = projectRepository;
+	}
+
 	private static Logger getLogger() {
 		return LogManager.getLogger(ProjectController.class);
 	}
@@ -80,19 +84,21 @@ public class ProjectController {
 
 	@ResponseBody
 	@PostMapping("/project/{name}/specify")
-	public void specify(ApplicationUser user, @PathVariable(value="name") String name, @RequestBody Specification specification) {
+	public void specify(ApplicationUser user, @PathVariable(value = "name") String name,
+			@RequestBody Specification specification) {
 		Iterator<Project> it = user.getProjects().iterator();
 		while (it.hasNext()) {
 			Project p = it.next();
 			if (p.getName().equals(name)) {
 				throw new ResponseStatusException(HttpStatus.CONFLICT, "A project with that name already exists.");
 			}
-		};
+		}
+		;
 		// project
 		ProjectFactory factory = new ProjectFactory();
 		Project project;
 		try {
-			project = factory.getProject(user,name,specification);
+			project = factory.getProject(user, name, specification);
 		} catch (ProjectException e) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
 		}
@@ -103,7 +109,8 @@ public class ProjectController {
 
 	@ResponseBody
 	@GetMapping("/project/{name}/execute")
-	public void execute(ApplicationUser user, @PathVariable(value="name") String name) throws CelloWebException, ResourceNotFoundException {
+	public void execute(ApplicationUser user, @PathVariable(value = "name") String name)
+			throws CelloWebException, ResourceNotFoundException, IOException {
 		Project project = null; // = Utils.findCObjectByName(name,user.getProjects());
 		Iterator<Project> it = user.getProjects().iterator();
 		while (it.hasNext()) {
@@ -111,7 +118,7 @@ public class ProjectController {
 			if (p.getName().equals(name)) {
 				project = p;
 			}
-		};
+		}
 		getLogger().info(String.format("Executing job '%s' for user '%s'.", name, user.getUsername()));
 		project.execute();
 		getLogger().info(String.format("Completed job '%s' for user '%s'.", name, user.getUsername()));
@@ -119,7 +126,7 @@ public class ProjectController {
 
 	@ResponseBody
 	@GetMapping("/project/{name}/delete")
-	public void delete(ApplicationUser user, @PathVariable(value="name") String name) throws IOException {
+	public void delete(ApplicationUser user, @PathVariable(value = "name") String name) throws IOException {
 		Iterator<Project> it = user.getProjects().iterator();
 		while (it.hasNext()) {
 			Project p = it.next();
@@ -132,7 +139,8 @@ public class ProjectController {
 
 	@ResponseBody
 	@GetMapping("/project/{name}/results")
-	public Collection<Result> results(ApplicationUser user, @PathVariable(value="name") String name) throws ResourceNotFoundException {
+	public Collection<Result> results(ApplicationUser user, @PathVariable(value = "name") String name)
+			throws ResourceNotFoundException {
 		Project project = null;
 		Iterator<Project> it = user.getProjects().iterator();
 		while (it.hasNext()) {
@@ -140,13 +148,14 @@ public class ProjectController {
 			if (p.getName().equals(name)) {
 				project = p;
 			}
-		};
+		}
 		return project.getResults();
 	}
 
 	@ResponseBody
 	@GetMapping("/project/{name}/result/{result}")
-	public Result result(ApplicationUser user, @PathVariable(value="name") String name, @PathVariable(value="result") String result) throws ResourceNotFoundException {
+	public Result result(ApplicationUser user, @PathVariable(value = "name") String name,
+			@PathVariable(value = "result") String result) throws ResourceNotFoundException {
 		Result rtn = null;
 		Project project = null;
 		Iterator<Project> it = user.getProjects().iterator();
@@ -155,9 +164,26 @@ public class ProjectController {
 			if (p.getName().equals(name)) {
 				project = p;
 			}
-		};
-		rtn = Utils.findCObjectByName(result,project.getResults()); 
+		}
+		rtn = Utils.findCObjectByName(result, project.getResults());
 		return rtn;
+	}
+
+	@ResponseBody
+	@GetMapping(value = "/project/{name}/result/{result}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public byte[] download(ApplicationUser user, @PathVariable(value = "name") String name,
+			@PathVariable(value = "result") String result) throws ResourceNotFoundException, IOException {
+		Project project = null;
+		Iterator<Project> it = user.getProjects().iterator();
+		while (it.hasNext()) {
+			Project p = it.next();
+			if (p.getName().equals(name)) {
+				project = p;
+			}
+		}
+		Result r = Utils.findCObjectByName(result, project.getResults());
+		InputStream is = new FileInputStream(r.getFile());
+		return IOUtils.toByteArray(is);
 	}
 
 }

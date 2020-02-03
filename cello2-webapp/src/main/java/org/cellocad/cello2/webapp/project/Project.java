@@ -23,10 +23,12 @@ package org.cellocad.cello2.webapp.project;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bson.types.ObjectId;
 import org.cellocad.cello2.webapp.common.Utils;
 import org.cellocad.cello2.webapp.exception.CelloWebException;
@@ -37,7 +39,6 @@ import org.cellocad.cello2.webapp.specification.library.SynBioHubLibraryResource
 import org.cellocad.cello2.webapp.specification.library.TargetDataLibraryResource;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -68,7 +69,6 @@ public abstract class Project {
 	private String inputSensorFile;
 	private String outputDeviceFile;
 
-	@Transient
 	private Collection<Result> results;
 
 	public Project() {
@@ -345,6 +345,12 @@ public abstract class Project {
 	 * @return value of <i>results</i>
 	 */
 	public Collection<Result> getResults() {
+		File resultsPath = new File(this.getFilepath());
+		Collection<Result> results = new ArrayList<>();
+		for (File file : FileUtils.listFiles(resultsPath, TrueFileFilter.TRUE, TrueFileFilter.TRUE)) {
+			Result result = new Result(file);
+			results.add(result);
+		}
 		return results;
 	}
 

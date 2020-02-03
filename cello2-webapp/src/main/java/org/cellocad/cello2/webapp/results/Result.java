@@ -35,17 +35,19 @@ import org.cellocad.cello2.webapp.common.CObject;
 public class Result extends CObject {
 
 	private File file;
-	
+
 	public Result(File file) {
 		this.file = file;
+		this.setName(file.getName());
 	}
 
 	/**
 	 * Getter for <i>file</i>
+	 * 
 	 * @return value of <i>file</i>
 	 */
 	public File getFile() {
 		return file;
 	}
-	
+
 }

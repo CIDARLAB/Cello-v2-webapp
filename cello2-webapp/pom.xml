@@ -192,6 +192,7 @@
                   <artifactId>cello2-export</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
+				<!-- <outputDirectory>${project.build.directory}/classes/</outputDirectory> -->
               </artifactItems>
             </configuration>
           </execution>

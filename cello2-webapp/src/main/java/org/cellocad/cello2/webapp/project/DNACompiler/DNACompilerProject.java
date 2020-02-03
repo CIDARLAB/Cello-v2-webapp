@@ -20,7 +20,9 @@
  */
 package org.cellocad.cello2.webapp.project.DNACompiler;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -29,6 +31,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.ThreadContext;
 import org.cellocad.cello2.DNACompiler.runtime.Main;
 import org.cellocad.cello2.DNACompiler.runtime.environment.DNACompilerArgString;
@@ -36,6 +40,7 @@ import org.cellocad.cello2.common.CelloException;
 import org.cellocad.cello2.webapp.exception.CelloWebException;
 import org.cellocad.cello2.webapp.exception.ProjectException;
 import org.cellocad.cello2.webapp.project.Project;
+import org.cellocad.cello2.webapp.results.Result;
 import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
 import org.springframework.data.annotation.TypeAlias;
@@ -136,6 +141,14 @@ public class DNACompilerProject extends Project {
 			throw new CelloWebException(e.getCause());
 		}
 		executor.shutdown();
+		// results
+		File resultsPath = new File(this.getFilepath());
+		Collection<Result> results = new ArrayList<>();
+		for (File file : FileUtils.listFiles(resultsPath, TrueFileFilter.TRUE, TrueFileFilter.TRUE)) {
+			Result result = new Result(file);
+			results.add(result);
+		}
+		this.setResults(results);
 	}
 
 }
