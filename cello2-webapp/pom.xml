@@ -156,11 +156,13 @@
         <executions>
           <execution>
             <id>unpack</id>
-            <phase>package</phase>
+            <phase>generate-resources</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
             <configuration>
+			  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+			  <includes>/input/**/*.json,/algorithms/**/*.json</includes>
               <artifactItems>
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
@@ -175,6 +177,21 @@
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
                   <artifactId>cello2-logicsynthesis</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+				<artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>cello2-logicoptimization</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+				<artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>cello2-clustering</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+				<artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>cello2-partitioning</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
@@ -192,7 +209,6 @@
                   <artifactId>cello2-export</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
-				<!-- <outputDirectory>${project.build.directory}/classes/</outputDirectory> -->
               </artifactItems>
             </configuration>
           </execution>
