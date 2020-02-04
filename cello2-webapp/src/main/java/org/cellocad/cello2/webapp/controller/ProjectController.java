@@ -93,14 +93,13 @@ public class ProjectController {
 				throw new ResponseStatusException(HttpStatus.CONFLICT, "A project with that name already exists.");
 			}
 		}
-		;
 		// project
 		ProjectFactory factory = new ProjectFactory();
 		Project project;
 		try {
 			project = factory.getProject(user, name, specification);
 		} catch (ProjectException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create project.");
 		}
 		projectRepository.insert(project);
 		user.getProjects().add(project);
