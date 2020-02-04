@@ -99,7 +99,7 @@ public class ProjectController {
 		try {
 			project = factory.getProject(user, name, specification);
 		} catch (ProjectException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create project.");
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 		projectRepository.insert(project);
 		user.getProjects().add(project);

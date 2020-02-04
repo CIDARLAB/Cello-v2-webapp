@@ -47,25 +47,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 @RequestMapping("/resources")
 public class ResourcesController {
 
-//	private static String[] userConstraintsFiles = new String[] { "Eco/Eco1C1T1G1.UCF.json",
-//			"Bth/Bth1C1T1G1.UCF.json" };
-//	private static String[] inputSensorFiles = new String[] { "Eco/Eco1C1T1G1.input.json",
-//			"Bth/Bth1C1T1G1.input.json" };
-//	private static String[] outputDeviceFiles = new String[] { "Eco/Eco1C1T1G1.output.json",
-//			"Bth/Bth1C1T1G1.output.json" };
-
 	@GetMapping(value = "/user_constraints_files", produces = { MediaType.APPLICATION_JSON_VALUE })
 	public JsonNode ucfs(HttpServletResponse res) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode rtn = mapper.createArrayNode();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resources[] = resolver.getResources("classpath:/input/*.UCF.json");
+		Resource resources[] = resolver.getResources("classpath:/input/**/*.UCF.json");
 		for (Resource r : resources) {
 			rtn.add(r.getFilename());
 		}
-//		for (String ucf : userConstraintsFiles) {
-//			rtn.add(ucf);
-//		}
 		return rtn;
 	}
 
@@ -74,7 +64,7 @@ public class ResourcesController {
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode rtn = mapper.createArrayNode();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resources[] = resolver.getResources("classpath:/input/*.input.json");
+		Resource resources[] = resolver.getResources("classpath:/input/**/*.input.json");
 		for (Resource r : resources) {
 			rtn.add(r.getFilename());
 		}
@@ -86,7 +76,7 @@ public class ResourcesController {
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode rtn = mapper.createArrayNode();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resources[] = resolver.getResources("classpath:/input/*.output.json");
+		Resource resources[] = resolver.getResources("classpath:/input/**/*.output.json");
 		for (Resource r : resources) {
 			rtn.add(r.getFilename());
 		}

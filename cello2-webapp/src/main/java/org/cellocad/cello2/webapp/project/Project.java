@@ -22,7 +22,6 @@ package org.cellocad.cello2.webapp.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,6 +37,8 @@ import org.cellocad.cello2.webapp.specification.Specification;
 import org.cellocad.cello2.webapp.specification.library.SynBioHubLibraryResource;
 import org.cellocad.cello2.webapp.specification.library.TargetDataLibraryResource;
 import org.cellocad.cello2.webapp.user.ApplicationUser;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -126,23 +127,43 @@ public abstract class Project {
 		if (specification.getLibraryResource() instanceof TargetDataLibraryResource) {
 			TargetDataLibraryResource library = (TargetDataLibraryResource) specification.getLibraryResource();
 			// FIXME
-			String path = "input/";
+			String path = "/input/";
+			String ucfPath = path + "ucf/";
+			String inoutPath = path + "inout/";
 			File userConstraintsFile = new File(library.getUserConstraintsFile().toString());
 			File inputSensorFile = new File(library.getInputSensorFile().toString());
 			File outputDeviceFile = new File(library.getOutputDeviceFile().toString());
-			InputStream is = null;
+			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+			Resource r[] = null;
+			// user constraints file
 			try {
-				is = Utils.getResourceAsStream(path + userConstraintsFile.toString());
+				r = resolver.getResources("classpath:" + ucfPath + "*/" + userConstraintsFile.toString());
+				if (r.length < 1)
+					throw new ProjectException("Unable to locate user constraints file.");
 				userConstraintsFile = new File(filepath, userConstraintsFile.toString());
-				FileUtils.copyInputStreamToFile(is, userConstraintsFile);
-				is = Utils.getResourceAsStream(path + inputSensorFile.toString());
-				inputSensorFile = new File(filepath, inputSensorFile.toString());
-				FileUtils.copyInputStreamToFile(is, inputSensorFile);
-				is = Utils.getResourceAsStream(path + outputDeviceFile.toString());
-				outputDeviceFile = new File(filepath, outputDeviceFile.toString());
-				FileUtils.copyInputStreamToFile(is, outputDeviceFile);
+				FileUtils.copyInputStreamToFile(r[0].getInputStream(), userConstraintsFile);
 			} catch (IOException e) {
-				throw new ProjectException(e);
+				throw new ProjectException("Unable to write user constraints file to project directory.");
+			}
+			// input sensor file
+			try {
+				r = resolver.getResources("classpath:" + inoutPath + "*/" + inputSensorFile.toString());
+				if (r.length < 1)
+					throw new ProjectException("Unable to locate input sensor file.");
+				inputSensorFile = new File(filepath, inputSensorFile.toString());
+				FileUtils.copyInputStreamToFile(r[0].getInputStream(), inputSensorFile);
+			} catch (IOException e) {
+				throw new ProjectException("Unable to write input sensor file to project directory.");
+			}
+			// output device file
+			try {
+				r = resolver.getResources("classpath:" + inoutPath + "*/" + outputDeviceFile.toString());
+				if (r.length < 1)
+					throw new ProjectException("Unable to locate output device file.");
+				outputDeviceFile = new File(filepath, outputDeviceFile.toString());
+				FileUtils.copyInputStreamToFile(r[0].getInputStream(), outputDeviceFile);
+			} catch (IOException e) {
+				throw new ProjectException("Unable to write output device file to project directory.");
 			}
 			this.userConstraintsFile = userConstraintsFile.toString();
 			this.inputSensorFile = inputSensorFile.toString();

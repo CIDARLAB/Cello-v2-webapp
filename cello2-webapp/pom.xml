@@ -156,7 +156,7 @@
         <executions>
           <execution>
             <id>unpack</id>
-            <phase>generate-resources</phase>
+            <phase>package</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
