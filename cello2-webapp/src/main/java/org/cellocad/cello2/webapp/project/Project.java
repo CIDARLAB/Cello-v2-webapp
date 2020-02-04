@@ -93,6 +93,7 @@ public abstract class Project {
 		ProjectUtils.createProjectDirectory(user, name);
 		this.id = new ObjectId();
 		this.filepath = (new File(ProjectUtils.getProjectDirectory(user, name))).getAbsolutePath();
+		this.created = new Date();
 		// verilog
 		String verilogFilepath = filepath.toString() + Utils.getFileSeparator() + name + ".v";
 		Utils.createFile(verilogFilepath);
