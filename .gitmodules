@@ -1,4 +1,4 @@
-[submodule "cello2-webapp/src/main/resources/public"]
-	path = cello2-webapp/src/main/resources/static
+[submodule "cello-webapp/src/main/resources/static"]
+	path = cello-webapp/src/main/resources/static
 	url = git@github.com:tim-tx/Cello2-webapp-gui.git
 	branch = gh-pages
