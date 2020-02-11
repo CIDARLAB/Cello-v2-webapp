@@ -22,7 +22,18 @@ RUN cd /root && \
 	cd hmetis-1.5-linux && \
 	install hmetis /usr/bin
 
-RUN apt-get remove -y bison clang curl flex gawk git libffi-dev libreadline-dev pkg-config tcl-dev
+RUN apt-get remove -y bison clang flex gawk git libffi-dev libreadline-dev pkg-config tcl-dev
+RUN apt-get install -y --no-install-recommends gnupg && \
+	curl -s -L https://www.mongodb.org/static/pgp/server-4.2.asc --output server-4.2.asc && \
+	apt-key add server-4.2.asc && \
+	echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list && \
+	apt-get update && \
+	apt-get install -y mongodb-org procps && \
+	update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+RUN apt-get install -y --no-install-recommends python3-pip python3-setuptools git && \
+	pip3 install wheel matplotlib numpy sympy && \
+	pip3 install dnaplotlib && \
+	pip3 install git+https://github.com/tim-tx/pycello2
 
 COPY target/${JAR_FILE} /root/app.jar
 COPY docker/entry.sh /root
