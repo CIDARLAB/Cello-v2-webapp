@@ -25,3 +25,8 @@ RUN cd /root && \
 RUN apt-get remove -y bison clang curl flex gawk git libffi-dev libreadline-dev pkg-config tcl-dev
 
 COPY target/${JAR_FILE} /root/app.jar
+COPY docker/entry.sh /root
+COPY docker/cmd.sh /root
+
+ENTRYPOINT ["/root/entry.sh"]
+CMD [ "/root/cmd.sh" ]
