@@ -71,7 +71,7 @@ public class CustomWebSecurity extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable().authorizeRequests()
+		http.headers().frameOptions().sameOrigin().and().cors().and().csrf().disable().authorizeRequests()
 		.antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
 		.antMatchers(HttpMethod.GET, ALLOWED_RESOURCES).permitAll()
 		.anyRequest().authenticated()
