@@ -145,7 +145,6 @@
         <configuration>
           <repository>${docker.image.prefix}/${project.artifactId}</repository>
           <buildArgs>
-            <YOSYS_VERSION>0.9</YOSYS_VERSION>
             <JAR_FILE>${project.build.finalName}-spring-boot.jar</JAR_FILE>
           </buildArgs>
         </configuration>
