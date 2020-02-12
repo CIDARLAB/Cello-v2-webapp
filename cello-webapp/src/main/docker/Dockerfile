@@ -13,8 +13,8 @@ RUN apt-get install -y --no-install-recommends gnupg procps && \
 	apt-get install -y mongodb-org
 
 COPY target/${JAR_FILE} /root/app.jar
-COPY docker/entry.sh /root
-COPY docker/cmd.sh /root
+COPY src/main/docker/entry.sh /root
+COPY src/main/docker/cmd.sh /root
 
 ENTRYPOINT ["/root/entry.sh"]
 CMD [ "/root/cmd.sh" ]

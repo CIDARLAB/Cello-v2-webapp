@@ -42,7 +42,7 @@
     <dependency>
       <groupId>org.sbolstandard</groupId>
       <artifactId>libSBOLj</artifactId>
-      <version>2.3.2-SNAPSHOT</version>
+      <version>2.4.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -120,7 +120,6 @@
         <artifactId>jackson-dataformat-csv</artifactId>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -139,14 +138,23 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.spotify</groupId>
-        <artifactId>dockerfile-maven-plugin</artifactId>
-        <version>1.4.9</version>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <version>0.33.0</version>
         <configuration>
-          <repository>${docker.image.prefix}/${project.artifactId}</repository>
-          <buildArgs>
-            <JAR_FILE>${project.build.finalName}-spring-boot.jar</JAR_FILE>
-          </buildArgs>
+          <images>
+            <image>
+              <name>${docker.image.prefix}/${project.artifactId}:%l</name>
+              <build>
+                <args>
+                  <JAR_FILE>${project.build.finalName}-spring-boot.jar</JAR_FILE>
+                </args>
+                <dockerFile>src${file.separator}main${file.separator}docker${file.separator}Dockerfile</dockerFile>
+                <contextDir>${project.basedir}</contextDir>
+              </build>
+            </image>
+          </images>
         </configuration>
       </plugin>
       <plugin>
@@ -215,5 +223,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>
