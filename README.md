@@ -1,6 +1,6 @@
 # 1. About
 
-This is a webapp designed to support the [Cello v2](https://github.com/CIDARLAB/Cello2) genetic circuit design software.
+This is a webapp designed to support the [Cello v2](https://github.com/CIDARLAB/Cello-v2) genetic circuit design software.
 In the future this webapp will run on [cellocad.org](http://www.cellocad.org), meaning installation will be unnecessary for most users.
 
 # 2. Installation
@@ -49,7 +49,7 @@ Navigate to <http://localhost:8080> to use.
     - Windows:
       * Download and install the latest msi, e.g. graphviz-2.38.msi, here: <https://graphviz.gitlab.io/_pages/Download/Download_windows.html>
       * Add the folder containing dot.exe, e.g. `C:\Program Files (x86)\Graphvix2.38\bin`, to `%Path%`
-  + *The latest JAR from the releases page of this repository.* Note that the [Cello v2 CAD tool itself](https://github.com/CIDARLAB/Cello2) is bundled with the JAR you download.
+  + *The latest JAR from the releases page of this repository.* Note that the [Cello v2 CAD tool itself](https://github.com/CIDARLAB/Cello-v2) is bundled with the JAR you download.
 
 ### Usage
 
@@ -66,23 +66,23 @@ Ensure that MongoDB is running, and then run the JAR file with:
   + [MongoDB](https://www.mongodb.com/)
   + [Yosys](http://www.clifford.at/yosys/) (see above)
   + [Graphviz](http://www.graphviz.org/) (see above)
-  + [Cello v2](https://github.com/CIDARLAB/Cello2)
+  + [Cello v2](https://github.com/CIDARLAB/Cello-v2)
 
 ### Usage
 
 Clone the repository.
 
-    git clone https://github.com/CIDARLAB/Cello2-webapp.git
+    git clone https://github.com/CIDARLAB/Cello-v2-webapp.git
 	
 Initialize GUI submodule.
 
-    cd Cello2-webapp/cello-webapp/src/main/resources/static
+    cd Cello-v2-webapp/cello-webapp/src/main/resources/static
 	git submodule init
 	git submodule update
 
 Build.
 
-    cd Cello2-webapp/cello-webapp
+    cd Cello-v2-webapp/cello-webapp
     mvn clean install
 
 Run.
