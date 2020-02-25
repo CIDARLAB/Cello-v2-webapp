@@ -26,7 +26,6 @@ import java.net.URL;
 
 import org.cellocad.v2.webapp.exception.LibraryException;
 import org.cellocad.v2.webapp.specification.library.SynBioHubLibraryResource;
-import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -40,7 +39,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class SynBioHubTest {
 
-	@Test
+	// @Test
 	public void test() throws MalformedURLException, LibraryException, JsonProcessingException {
 		URL url = new URL("https://synbiohub.programmingbiology.org");
 		URI uri = URI.create("https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/Eco1C1G1T1_collection/1");
