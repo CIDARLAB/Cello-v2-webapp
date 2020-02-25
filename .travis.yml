@@ -1,0 +1,18 @@
+branches:
+  only:
+    - develop
+    - master
+os:
+  - linux
+  - osx
+osx_image: xcode9.3
+dist: trusty
+language: java
+jdk:
+  - oraclejdk8
+git:
+  submodules: false
+before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
+  - cd cello-webapp/
