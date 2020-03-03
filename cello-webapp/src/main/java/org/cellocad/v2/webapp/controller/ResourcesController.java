@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -54,7 +55,9 @@ public class ResourcesController {
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		Resource resources[] = resolver.getResources("classpath:/input/**/*.UCF.json");
 		for (Resource r : resources) {
-			rtn.add(r.getFilename());
+			ObjectNode node = mapper.createObjectNode();
+			node.put("name", r.getFilename());
+			rtn.add(node);
 		}
 		return rtn;
 	}
