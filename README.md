@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CIDARLAB/Cello-v2-webapp.svg?branch=develop)](https://travis-ci.org/CIDARLAB/Cello-v2-webapp)
+
 # 1. About
 
 This is a webapp designed to support the [Cello v2](https://github.com/CIDARLAB/Cello-v2) genetic circuit design software.
