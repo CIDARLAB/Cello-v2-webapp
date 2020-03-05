@@ -70,6 +70,7 @@
       <groupId>org.cellocad.v2</groupId>
       <artifactId>cello-dnacompiler</artifactId>
       <version>2.0.0-SNAPSHOT</version>
+      <classifier>jar-with-dependencies</classifier>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
