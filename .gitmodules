@@ -2,3 +2,6 @@
 	path = cello-webapp/src/main/resources/static
 	url = git@github.com:CIDARLAB/Cello-v2-webapp-gui.git
 	branch = production
+[submodule "cello-webapp/src/main/resources/lib"]
+	path = cello-webapp/src/main/resources/lib
+	url = https://github.com/CIDARLAB/Cello-UCF.git
