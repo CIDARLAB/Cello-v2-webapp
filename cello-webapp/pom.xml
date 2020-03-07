@@ -72,6 +72,16 @@
       <artifactId>spring-boot-starter-log4j2</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.9.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.cellocad.v2</groupId>
       <artifactId>cello-dnacompiler</artifactId>
       <version>2.0.0-SNAPSHOT</version>
@@ -174,7 +184,7 @@
             </goals>
             <configuration>
               <outputDirectory>${project.build.directory}/classes</outputDirectory>
-              <includes>/input/**/*.json,/algorithms/**/*.json</includes>
+              <includes>/algorithms/**/*.json</includes>
               <artifactItems>
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>

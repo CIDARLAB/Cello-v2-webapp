@@ -49,11 +49,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ResourcesController {
 
 	@GetMapping(value = "/user_constraints_files", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public JsonNode ucfs(HttpServletResponse res) throws IOException {
+	public JsonNode userConstraintsFiles(HttpServletResponse res) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode rtn = mapper.createArrayNode();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resources[] = resolver.getResources("classpath:/input/**/*.UCF.json");
+		Resource resources[] = resolver.getResources("classpath:/lib/files/v2/ucf/**/*.UCF.json");
 		for (Resource r : resources) {
 			ObjectNode node = mapper.createObjectNode();
 			node.put("name", r.getFilename());
@@ -67,9 +67,11 @@ public class ResourcesController {
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode rtn = mapper.createArrayNode();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resources[] = resolver.getResources("classpath:/input/**/*.input.json");
+		Resource resources[] = resolver.getResources("classpath:/lib/files/v2/input/**/*.input.json");
 		for (Resource r : resources) {
-			rtn.add(r.getFilename());
+			ObjectNode node = mapper.createObjectNode();
+			node.put("name", r.getFilename());
+			rtn.add(node);
 		}
 		return rtn;
 	}
@@ -79,9 +81,11 @@ public class ResourcesController {
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode rtn = mapper.createArrayNode();
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resources[] = resolver.getResources("classpath:/input/**/*.output.json");
+		Resource resources[] = resolver.getResources("classpath:/lib/files/v2/output/**/*.output.json");
 		for (Resource r : resources) {
-			rtn.add(r.getFilename());
+			ObjectNode node = mapper.createObjectNode();
+			node.put("name", r.getFilename());
+			rtn.add(node);
 		}
 		return rtn;
 	}
