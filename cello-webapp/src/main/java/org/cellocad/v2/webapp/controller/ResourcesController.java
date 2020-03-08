@@ -56,7 +56,9 @@ public class ResourcesController {
 		Resource resources[] = resolver.getResources("classpath:/lib/files/v2/ucf/**/*.UCF.json");
 		for (Resource r : resources) {
 			ObjectNode node = mapper.createObjectNode();
-			node.put("name", r.getFilename());
+			node.put("file", r.getFilename());
+			node.put("version", r.getFilename());
+			node.put("organism", "Escherichia coli NEB 10-beta");
 			rtn.add(node);
 		}
 		return rtn;

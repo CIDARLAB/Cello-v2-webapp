@@ -25,7 +25,7 @@ import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 
 /**
- *
+ * A Utils class for user projects.
  *
  * @author Timothy Jones
  *

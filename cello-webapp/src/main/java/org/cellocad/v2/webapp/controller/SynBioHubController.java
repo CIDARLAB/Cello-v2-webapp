@@ -80,158 +80,154 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 @RequestMapping("/synbiohub")
 public class SynBioHubController {
 
-	private static Logger getLogger() {
-		return LogManager.getLogger(SynBioHubController.class);
-	}
+    private static Logger getLogger() {
+        return LogManager.getLogger(SynBioHubController.class);
+    }
 
-	@PostConstruct
-	public void init() {
-		String projects = ApplicationUtils.getProjectsDirectory();
-		if (!Utils.isValidFilepath(projects)) {
-			Utils.makeDirectory(projects);
-		}
-		String users = ApplicationUtils.getUsersFile();
-		if (!Utils.isValidFilepath(users)) {
-			ApplicationUtils.createUsersFile();
-		}
-	}
+    @PostConstruct
+    public void init() {
+        String projects = ApplicationUtils.getProjectsDirectory();
+        if (!Utils.isValidFilepath(projects)) {
+            Utils.makeDirectory(projects);
+        }
+    }
 
-	@ResponseBody
-	@GetMapping(value = "/collections", produces = { MediaType.APPLICATION_JSON_VALUE })
-	public JsonNode collections(@RequestParam(name = "u") URL registry,
-			@RequestHeader(value = "X-authorization", required = false) String token, HttpServletResponse response) {
-		if (token == null) {
-			URL url = null;
-			try {
-				url = new URL(registry, "rootCollections");
-			} catch (MalformedURLException e) {
-				throw new RuntimeException("Error with SynBioHub url.");
-			}
-			RestTemplate rest = new RestTemplate();
-			JsonNode collections = rest.getForObject(url.toString(), JsonNode.class);
-			return collections;
-		} else {
-			URI endpoint = null;
-			try {
-				URL url = new URL(registry, "search/objectType%3DCollection%26/?offset=0&limit=10000");
-				endpoint = url.toURI();
-			} catch (MalformedURLException | URISyntaxException e) {
-				throw new RuntimeException("Error with SynBioHub url.");
-			}
-			RestTemplate rest = new RestTemplate();
-			HttpHeaders headers = new HttpHeaders();
-			headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-			headers.set("X-authorization", token);
-			HttpEntity<String> entity = new HttpEntity<>(headers);
-			ResponseEntity<String> result = rest.exchange(endpoint, HttpMethod.GET, entity, String.class);
-			ObjectMapper mapper = new ObjectMapper();
-			ArrayNode collections = mapper.createArrayNode();
-			try {
-				JsonNode arr = mapper.readTree(result.getBody());
-				for (JsonNode obj : arr) {
-					if (obj.get("uri").asText().contains("/public/"))
-						continue;
-					collections.add(obj);
-				}
-			} catch (NullPointerException | IOException e) {
-				throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving collections.");
-			}
-			return collections;
-		}
-	}
+    @ResponseBody
+    @GetMapping(value = "/collections", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public JsonNode collections(@RequestParam(name = "u") URL registry,
+            @RequestHeader(value = "X-authorization", required = false) String token, HttpServletResponse response) {
+        if (token == null) {
+            URL url = null;
+            try {
+                url = new URL(registry, "rootCollections");
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("Error with SynBioHub url.");
+            }
+            RestTemplate rest = new RestTemplate();
+            JsonNode collections = rest.getForObject(url.toString(), JsonNode.class);
+            return collections;
+        } else {
+            URI endpoint = null;
+            try {
+                URL url = new URL(registry, "search/objectType%3DCollection%26/?offset=0&limit=10000");
+                endpoint = url.toURI();
+            } catch (MalformedURLException | URISyntaxException e) {
+                throw new RuntimeException("Error with SynBioHub url.");
+            }
+            RestTemplate rest = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.set("X-authorization", token);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> result = rest.exchange(endpoint, HttpMethod.GET, entity, String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayNode collections = mapper.createArrayNode();
+            try {
+                JsonNode arr = mapper.readTree(result.getBody());
+                for (JsonNode obj : arr) {
+                    if (obj.get("uri").asText().contains("/public/"))
+                        continue;
+                    collections.add(obj);
+                }
+            } catch (NullPointerException | IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving collections.");
+            }
+            return collections;
+        }
+    }
 
-	@ResponseBody
-	@PostMapping(value = "/login")
-	public String login(@RequestParam(name = "u") URL registry, @RequestBody String request,
-			HttpServletResponse response) {
-		String rtn = null;
-		URI endpoint = null;
-		try {
-			URL url = new URL(registry, "login");
-			endpoint = url.toURI();
-		} catch (MalformedURLException | URISyntaxException e) {
-			throw new RuntimeException("Error with SynBioHub url.");
-		}
-		RestTemplate rest = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<String> entity = new HttpEntity<>(request, headers);
-		ResponseEntity<String> result = rest.exchange(endpoint, HttpMethod.POST, entity, String.class);
-		rtn = result.getBody();
-		return rtn;
-	}
+    @ResponseBody
+    @PostMapping(value = "/login")
+    public String login(@RequestParam(name = "u") URL registry, @RequestBody String request,
+            HttpServletResponse response) {
+        String rtn = null;
+        URI endpoint = null;
+        try {
+            URL url = new URL(registry, "login");
+            endpoint = url.toURI();
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new RuntimeException("Error with SynBioHub url.");
+        }
+        RestTemplate rest = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(request, headers);
+        ResponseEntity<String> result = rest.exchange(endpoint, HttpMethod.POST, entity, String.class);
+        rtn = result.getBody();
+        return rtn;
+    }
 
-	@ResponseBody
-	@PostMapping(value = "/submit/{project}/{file}")
-	public void submit(ApplicationUser user, @RequestParam(name = "u") URL registry,
-			@RequestHeader(value = "X-authorization") String token, @PathVariable(value = "project") String projectName,
-			@PathVariable(value = "file") String fileName, @RequestBody JsonNode request, HttpServletResponse response)
-			throws IOException, ResourceNotFoundException {
-		// rest
-		RestTemplate rest = new RestTemplate();
+    @ResponseBody
+    @PostMapping(value = "/submit/{project}/{file}")
+    public void submit(ApplicationUser user, @RequestParam(name = "u") URL registry,
+            @RequestHeader(value = "X-authorization") String token, @PathVariable(value = "project") String projectName,
+            @PathVariable(value = "file") String fileName, @RequestBody JsonNode request, HttpServletResponse response)
+            throws IOException, ResourceNotFoundException {
+        // rest
+        RestTemplate rest = new RestTemplate();
 
-		// url
-		URI uri;
-		try {
-			URL url = new URL(registry, "submit");
-			uri = url.toURI();
-		} catch (MalformedURLException | URISyntaxException e) {
-			return;
-		}
+        // url
+        URI uri;
+        try {
+            URL url = new URL(registry, "submit");
+            uri = url.toURI();
+        } catch (MalformedURLException | URISyntaxException e) {
+            return;
+        }
 
-		// headers
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-		headers.set("X-authorization", token);
+        // headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.set("X-authorization", token);
 
-		// body
-		MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-		if (!request.has("collection"))
-			return;
-		JsonNode coll = request.get("collection");
-		if (coll.has("uri") && !coll.get("uri").asText("").equals("")) {
-			map.add("rootCollections", coll.get("uri").toString());
-		} else {
-			try {
-				map.add("id", coll.get("id").asText());
-				map.add("version", coll.get("version").asText());
-				map.add("name", coll.get("name").asText());
-				map.add("description", coll.get("description").asText());
-				map.add("citations", coll.get("citations").asText(""));
-			} catch (NullPointerException e) {
-				return;
-			}
-			map.add("collectionChoices", "");
-		}
-		try {
-			map.add("overwrite_merge", coll.get("overwrite").asBoolean() ? 1 : 0);
-		} catch (NullPointerException e) {
-			return;
-		}
-		map.add("user", token);
+        // body
+        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        if (!request.has("collection"))
+            return;
+        JsonNode coll = request.get("collection");
+        if (coll.has("uri") && !coll.get("uri").asText("").equals("")) {
+            map.add("rootCollections", coll.get("uri").toString());
+        } else {
+            try {
+                map.add("id", coll.get("id").asText());
+                map.add("version", coll.get("version").asText());
+                map.add("name", coll.get("name").asText());
+                map.add("description", coll.get("description").asText());
+                map.add("citations", coll.get("citations").asText(""));
+            } catch (NullPointerException e) {
+                return;
+            }
+            map.add("collectionChoices", "");
+        }
+        try {
+            map.add("overwrite_merge", coll.get("overwrite").asBoolean() ? 1 : 0);
+        } catch (NullPointerException e) {
+            return;
+        }
+        map.add("user", token);
 
-		Project project = null;
-		Iterator<Project> it = user.getProjects().iterator();
-		while (it.hasNext()) {
-			Project p = it.next();
-			if (p.getName().equals(projectName)) {
-				project = p;
-			}
-		}
-		Result r = Utils.findCObjectByName(fileName, project.getResults());
-		map.add("file", new ByteArrayResource(Files.readAllBytes(r.getFile().toPath())));
+        Project project = null;
+        Iterator<Project> it = user.getProjects().iterator();
+        while (it.hasNext()) {
+            Project p = it.next();
+            if (p.getName().equals(projectName)) {
+                project = p;
+            }
+        }
+        Result r = Utils.findCObjectByName(fileName, project.getResults());
+        map.add("file", new ByteArrayResource(Files.readAllBytes(r.getFile().toPath())));
 
-		// entity
-		HttpEntity<?> entity = new HttpEntity<>(map, headers);
+        // entity
+        HttpEntity<?> entity = new HttpEntity<>(map, headers);
 
-		// response
-		try {
-			rest.exchange(uri, HttpMethod.POST, entity, String.class);
-		} catch (RestClientException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-		}
-	}
+        // response
+        try {
+            rest.exchange(uri, HttpMethod.POST, entity, String.class);
+        } catch (RestClientException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
 
 }

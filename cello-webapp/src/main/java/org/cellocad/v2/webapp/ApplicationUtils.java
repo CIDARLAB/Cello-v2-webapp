@@ -20,17 +20,10 @@
  */
 package org.cellocad.v2.webapp;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.cellocad.v2.webapp.common.Utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
- *
+ * A Utils class for the {@link Application} class.
  *
  * @author Timothy Jones
  *
@@ -39,57 +32,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ApplicationUtils {
 
-	/**
-	 * @return
-	 */
-	public static String getProjectsDirectory() {
-		String rtn = "";
-		rtn = Utils.getFilepath() + "projects";
-		return rtn;
-	}
+    /**
+     * Get the projects directory.
+     *
+     * @return The projects directory.
+     */
+    public static String getProjectsDirectory() {
+        String rtn = "";
+        rtn = Utils.getFilepath() + "projects";
+        return rtn;
+    }
 
-	/**
-	 * 
-	 */
-	public static void createProjectsDirectory() {
-		Utils.makeDirectory(getProjectsDirectory());
-	}
-
-	/**
-	 * @return
-	 */
-	public static String getUsersFile() {
-		String rtn = "";
-		rtn = getProjectsDirectory() + Utils.getFileSeparator() + "users.json";
-		return rtn;
-	}
-
-	/**
-	 * 
-	 */
-	public static void createUsersFile() {
-		String filepath = getUsersFile();
-		Utils.createFile(filepath);
-		ObjectMapper mapper = new ObjectMapper();
-		ArrayNode arr = mapper.createArrayNode();
-		Utils.writeToFile(arr.toString(),filepath);
-	}
-
-	/**
-	 * 
-	 */
-	public static void appendToUsersFile(String userId, String email) {
-		String filepath = getUsersFile();
-		ObjectMapper mapper = new ObjectMapper();
-		ArrayNode node = null;
-		try {
-			node = (ArrayNode) mapper.readTree(new File(filepath));
-		} catch (IOException e) {
-			throw new RuntimeException("Error with file.");
-		}
-		ObjectNode obj = mapper.createObjectNode();
-		obj.put(email,userId);
-		Utils.writeToFile(node.toString(),filepath);
-	}
+    /**
+     * Create the projects directory.
+     */
+    public static void createProjectsDirectory() {
+        Utils.makeDirectory(getProjectsDirectory());
+    }
 
 }
