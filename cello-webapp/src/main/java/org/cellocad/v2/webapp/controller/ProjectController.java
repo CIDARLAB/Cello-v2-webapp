@@ -26,9 +26,12 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cellocad.v2.webapp.ApplicationUtils;
 import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
@@ -62,127 +65,136 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class ProjectController {
 
-	@Autowired
-	private ApplicationUserRepository applicationUserRepository;
-	@Autowired
-	private ProjectRepository projectRepository;
+    @Autowired
+    private ApplicationUserRepository applicationUserRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
 
-	public ProjectController(ApplicationUserRepository applicationUserRepository, ProjectRepository projectRepository) {
-		this.applicationUserRepository = applicationUserRepository;
-		this.projectRepository = projectRepository;
-	}
+    public ProjectController(ApplicationUserRepository applicationUserRepository, ProjectRepository projectRepository) {
+        this.applicationUserRepository = applicationUserRepository;
+        this.projectRepository = projectRepository;
+    }
 
-	private static Logger getLogger() {
-		return LogManager.getLogger(ProjectController.class);
-	}
+    private static Logger getLogger() {
+        return LogManager.getLogger(ProjectController.class);
+    }
 
-	@ResponseBody
-	@GetMapping("/projects")
-	public Collection<Project> projects(ApplicationUser user) {
-		return user.getProjects();
-	}
+    @PostConstruct
+    public void init() {
+        String dir = ApplicationUtils.getProjectsDirectory();
+        if (!Utils.isValidFilepath(dir)) {
+            getLogger().info("Creating projects directory.");
+            ApplicationUtils.createProjectsDirectory();
+        }
+    }
 
-	@ResponseBody
-	@PostMapping("/project/{name}/specify")
-	public void specify(ApplicationUser user, @PathVariable(value = "name") String name,
-			@RequestBody Specification specification) {
-		Iterator<Project> it = user.getProjects().iterator();
-		while (it.hasNext()) {
-			Project p = it.next();
-			if (p.getName().equals(name)) {
-				throw new ResponseStatusException(HttpStatus.CONFLICT, "A project with that name already exists.");
-			}
-		}
-		// project
-		ProjectFactory factory = new ProjectFactory();
-		Project project;
-		try {
-			project = factory.getProject(user, name, specification);
-		} catch (ProjectException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-		}
-		projectRepository.insert(project);
-		user.getProjects().add(project);
-		applicationUserRepository.save(user);
-	}
+    @ResponseBody
+    @GetMapping("/projects")
+    public Collection<Project> projects(ApplicationUser user) {
+        return user.getProjects();
+    }
 
-	@ResponseBody
-	@GetMapping("/project/{name}/execute")
-	public void execute(ApplicationUser user, @PathVariable(value = "name") String name)
-			throws CelloWebException, ResourceNotFoundException, IOException {
-		Project project = null; // = Utils.findCObjectByName(name,user.getProjects());
-		Iterator<Project> it = user.getProjects().iterator();
-		while (it.hasNext()) {
-			Project p = it.next();
-			if (p.getName().equals(name)) {
-				project = p;
-			}
-		}
-		getLogger().info(String.format("Executing job '%s' for user '%s'.", name, user.getUsername()));
-		project.execute();
-		getLogger().info(String.format("Completed job '%s' for user '%s'.", name, user.getUsername()));
-	}
+    @ResponseBody
+    @PostMapping("/project/{name}/specify")
+    public void specify(ApplicationUser user, @PathVariable(value = "name") String name,
+            @RequestBody Specification specification) {
+        Iterator<Project> it = user.getProjects().iterator();
+        while (it.hasNext()) {
+            Project p = it.next();
+            if (p.getName().equals(name)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A project with that name already exists.");
+            }
+        }
+        // project
+        ProjectFactory factory = new ProjectFactory();
+        Project project;
+        try {
+            project = factory.getProject(user, name, specification);
+        } catch (ProjectException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+        projectRepository.insert(project);
+        user.getProjects().add(project);
+        applicationUserRepository.save(user);
+    }
 
-	@ResponseBody
-	@GetMapping("/project/{name}/delete")
-	public void delete(ApplicationUser user, @PathVariable(value = "name") String name) throws IOException {
-		Iterator<Project> it = user.getProjects().iterator();
-		while (it.hasNext()) {
-			Project p = it.next();
-			if (p.getName().equals(name)) {
-				p.delete();
-				it.remove();
-			}
-		}
-	}
+    @ResponseBody
+    @GetMapping("/project/{name}/execute")
+    public void execute(ApplicationUser user, @PathVariable(value = "name") String name)
+            throws CelloWebException, ResourceNotFoundException, IOException {
+        Project project = null; // = Utils.findCObjectByName(name,user.getProjects());
+        Iterator<Project> it = user.getProjects().iterator();
+        while (it.hasNext()) {
+            Project p = it.next();
+            if (p.getName().equals(name)) {
+                project = p;
+            }
+        }
+        getLogger().info(String.format("Executing job '%s' for user '%s'.", name, user.getUsername()));
+        project.execute();
+        getLogger().info(String.format("Completed job '%s' for user '%s'.", name, user.getUsername()));
+    }
 
-	@ResponseBody
-	@GetMapping("/project/{name}/results")
-	public Collection<Result> results(ApplicationUser user, @PathVariable(value = "name") String name)
-			throws ResourceNotFoundException {
-		Project project = null;
-		Iterator<Project> it = user.getProjects().iterator();
-		while (it.hasNext()) {
-			Project p = it.next();
-			if (p.getName().equals(name)) {
-				project = p;
-			}
-		}
-		return project.getResults();
-	}
+    @ResponseBody
+    @GetMapping("/project/{name}/delete")
+    public void delete(ApplicationUser user, @PathVariable(value = "name") String name) throws IOException {
+        Iterator<Project> it = user.getProjects().iterator();
+        while (it.hasNext()) {
+            Project p = it.next();
+            if (p.getName().equals(name)) {
+                p.delete();
+                it.remove();
+            }
+        }
+    }
 
-	@ResponseBody
-	@GetMapping("/project/{name}/result/{result}")
-	public Result result(ApplicationUser user, @PathVariable(value = "name") String name,
-			@PathVariable(value = "result") String result) throws ResourceNotFoundException {
-		Result rtn = null;
-		Project project = null;
-		Iterator<Project> it = user.getProjects().iterator();
-		while (it.hasNext()) {
-			Project p = it.next();
-			if (p.getName().equals(name)) {
-				project = p;
-			}
-		}
-		rtn = Utils.findCObjectByName(result, project.getResults());
-		return rtn;
-	}
+    @ResponseBody
+    @GetMapping("/project/{name}/results")
+    public Collection<Result> results(ApplicationUser user, @PathVariable(value = "name") String name)
+            throws ResourceNotFoundException {
+        Project project = null;
+        Iterator<Project> it = user.getProjects().iterator();
+        while (it.hasNext()) {
+            Project p = it.next();
+            if (p.getName().equals(name)) {
+                project = p;
+            }
+        }
+        return project.getResults();
+    }
 
-	@ResponseBody
-	@GetMapping(value = "/project/{name}/result/{result}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public byte[] download(ApplicationUser user, @PathVariable(value = "name") String name,
-			@PathVariable(value = "result") String result) throws ResourceNotFoundException, IOException {
-		Project project = null;
-		Iterator<Project> it = user.getProjects().iterator();
-		while (it.hasNext()) {
-			Project p = it.next();
-			if (p.getName().equals(name)) {
-				project = p;
-			}
-		}
-		Result r = Utils.findCObjectByName(result, project.getResults());
-		InputStream is = new FileInputStream(r.getFile());
-		return IOUtils.toByteArray(is);
-	}
+    @ResponseBody
+    @GetMapping("/project/{name}/result/{result}")
+    public Result result(ApplicationUser user, @PathVariable(value = "name") String name,
+            @PathVariable(value = "result") String result) throws ResourceNotFoundException {
+        Result rtn = null;
+        Project project = null;
+        Iterator<Project> it = user.getProjects().iterator();
+        while (it.hasNext()) {
+            Project p = it.next();
+            if (p.getName().equals(name)) {
+                project = p;
+            }
+        }
+        rtn = Utils.findCObjectByName(result, project.getResults());
+        return rtn;
+    }
+
+    @ResponseBody
+    @GetMapping(value = "/project/{name}/result/{result}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public byte[] download(ApplicationUser user, @PathVariable(value = "name") String name,
+            @PathVariable(value = "result") String result) throws ResourceNotFoundException, IOException {
+        Project project = null;
+        Iterator<Project> it = user.getProjects().iterator();
+        while (it.hasNext()) {
+            Project p = it.next();
+            if (p.getName().equals(name)) {
+                project = p;
+            }
+        }
+        Result r = Utils.findCObjectByName(result, project.getResults());
+        InputStream is = new FileInputStream(r.getFile());
+        return IOUtils.toByteArray(is);
+    }
 
 }

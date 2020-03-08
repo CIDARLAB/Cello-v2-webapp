@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019 Boston University (BU)
+ * Copyright (C) 2020 Boston University (BU)
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -18,54 +18,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.cellocad.v2.webapp;
-
-import org.cellocad.v2.webapp.common.Utils;
+package org.cellocad.v2.webapp.specification.library.serialization;
 
 /**
- * A Utils class for the {@link Application} class.
+ *
  *
  * @author Timothy Jones
  *
- * @date 2019-02-23
+ * @date 2020-03-08
  *
  */
-public class ApplicationUtils {
+public class HeaderSerializationConstants {
 
-    /**
-     * Get the projects directory.
-     *
-     * @return The projects directory.
-     */
-    public static String getProjectsDirectory() {
-        String rtn = "";
-        rtn = Utils.getFilepath() + "projects";
-        return rtn;
-    }
-
-    /**
-     * Create the projects directory.
-     */
-    public static void createProjectsDirectory() {
-        Utils.makeDirectory(getProjectsDirectory());
-    }
-
-    /**
-     * Get the resources directory.
-     *
-     * @return The resources directory.
-     */
-    public static String getResourcesDirectory() {
-        String rtn = "";
-        rtn = Utils.getFilepath() + "resources";
-        return rtn;
-    }
-
-    /**
-     * Create the resources directory.
-     */
-    public static void createResourcesDirectory() {
-        Utils.makeDirectory(getResourcesDirectory());
-    }
+    public static final String S_UCF_COLLECTION = "header";
 
 }

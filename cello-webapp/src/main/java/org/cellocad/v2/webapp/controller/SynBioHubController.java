@@ -29,12 +29,10 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Iterator;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cellocad.v2.webapp.ApplicationUtils;
 import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.exception.ResourceNotFoundException;
 import org.cellocad.v2.webapp.project.Project;
@@ -82,14 +80,6 @@ public class SynBioHubController {
 
     private static Logger getLogger() {
         return LogManager.getLogger(SynBioHubController.class);
-    }
-
-    @PostConstruct
-    public void init() {
-        String projects = ApplicationUtils.getProjectsDirectory();
-        if (!Utils.isValidFilepath(projects)) {
-            Utils.makeDirectory(projects);
-        }
     }
 
     @ResponseBody
