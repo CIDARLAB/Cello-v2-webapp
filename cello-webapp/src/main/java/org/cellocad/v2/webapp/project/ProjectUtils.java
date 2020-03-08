@@ -34,46 +34,54 @@ import org.cellocad.v2.webapp.user.ApplicationUser;
  */
 public class ProjectUtils {
 
-	/**
-	 * @param userId
-	 * @return
-	 */
-	public static String getUserDirectory(ApplicationUser user) {
-		String rtn = "";
-		rtn += ApplicationUtils.getProjectsDirectory() + Utils.getFileSeparator() + user.getUsername().toString();
-		return rtn;
-	}
+    /**
+     * Get the projects directory for the specified user.
+     * 
+     * @param user The user.
+     * @return The projects directory.
+     */
+    public static String getUserDirectory(ApplicationUser user) {
+        String rtn = "";
+        rtn += ApplicationUtils.getProjectsDirectory() + Utils.getFileSeparator() + user.getUsername().toString();
+        return rtn;
+    }
 
-	/**
-	 * @param user
-	 */
-	public static void createUserDirectory(ApplicationUser user) {
-		String path = ProjectUtils.getUserDirectory(user);
-		Utils.makeDirectory(path);
-	}
+    /**
+     * Create a projects directory for the specified user.
+     * 
+     * @param user The user.
+     */
+    public static void createUserDirectory(ApplicationUser user) {
+        String path = ProjectUtils.getUserDirectory(user);
+        Utils.makeDirectory(path);
+    }
 
-	/**
-	 * @param userId
-	 * @param name
-	 * @return
-	 */
-	public static String getProjectDirectory(ApplicationUser user, String name) {
-		String rtn = "";
-		rtn += ProjectUtils.getUserDirectory(user);
-		rtn += Utils.getFileSeparator();
-		rtn += name;
-		return rtn;
-	}
+    /**
+     * Get the project directory for the specified user and project.
+     * 
+     * @param user The user.
+     * @param name The project name.
+     * @return The project directory.
+     */
+    public static String getProjectDirectory(ApplicationUser user, String name) {
+        String rtn = "";
+        rtn += ProjectUtils.getUserDirectory(user);
+        rtn += Utils.getFileSeparator();
+        rtn += name;
+        return rtn;
+    }
 
-	/**
-	 * @param userId
-	 * @param name
-	 * @return
-	 */
-	public static String createProjectDirectory(ApplicationUser user, String name) {
-		String rtn = ProjectUtils.getProjectDirectory(user,name);
-		Utils.makeDirectory(rtn);
-		return rtn;
-	}
+    /**
+     * Create a project directory for the specified user and project.
+     * 
+     * @param user The user.
+     * @param name The project name.
+     * @return The directory created.
+     */
+    public static String createProjectDirectory(ApplicationUser user, String name) {
+        String rtn = ProjectUtils.getProjectDirectory(user, name);
+        Utils.makeDirectory(rtn);
+        return rtn;
+    }
 
 }
