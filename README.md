@@ -27,7 +27,7 @@ Download and install Docker.
   
 Pull and run the image:
 
-    docker run -p 8080:8080 -v /local/path/to/db:/data/db -v /local/path/to/projects:/root/projects -t cidarlab/cello-webapp
+    docker run --rm -p 8080:8080 -v /local/path/to/db:/data/db -v /local/path/to/projects:/root/projects -t cidarlab/cello-webapp
 	
 Note the two `/local/path/to` directories. You will need to replace these with folders on your machine of your choosing. You can omit these `-v` clauses, but then the user database and projects storage will be destroyed when you stop the container.
 
