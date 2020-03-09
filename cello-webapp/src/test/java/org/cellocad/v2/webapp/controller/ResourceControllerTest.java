@@ -20,20 +20,20 @@
  */
 package org.cellocad.v2.webapp.controller;
 
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
-
-import org.cellocad.v2.webapp.resource.ResourceUtils;
+import org.cellocad.v2.webapp.common.Utils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -47,17 +47,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  * @date 2020-03-07
  *
  */
+@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc
+@SpringBootTest
 public class ResourceControllerTest {
 
     @InjectMocks
     private ResourceController resourcesController;
 
+    @Autowired
     private MockMvc mockMvc;
-
-    @BeforeClass
-    public static void init() throws IOException {
-        ResourceUtils.initResources();
-    }
 
     /**
      * Create mock controller.
@@ -75,14 +74,10 @@ public class ResourceControllerTest {
      */
     @Test
     public void userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
+        String str = Utils.getResourceAsString("userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles.json");
         this.mockMvc.perform(get("/resources/user_constraints_files"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(allOf(
-                        containsString("Bth1C1G1T1.UCF.json"),
-                        containsString("Eco1C1G1T1.UCF.json"),
-                        containsString("Eco1C2G2T2.UCF.json"),
-                        containsString("Eco2C1G3T1.UCF.json"),
-                        containsString("SC1C1G1T1.UCF.json"))));
+                .andExpect(content().json(str));
     }
 
     /**
@@ -92,10 +87,10 @@ public class ResourceControllerTest {
      */
     @Test
     public void inputSensorFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
+        String str = Utils.getResourceAsString("inputSensorFiles_MockResponse_ShouldReturnExpectedFiles.json");
         this.mockMvc.perform(get("/resources/input_sensor_files"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(
-                        "[{\"name\":\"Bth1C1G1T1.input.json\"},{\"name\":\"Eco1C1G1T1.input.json\"},{\"name\":\"Eco1C2G2T2.input.json\"},{\"name\":\"Eco2C1G3T1.input.json\"},{\"name\":\"SC1C1G1T1.input.json\"}]"));
+                .andExpect(content().json(str));
     }
 
     /**
@@ -105,10 +100,10 @@ public class ResourceControllerTest {
      */
     @Test
     public void outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
+        String str = Utils.getResourceAsString("outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles.json");
         this.mockMvc.perform(get("/resources/output_device_files"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(
-                        "[{\"name\":\"Bth1C1G1T1.output.json\"},{\"name\":\"Eco1C1G1T1.output.json\"},{\"name\":\"Eco1C2G2T2.output.json\"},{\"name\":\"Eco2C1G3T1.output.json\"},{\"name\":\"SC1C1G1T1.output.json\"}]"));
+                .andExpect(content().json(str));
     }
 
 }

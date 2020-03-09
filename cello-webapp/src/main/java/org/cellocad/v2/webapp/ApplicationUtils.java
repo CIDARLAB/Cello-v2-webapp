@@ -32,6 +32,32 @@ import org.cellocad.v2.webapp.common.Utils;
  */
 public class ApplicationUtils {
 
+    // https://github.com/spring-projects/spring-boot/blob/4b670f8696e252f4a5cc596b9f8a96ca7978daa1/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/system/ApplicationHome.java#L105
+    private static boolean isUnitTest() {
+        try {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            for (int i = stackTrace.length - 1; i >= 0; i--) {
+                if (stackTrace[i].getClassName().startsWith("org.junit.")) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    private static String getApplicationDirectory() {
+        String rtn = "";
+        rtn += Utils.getFilepath();
+        if (isUnitTest()) {
+            rtn += "target";
+            rtn += Utils.getFileSeparator();
+            rtn += "test-classes";
+            rtn += Utils.getFileSeparator();
+        }
+        return rtn;
+    }
+
     /**
      * Get the projects directory.
      *
@@ -39,7 +65,7 @@ public class ApplicationUtils {
      */
     public static String getProjectsDirectory() {
         String rtn = "";
-        rtn = Utils.getFilepath() + "projects";
+        rtn += getApplicationDirectory() + "projects";
         return rtn;
     }
 
@@ -57,7 +83,7 @@ public class ApplicationUtils {
      */
     public static String getResourcesDirectory() {
         String rtn = "";
-        rtn = Utils.getFilepath() + "resources";
+        rtn += getApplicationDirectory() + "resources";
         return rtn;
     }
 

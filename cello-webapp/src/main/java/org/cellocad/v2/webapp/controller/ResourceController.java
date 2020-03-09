@@ -54,7 +54,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ResourceController {
 
     private static Logger getLogger() {
-        return LogManager.getLogger(SynBioHubController.class);
+        return LogManager.getLogger(ResourceController.class);
     }
 
     @PostConstruct

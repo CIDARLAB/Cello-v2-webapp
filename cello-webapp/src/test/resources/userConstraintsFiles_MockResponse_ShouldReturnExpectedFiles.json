@@ -1,0 +1,96 @@
+[
+    {
+        "file": "Bth1C1G1T1.UCF.json",
+        "header": {
+            "collection": "header",
+            "description": "CRISPRi with dCas9",
+            "version": "Bth1C1G1T1",
+            "date": "Fri Feb 15 15:09:48 EST 2019",
+            "author": [
+                "Mao Taketani",
+                "Shuyi Zhang",
+                "Timothy Jones"
+            ],
+            "organism": "Bacteroides thetaiotaomicron VPI-5482",
+            "genome": "wildtype with dCas9 integrated",
+            "media": "TYG (10 g/L Tryptone Peptone, 5 g/L Yeast Extract, 11 mM Glucose, 100 mM KPO4 (pH7.2), 72µM CaCl2, 0.4 µg/ml FeSO4 and 1µg/mL Resazurin, 1.2 µg/ml hematin, 0.5g/mL of L-cysteine, and 1 µg/ml of Vitamin K (menadione)",
+            "temperature": "37",
+            "growth": "Inoculation: Inoculate individual colonies into TYG media without antibiotics and grow 18 hours overnight in the anaerobic chamber.  Dilution and Induction: Next day, dilute 100-fold into pre-reduced TYG with inducers (no antibiotics), grow for 6 hours in the anaerobic chamber.  Measurement: Plate Reader, data processing for RPUL normalization."
+        }
+    },
+    {
+        "file": "Eco1C1G1T1.UCF.json",
+        "header": {
+            "collection": "header",
+            "description": "TetR homologs: PhlF, SrpR, BM3R1, HlyIIR, BetI, AmtR, AmeR, QacR, IcaRA, LitR, PsrA, LmrA",
+            "version": "Eco1C1G1T1",
+            "date": "Thu Dec 24 00:56:10 EST 2015",
+            "author": [
+                "Bryan Der",
+                "Timothy Jones"
+            ],
+            "organism": "Escherichia coli NEB 10-beta",
+            "genome": "NEB 10 ∆(ara-leu) 7697 araD139 fhuA ∆lacX74 galK16 galE15 e14- φ80dlacZ∆M15  recA1 relA1 endA1 nupG  rpsL (StrR) rph spoT1 ∆(mrr-hsdRMS-mcrBC)",
+            "media": "M9 minimal media composed of M9 media salts (6.78 g/L Na2HPO4, 3 g/L KH2PO4, 1 g/L NH4Cl, 0.5 g/L NaCl, 0.34 g/L thiamine hydrochloride, 0.4% D-glucose, 0.2% Casamino acids, 2 mM MgSO4, and 0.1 mM CaCl2; kanamycin (50 ug/ml), spectinomycin (50 ug/ml)",
+            "temperature": "37",
+            "growth": "Inoculation: Individual colonies into M9 media, 16 hours overnight in plate shaker.  Dilution: Next day, cells dilute ~200-fold into M9 media with antibiotics, growth for 3 hours.  Induction: Cells diluted ~650-fold into M9 media with antibiotics.  Growth: shaking incubator for 5 hours.  Arrest protein production: PBS and 2mg/ml kanamycin.  Measurement: flow cytometry, data processing for RPU normalization."
+        }
+    },
+    {
+        "file": "Eco1C2G2T2.UCF.json",
+        "header": {
+            "collection": "header",
+            "description": "TetR homologs: PhlF, SrpR, BM3R1, HlyIIR, BetI, AmtR, AmeR, QacR, IcaRA",
+            "version": "Eco1C2G2T2",
+            "date": "Mon Jun 17 14:13:20 EDT 2019",
+            "author": [
+                "Jonghyeon Shin",
+                "Shuyi Zhang",
+                "Timothy Jones"
+            ],
+            "organism": "Escherichia coli NEB 10-beta",
+            "genome": "NEB 10 ∆(ara-leu) 7697 araD139 fhuA ∆lacX74 galK16 galE15 e14- φ80dlacZ∆M15  recA1 relA1 endA1 nupG  rpsL (StrR) rph spoT1 ∆(mrr-hsdRMS-mcrBC)",
+            "media": "M9 minimal media composed of M9 media salts (6.78 g/L Na2HPO4, 3 g/L KH2PO4, 1 g/L NH4Cl, 0.5 g/L NaCl, 0.34 g/L thiamine hydrochloride, 0.4% D-glucose, 0.2% Casamino acids, 2 mM MgSO4, and 0.1 mM CaCl2; kanamycin (50 ug/ml), spectinomycin (50 ug/ml)",
+            "temperature": "37",
+            "growth": "Inoculation: Individual colonies into M9 media, 16 hours overnight in plate shaker.  Dilution: Next day, cells dilute ~200-fold into M9 media with antibiotics, growth for 3 hours.  Induction: Cells diluted ~650-fold into M9 media with antibiotics.  Growth: shaking incubator for 5 hours.  Arrest protein production: PBS and 2mg/ml kanamycin.  Measurement: flow cytometry, data processing for REU normalization."
+        }
+    },
+    {
+        "file": "Eco2C1G3T1.UCF.json",
+        "header": {
+            "collection": "header",
+            "description": "TetR homologs: PhlF, QacR, BM3R1, BetI, AmtR, AmeRs",
+            "version": "Eco2C1G3T1",
+            "date": "Mon Nov 19 10:14:11 EDT 2019",
+            "author": [
+                "Yongjin Park",
+                "Shuyi Zhang",
+                "Timothy Jones"
+            ],
+            "organism": "Escherichia coli MG1655 K-12",
+            "genome": "wildtype (NCBI RefSeq: NC_000913.3) with three landing pads integrated",
+            "media": "M9 minimal media composed of M9 media salts (6.78 g/L Na2HPO4, 3 g/L KH2PO4, 1 g/L NH4Cl, 0.5 g/L NaCl, 0.34 g/L thiamine hydrochloride, 0.4% D-glucose, 0.2% Casamino acids, 2 mM MgSO4, and 0.1 mM CaCl2; kanamycin (50 ug/ml), spectinomycin (50 ug/ml)",
+            "temperature": "37",
+            "growth": "Inoculation: Individual colonies into M9 media, 16 hours overnight in plate shaker.\tDilution: Next day, cells dilute ~200-fold into M9 media with antibiotics, growth for 3 hours.\tInduction: Cells diluted ~700-fold into M9 media with antibiotics.\tGrowth: shaking incubator for 5 hours.\tArrest protein production: PBS and 2mg/ml kanamycin.  Measurement: flow cytometry, data processing for REU normalization."
+        }
+    },
+    {
+        "file": "SC1C1G1T1.UCF.json",
+        "header": {
+            "collection": "header",
+            "description": "TetR homologs: PhlF, SrpR, BM3R1, HlyIIR, BetI, AmtR, AmeR",
+            "version": "SC1C1G1T1",
+            "date": "Thu Apr 12 15:53:49 EDT 2018",
+            "author": [
+                "Ye Chen",
+                "Bryan Der",
+                "Timothy Jones"
+            ],
+            "organism": "Saccharomyces cerevisiae",
+            "genome": "NEB 10 ∆(ara-leu) 7697 araD139 fhuA ∆lacX74 galK16 galE15 e14- φ80dlacZ∆M15  recA1 relA1 endA1 nupG  rpsL (StrR) rph spoT1 ∆(mrr-hsdRMS-mcrBC)",
+            "media": "M9 minimal media composed of M9 media salts (6.78 g/L Na2HPO4, 3 g/L KH2PO4, 1 g/L NH4Cl, 0.5 g/L NaCl, 0.34 g/L thiamine hydrochloride, 0.4% D-glucose, 0.2% Casamino acids, 2 mM MgSO4, and 0.1 mM CaCl2; kanamycin (50 ug/ml), spectinomycin (50 ug/ml)",
+            "temperature": "37",
+            "growth": "Inoculation: Individual colonies into M9 media, 16 hours overnight in plate shaker.  Dilution: Next day, cells dilute ~200-fold into M9 media with antibiotics, growth for 3 hours.  Induction: Cells diluted ~650-fold into M9 media with antibiotics.  Growth: shaking incubator for 5 hours.  Arrest protein production: PBS and 2mg/ml kanamycin.  Measurement: flow cytometry, data processing for REU normalization."
+        }
+    }
+]
