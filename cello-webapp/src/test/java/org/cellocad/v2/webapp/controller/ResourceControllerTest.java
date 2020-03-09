@@ -20,16 +20,21 @@
  */
 package org.cellocad.v2.webapp.controller;
 
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+
+import org.cellocad.v2.webapp.resource.ResourceUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
@@ -49,6 +54,11 @@ public class ResourceControllerTest {
 
     private MockMvc mockMvc;
 
+    @BeforeClass
+    public static void init() throws IOException {
+        ResourceUtils.initResources();
+    }
+
     /**
      * Create mock controller.
      */
@@ -63,14 +73,16 @@ public class ResourceControllerTest {
      *
      * @throws Exception
      */
-    // TODO: repair filepath
-    // @Test
+    @Test
     public void userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
         this.mockMvc.perform(get("/resources/user_constraints_files"))
-                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andExpect(content().json(
-                        "[{\"name\":\"Bth1C1G1T1.UCF.json\"},{\"name\":\"Eco1C1G1T1.UCF.json\"},{\"name\":\"Eco1C2G2T2.UCF.json\"},{\"name\":\"Eco2C1G3T1.UCF.json\"},{\"name\":\"SC1C1G1T1.UCF.json\"}]"));
+                .andExpect(content().string(allOf(
+                        containsString("Bth1C1G1T1.UCF.json"),
+                        containsString("Eco1C1G1T1.UCF.json"),
+                        containsString("Eco1C2G2T2.UCF.json"),
+                        containsString("Eco2C1G3T1.UCF.json"),
+                        containsString("SC1C1G1T1.UCF.json"))));
     }
 
     /**
