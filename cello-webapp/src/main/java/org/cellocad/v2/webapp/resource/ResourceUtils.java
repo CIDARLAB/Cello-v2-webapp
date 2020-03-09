@@ -22,8 +22,10 @@ package org.cellocad.v2.webapp.resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.cellocad.v2.DNACompiler.runtime.environment.DNACompilerRuntimeEnv;
 import org.cellocad.v2.webapp.ApplicationUtils;
 import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.specification.library.serialization.HeaderSerializationConstants;
@@ -89,6 +91,18 @@ public class ResourceUtils {
     public static String getOutputDeviceFileMetaDataFile() {
         String rtn = "";
         rtn = getOutputDeviceFileResourcesDirectory() + Utils.getFileSeparator() + "metadata.json";
+        return rtn;
+    }
+
+    public static String getSettingsResourcesDirectory() {
+        String rtn = "";
+        rtn = ApplicationUtils.getResourcesDirectory() + Utils.getFileSeparator() + "settings";
+        return rtn;
+    }
+
+    public static String getSettingsFile() {
+        String rtn = "";
+        rtn = getSettingsResourcesDirectory() + Utils.getFileSeparator() + "settings.json";
         return rtn;
     }
 
@@ -158,9 +172,74 @@ public class ResourceUtils {
         initTargetDataResources(dir, metadata, "classpath:/lib/files/v2/output/**/*.output.json");
     }
 
+    private static ObjectNode getStageNode(String name, ArrayNode stages) {
+        ObjectNode rtn = null;
+        for (JsonNode node : stages) {
+            if (node.get("name").asText().equals(name)) {
+                rtn = (ObjectNode) node;
+                break;
+            }
+        }
+        if (rtn == null) {
+            rtn = stages.addObject();
+            rtn.put("name", name);
+            rtn.putArray("algorithms");
+        }
+        return rtn;
+    }
+
+    private static Boolean isDefaultAlgo(String stage, String algo, JsonNode Configuration) {
+        Boolean rtn = false;
+        for (JsonNode node : Configuration.get("stages")) {
+            if (node.get("name").asText().equals(stage) && node.get("algorithm_name").asText().equals(algo)) {
+                rtn = true;
+                break;
+            }
+        }
+        return rtn;
+    }
+
+    private static void initSettingsFile() throws IOException {
+        InputStream is = DNACompilerRuntimeEnv.class.getClassLoader().getResourceAsStream("Configuration.json");
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode Configuration = mapper.readTree(is);
+        ObjectNode settings = mapper.createObjectNode();
+        ArrayNode applications = settings.putArray("applications");
+        ObjectNode DNACompiler = applications.addObject();
+        DNACompiler.put("name", "DNACompiler");
+        ArrayNode stages = DNACompiler.putArray("stages");
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(
+                DNACompilerRuntimeEnv.class.getClassLoader());
+        Resource resources[] = resolver.getResources("classpath:/algorithms/**/*.json");
+        for (Resource r : resources) {
+            InputStream i = r.getInputStream();
+            File algo = r.getFile().getParentFile();
+            File stage = algo.getParentFile().getParentFile();
+            JsonNode refAlgoNode = mapper.readTree(i);
+            ObjectNode stageNode = getStageNode(stage.getName(), stages);
+            ArrayNode algorithms = (ArrayNode) stageNode.get("algorithms");
+            ObjectNode algoNode = algorithms.addObject();
+            algoNode.set("name", refAlgoNode.get("name"));
+            algoNode.set("parameters", refAlgoNode.get("parameters"));
+        }
+        for (JsonNode node : Configuration.get("stages")) {
+            ObjectNode stageNode = getStageNode(node.get("name").asText(), stages);
+            stageNode.set("default", node.get("algorithm_name"));
+        }
+        settings.put("default", "DNACompiler");
+        ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+        writer.writeValue(new File(getSettingsFile()), settings);
+    }
+
+    private static void initSettingsResources() throws IOException {
+        Utils.createDirectoryIfNonExistant(getSettingsResourcesDirectory());
+        initSettingsFile();
+    }
+
     public static void initResources() throws IOException {
         Utils.createDirectoryIfNonExistant(ApplicationUtils.getResourcesDirectory());
         initTargetDataResources();
+        initSettingsResources();
     }
 
 }

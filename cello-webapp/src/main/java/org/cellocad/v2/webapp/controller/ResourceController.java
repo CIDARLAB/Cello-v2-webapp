@@ -83,4 +83,12 @@ public class ResourceController {
         return rtn;
     }
 
+    @GetMapping(value = "/settings", produces = { MediaType.APPLICATION_JSON_VALUE })
+    public JsonNode settings(HttpServletResponse res) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String filepath = ResourceUtils.getSettingsFile();
+        JsonNode rtn = mapper.readTree(new File(filepath));
+        return rtn;
+    }
+
 }
