@@ -68,18 +68,40 @@ public class ResourceUtils {
         return rtn;
     }
 
-    private static void initUserConstraintsFileMetaDataFile() throws IOException {
-        String str = getUserConstraintsFileMetaDataFile();
-        Utils.createFileIfNonExistant(str);
+    private static String getInputSensorFileResourcesDirectory() {
+        String rtn = "";
+        rtn = getTargetDataResourcesDirectory() + Utils.getFileSeparator() + "input";
+        return rtn;
+    }
+
+    public static String getInputSensorFileMetaDataFile() {
+        String rtn = "";
+        rtn = getInputSensorFileResourcesDirectory() + Utils.getFileSeparator() + "metadata.json";
+        return rtn;
+    }
+
+    private static String getOutputDeviceFileResourcesDirectory() {
+        String rtn = "";
+        rtn = getTargetDataResourcesDirectory() + Utils.getFileSeparator() + "output";
+        return rtn;
+    }
+
+    public static String getOutputDeviceFileMetaDataFile() {
+        String rtn = "";
+        rtn = getOutputDeviceFileResourcesDirectory() + Utils.getFileSeparator() + "metadata.json";
+        return rtn;
+    }
+
+    private static void initMetaDataFile(String filepath) throws IOException {
+        Utils.createFileIfNonExistant(filepath);
         // write empty array
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode arr = mapper.createArrayNode();
-        Utils.writeToFile(arr.toString(), str);
+        Utils.writeToFile(arr.toString(), filepath);
     }
 
-    public static void appendToUserConstraintsFileMetaDataFile(File resource, JsonNode header)
+    private static void appendToMetaDataFile(String filepath, File resource, JsonNode header)
             throws JsonGenerationException, JsonMappingException, IOException {
-        String filepath = getUserConstraintsFileMetaDataFile();
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode node = null;
         try {
@@ -96,25 +118,44 @@ public class ResourceUtils {
         node = (ArrayNode) mapper.readTree(new File(filepath));
     }
 
-    private static void initTargetDataResources() throws IOException {
-        Utils.createDirectoryIfNonExistant(getTargetDataResourcesDirectory());
-        Utils.createDirectoryIfNonExistant(getUserConstraintsFileResourcesDirectory());
-        initUserConstraintsFileMetaDataFile();
+    private static void initTargetDataResources(String dir, String filepath, String pattern) throws IOException {
+        Utils.createDirectoryIfNonExistant(dir);
+        initMetaDataFile(filepath);
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        Resource resources[] = resolver.getResources("classpath:/lib/files/v2/ucf/**/*.UCF.json");
+        Resource resources[] = resolver.getResources(pattern);
         ObjectMapper mapper = new ObjectMapper();
         for (Resource r : resources) {
-            File f = new File(getUserConstraintsFileResourcesDirectory() + Utils.getFileSeparator() + r.getFilename());
+            File f = new File(dir + Utils.getFileSeparator() + r.getFilename());
             FileUtils.copyInputStreamToFile(r.getInputStream(), f);
             JsonNode node = mapper.readTree(f);
-            for (JsonNode collection : node) {
-                if (collection.get(LibrarySerializationConstants.S_UCF_COLLECTION).asText()
+            JsonNode collection = null;
+            for (JsonNode n : node) {
+                if (n.get(LibrarySerializationConstants.S_UCF_COLLECTION).asText()
                         .equals(HeaderSerializationConstants.S_UCF_COLLECTION)) {
-                    appendToUserConstraintsFileMetaDataFile(f, collection);
+                    collection = n;
                     break;
                 }
             }
+            appendToMetaDataFile(filepath, f, collection);
         }
+    }
+
+    private static void initTargetDataResources() throws IOException {
+        Utils.createDirectoryIfNonExistant(getTargetDataResourcesDirectory());
+        String dir = "";
+        String metadata = "";
+        // user constraints
+        dir = getUserConstraintsFileResourcesDirectory();
+        metadata = getUserConstraintsFileMetaDataFile();
+        initTargetDataResources(dir, metadata, "classpath:/lib/files/v2/ucf/**/*.UCF.json");
+        // input sensor
+        dir = getInputSensorFileResourcesDirectory();
+        metadata = getInputSensorFileMetaDataFile();
+        initTargetDataResources(dir, metadata, "classpath:/lib/files/v2/input/**/*.input.json");
+        // output device
+        dir = getOutputDeviceFileResourcesDirectory();
+        metadata = getOutputDeviceFileMetaDataFile();
+        initTargetDataResources(dir, metadata, "classpath:/lib/files/v2/output/**/*.output.json");
     }
 
     public static void initResources() throws IOException {

@@ -1,17 +1,16 @@
-[
-    {
-        "name": "Bth1C1G1T1.output.json"
-    },
-    {
-        "name": "Eco1C1G1T1.output.json"
-    },
-    {
-        "name": "Eco1C2G2T2.output.json"
-    },
-    {
-        "name": "Eco2C1G3T1.output.json"
-    },
-    {
-        "name": "SC1C1G1T1.output.json"
-    }
-]
+[ {
+  "file" : "Bth1C1G1T1.output.json",
+  "header" : null
+}, {
+  "file" : "Eco1C1G1T1.output.json",
+  "header" : null
+}, {
+  "file" : "Eco1C2G2T2.output.json",
+  "header" : null
+}, {
+  "file" : "Eco2C1G3T1.output.json",
+  "header" : null
+}, {
+  "file" : "SC1C1G1T1.output.json",
+  "header" : null
+} ]

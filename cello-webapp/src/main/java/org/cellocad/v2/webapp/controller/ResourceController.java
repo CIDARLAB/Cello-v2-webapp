@@ -67,8 +67,7 @@ public class ResourceController {
     public JsonNode userConstraintsFiles(HttpServletResponse res) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         String filepath = ResourceUtils.getUserConstraintsFileMetaDataFile();
-        JsonNode node = mapper.readTree(new File(filepath));
-        JsonNode rtn = node;
+        JsonNode rtn = mapper.readTree(new File(filepath));
         return rtn;
     }
 
