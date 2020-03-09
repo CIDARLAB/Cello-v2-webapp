@@ -35,6 +35,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
@@ -89,6 +90,7 @@ public class ResourceControllerTest {
     public void inputSensorFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
         String str = Utils.getResourceAsString("inputSensorFiles_MockResponse_ShouldReturnExpectedFiles.json");
         this.mockMvc.perform(get("/resources/input_sensor_files"))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(str));
     }

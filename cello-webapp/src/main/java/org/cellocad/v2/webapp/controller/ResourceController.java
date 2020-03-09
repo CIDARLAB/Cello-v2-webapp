@@ -29,8 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cellocad.v2.webapp.resource.ResourceUtils;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,8 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  *
@@ -74,28 +70,16 @@ public class ResourceController {
     @GetMapping(value = "/input_sensor_files", produces = { MediaType.APPLICATION_JSON_VALUE })
     public JsonNode inputSensorFiles(HttpServletResponse res) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ArrayNode rtn = mapper.createArrayNode();
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        Resource resources[] = resolver.getResources("classpath:/lib/files/v2/input/**/*.input.json");
-        for (Resource r : resources) {
-            ObjectNode node = mapper.createObjectNode();
-            node.put("name", r.getFilename());
-            rtn.add(node);
-        }
+        String filepath = ResourceUtils.getInputSensorFileMetaDataFile();
+        JsonNode rtn = mapper.readTree(new File(filepath));
         return rtn;
     }
 
     @GetMapping(value = "/output_device_files", produces = { MediaType.APPLICATION_JSON_VALUE })
     public JsonNode outputDeviceFiles(HttpServletResponse res) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ArrayNode rtn = mapper.createArrayNode();
-        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        Resource resources[] = resolver.getResources("classpath:/lib/files/v2/output/**/*.output.json");
-        for (Resource r : resources) {
-            ObjectNode node = mapper.createObjectNode();
-            node.put("name", r.getFilename());
-            rtn.add(node);
-        }
+        String filepath = ResourceUtils.getOutputDeviceFileMetaDataFile();
+        JsonNode rtn = mapper.readTree(new File(filepath));
         return rtn;
     }
 
