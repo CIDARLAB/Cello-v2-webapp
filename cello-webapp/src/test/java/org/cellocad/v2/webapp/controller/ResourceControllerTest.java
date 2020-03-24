@@ -52,67 +52,67 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @SpringBootTest
 public class ResourceControllerTest {
 
-    @InjectMocks
-    private ResourceController resourcesController;
+	@InjectMocks
+	private ResourceController resourcesController;
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    /**
-     * Create mock controller.
-     */
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(resourcesController).build();
-    }
+	/**
+	 * Create mock controller.
+	 */
+	@Before
+	public void setup() {
+		MockitoAnnotations.initMocks(this);
+		this.mockMvc = MockMvcBuilders.standaloneSetup(this.resourcesController).build();
+	}
 
-    /**
-     * Test user constraints files retrieval.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
-        String str = Utils.getResourceAsString("userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles.json");
-        this.mockMvc.perform(get("/resources/user_constraints_files"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(str));
-    }
+	/**
+	 * Test user constraints files retrieval.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
+		String str = Utils.getResourceAsString("userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles.json");
+		this.mockMvc.perform(get("/resources/user_constraints_files"))
+		        .andExpect(status().isOk())
+		        .andExpect(content().json(str));
+	}
 
-    /**
-     * Test input sensor files listing.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void inputSensorFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
-        String str = Utils.getResourceAsString("inputSensorFiles_MockResponse_ShouldReturnExpectedFiles.json");
-        this.mockMvc.perform(get("/resources/input_sensor_files"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(str));
-    }
+	/**
+	 * Test input sensor files listing.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void inputSensorFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
+		String str = Utils.getResourceAsString("inputSensorFiles_MockResponse_ShouldReturnExpectedFiles.json");
+		this.mockMvc.perform(get("/resources/input_sensor_files"))
+		        .andExpect(status().isOk())
+		        .andExpect(content().json(str));
+	}
 
-    /**
-     * Test output device files listing.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
-        String str = Utils.getResourceAsString("outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles.json");
-        this.mockMvc.perform(get("/resources/output_device_files"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(str));
-    }
+	/**
+	 * Test output device files listing.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
+		String str = Utils.getResourceAsString("outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles.json");
+		this.mockMvc.perform(get("/resources/output_device_files"))
+		        .andExpect(status().isOk())
+		        .andExpect(content().json(str));
+	}
 
-    /**
-     * Test available settings listing.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void settings_MockResponse_ShouldReturnExpectedJson() throws Exception {
-    }
+	/**
+	 * Test available settings listing.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void settings_MockResponse_ShouldReturnExpectedJson() throws Exception {
+	}
 
 }
