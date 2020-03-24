@@ -58,14 +58,14 @@
   "file" : "SC1C1G1T1.UCF.json",
   "header" : {
     "collection" : "header",
-    "description" : "TetR homologs: PhlF, SrpR, BM3R1, HlyIIR, BetI, AmtR, AmeR",
+    "description" : "Gates: PhlF, QacR, BM3R1, PsrA, IcaR, CI, CI434, HKCI, LexA",
     "version" : "SC1C1G1T1",
     "date" : "Thu Apr 12 15:53:49 EDT 2018",
-    "author" : [ "Ye Chen", "Bryan Der", "Timothy Jones" ],
-    "organism" : "Saccharomyces cerevisiae",
-    "genome" : "NEB 10 ∆(ara-leu) 7697 araD139 fhuA ∆lacX74 galK16 galE15 e14- φ80dlacZ∆M15  recA1 relA1 endA1 nupG  rpsL (StrR) rph spoT1 ∆(mrr-hsdRMS-mcrBC)",
-    "media" : "M9 minimal media composed of M9 media salts (6.78 g/L Na2HPO4, 3 g/L KH2PO4, 1 g/L NH4Cl, 0.5 g/L NaCl, 0.34 g/L thiamine hydrochloride, 0.4% D-glucose, 0.2% Casamino acids, 2 mM MgSO4, and 0.1 mM CaCl2; kanamycin (50 ug/ml), spectinomycin (50 ug/ml)",
-    "temperature" : "37",
-    "growth" : "Inoculation: Individual colonies into M9 media, 16 hours overnight in plate shaker.  Dilution: Next day, cells dilute ~200-fold into M9 media with antibiotics, growth for 3 hours.  Induction: Cells diluted ~650-fold into M9 media with antibiotics.  Growth: shaking incubator for 5 hours.  Arrest protein production: PBS and 2mg/ml kanamycin.  Measurement: flow cytometry, data processing for REU normalization."
+    "author" : [ "Chen Ye 陈业", "Shuyi Zhang", "Timothy Jones" ],
+    "organism" : "Saccharomyces cerevisiae BY4741",
+    "genome" : "Saccharomyces cerevisiae S288C MATa his3Δ1 leu2Δ0 met15Δ0 ura3Δ0",
+    "media" : "SD broth composed of CSM powder (Adenine hemisulfate (10 mg/L), L-Arginine  (50 mg/L), L-Aspartic acid (80 mg/L), L-Histidine hydrochloride monohydrate (20 mg/L), L-Isoleucine (50 mg/L), L-Leucine (100 mg/L), L-Lysine hydrochloride (50 mg/L), L-Methionine (20 mg/L), L-Phenylalanine (50 mg/L), L-Threonine (100 mg/L), L-Tryptophan (50 mg/L), L-Tyrosine (50 mg/L), L-Valine (140 mg/L), Uracil (20 mg/L)), YNB base (Biotin (0.002 mg/L), Boric acid (0.5 mg/L), Calcium chloride dihydrate (100 mg/L), Copper (II) sulfate pentahydrate (0.04 mg/L), Folic acid (0.002 mg/L), Inositol (In Base Formula) (2 mg/L), Iron (III) chloride (0.2 mg/L), Magnesium sulfate anhydrous (500 mg/L), Manganese sulfate monohydrate (0.4 mg/L), Niacin (0.4 mg/L), 4-Aminobenzoic acid (PABA) (In Base Formula) (0.2 mg/L), D-Pantothenic acid hemicalcium salt (0.4 mg/L), Potassium iodide (0.1 mg/L), Potassium phosphate monobasic anhydrous (1000 mg/L), Pyridoxine hydrochloride (0.4 mg/L), Riboflavin (0.2 mg/L), Sodium chloride (100 mg/L), Sodium molybdate (0.2 mg/L), Thiamine hydrochloride (0.4 mg/L), Zinc sulfate monohydrate (0.4 mg/L)), Ammonium sulfate (5000 mg/L), Glucose (20000 mg/L)",
+    "temperature" : "30",
+    "growth" : "Inoculation: Individual colonies into SD media, 24 hours overnight in plate shaker (deepwell plate). Dilution and induction: Next day, cells dilute ~200-fold into SD media with inducer, overnight for 16 hours. Arrest protein production: PBS and 2mg/ml kanamycin. Measurement: flow cytometry, data processing for REU normalization."
   }
 } ]
