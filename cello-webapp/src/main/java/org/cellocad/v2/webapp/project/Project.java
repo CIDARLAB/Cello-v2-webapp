@@ -57,77 +57,77 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @TypeAlias("project")
 public abstract class Project {
 
-    @Id
-    private ObjectId id;
-    private String name;
-    private String filepath;
-    private Date created;
+	@Id
+	private ObjectId id;
+	private String name;
+	private String filepath;
+	private Date created;
 
-    private String verilogFile;
-    private String optionsFile;
-    private String netlistConstraintFile;
-    private String userConstraintsFile;
-    private String inputSensorFile;
-    private String outputDeviceFile;
+	private String verilogFile;
+	private String optionsFile;
+	private String netlistConstraintFile;
+	private String userConstraintsFile;
+	private String inputSensorFile;
+	private String outputDeviceFile;
 
-    private Collection<Result> results;
+	private Collection<Result> results;
 
-    public Project() {
+	public Project() {
 
-    }
+	}
 
-    public Project(String name, String filepath, Date created, String verilogFile, String optionsFile,
-            String netlistConstraintFile, String targetDataFile) {
-        this.name = name;
-        this.filepath = filepath;
-        this.created = created;
-        this.verilogFile = verilogFile;
-        this.optionsFile = optionsFile;
-        this.netlistConstraintFile = netlistConstraintFile;
-        this.userConstraintsFile = targetDataFile;
-    }
+	public Project(String name, String filepath, Date created, String verilogFile, String optionsFile,
+	        String netlistConstraintFile, String targetDataFile) {
+		this.name = name;
+		this.filepath = filepath;
+		this.created = created;
+		this.verilogFile = verilogFile;
+		this.optionsFile = optionsFile;
+		this.netlistConstraintFile = netlistConstraintFile;
+		this.userConstraintsFile = targetDataFile;
+	}
 
-    public Project(ApplicationUser user, String name, Specification specification)
-            throws ProjectException {
-        this.name = name;
-        ObjectMapper mapper = new ObjectMapper();
-        ProjectUtils.createProjectDirectory(user, name);
-        this.id = new ObjectId();
-        this.filepath = (new File(ProjectUtils.getProjectDirectory(user, name))).getAbsolutePath();
-        this.created = new Date();
-        // verilog
-        String verilogFilepath = filepath.toString() + Utils.getFileSeparator() + name + ".v";
-        try {
-            Utils.createFile(verilogFilepath);
-        } catch (IOException e) {
-            throw new ProjectException(e);
-        }
-        Utils.writeToFile(specification.getVerilog(), verilogFilepath);
-        this.verilogFile = verilogFilepath;
-        // options
-        String optionsFilepath = filepath.toString() + Utils.getFileSeparator() + name + "_options.csv";
-        try {
-            Utils.createFile(optionsFilepath);
-        } catch (IOException e) {
-            throw new ProjectException(e);
-        }
-        Utils.writeToFile(specification.getSettings().toCSV(), optionsFilepath);
-        this.optionsFile = optionsFilepath;
-        // netlist constraint
-        String netlistConstraintFilepath = filepath.toString() + Utils.getFileSeparator() + name
-                + "_netlistconstraints.json";
-        try {
-            Utils.createFile(netlistConstraintFilepath);
-        } catch (IOException e) {
-            throw new ProjectException(e);
-        }
-        try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(netlistConstraintFilepath),
-                    specification.getConstraints());
-        } catch (IOException e) {
-            throw new ProjectException(e);
-        }
-        this.netlistConstraintFile = netlistConstraintFilepath;
+	public Project(ApplicationUser user, String name, Specification specification)
+	        throws ProjectException {
+		this.name = name;
+		ObjectMapper mapper = new ObjectMapper();
+		ProjectUtils.createProjectDirectory(user, name);
+		this.id = new ObjectId();
+		this.filepath = (new File(ProjectUtils.getProjectDirectory(user, name))).getAbsolutePath();
+		this.created = new Date();
+		// verilog
+		String verilogFilepath = this.filepath.toString() + Utils.getFileSeparator() + name + ".v";
+		try {
+			Utils.createFile(verilogFilepath);
+		} catch (IOException e) {
+			throw new ProjectException(e);
+		}
+		Utils.writeToFile(specification.getVerilog(), verilogFilepath);
+		this.verilogFile = verilogFilepath;
+		// options
+		String optionsFilepath = this.filepath.toString() + Utils.getFileSeparator() + name + "_options.csv";
+		try {
+			Utils.createFile(optionsFilepath);
+		} catch (IOException e) {
+			throw new ProjectException(e);
+		}
+		Utils.writeToFile(specification.getSettings().toCSV(), optionsFilepath);
+		this.optionsFile = optionsFilepath;
+		// netlist constraint
+		String netlistConstraintFilepath = this.filepath.toString() + Utils.getFileSeparator() + name
+		        + "_netlistconstraints.json";
+		try {
+			Utils.createFile(netlistConstraintFilepath);
+		} catch (IOException e) {
+			throw new ProjectException(e);
+		}
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(new File(netlistConstraintFilepath),
+			        specification.getConstraints());
+		} catch (IOException e) {
+			throw new ProjectException(e);
+		}
+		this.netlistConstraintFile = netlistConstraintFilepath;
 
 //		// user constraints file
 //    	String userConstraintsFilePath = filepath.toString() + Utils.getFileSeparator() + name + ".UCF.json";
@@ -138,264 +138,265 @@ public abstract class Project {
 //			throw new ProjectException(e);
 //		}
 //    	this.userConstraintsFile = userConstraintsFilePath;
-        if (specification.getLibraryResource() instanceof TargetDataLibraryResource) {
-            TargetDataLibraryResource library = (TargetDataLibraryResource) specification.getLibraryResource();
-            // FIXME
-            String path = "/input/";
-            String ucfPath = path + "ucf/";
-            String inoutPath = path + "inout/";
-            File userConstraintsFile = new File(library.getUserConstraintsFile().toString());
-            File inputSensorFile = new File(library.getInputSensorFile().toString());
-            File outputDeviceFile = new File(library.getOutputDeviceFile().toString());
-            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            Resource r[] = null;
-            // user constraints file
-            try {
-                r = resolver.getResources("classpath:" + ucfPath + "*/" + userConstraintsFile.toString());
-                if (r.length < 1)
-                    throw new ProjectException("Unable to locate user constraints file.");
-                userConstraintsFile = new File(filepath, userConstraintsFile.toString());
-                FileUtils.copyInputStreamToFile(r[0].getInputStream(), userConstraintsFile);
-            } catch (IOException e) {
-                throw new ProjectException("Unable to write user constraints file to project directory.");
-            }
-            // input sensor file
-            try {
-                r = resolver.getResources("classpath:" + inoutPath + "*/" + inputSensorFile.toString());
-                if (r.length < 1)
-                    throw new ProjectException("Unable to locate input sensor file.");
-                inputSensorFile = new File(filepath, inputSensorFile.toString());
-                FileUtils.copyInputStreamToFile(r[0].getInputStream(), inputSensorFile);
-            } catch (IOException e) {
-                throw new ProjectException("Unable to write input sensor file to project directory.");
-            }
-            // output device file
-            try {
-                r = resolver.getResources("classpath:" + inoutPath + "*/" + outputDeviceFile.toString());
-                if (r.length < 1)
-                    throw new ProjectException("Unable to locate output device file.");
-                outputDeviceFile = new File(filepath, outputDeviceFile.toString());
-                FileUtils.copyInputStreamToFile(r[0].getInputStream(), outputDeviceFile);
-            } catch (IOException e) {
-                throw new ProjectException("Unable to write output device file to project directory.");
-            }
-            this.userConstraintsFile = userConstraintsFile.toString();
-            this.inputSensorFile = inputSensorFile.toString();
-            this.outputDeviceFile = outputDeviceFile.toString();
-        }
-        if (specification.getLibraryResource() instanceof SynBioHubLibraryResource) {
-            SynBioHubLibraryResource library = (SynBioHubLibraryResource) specification.getLibraryResource();
-        }
-    }
+		if (specification.getLibraryResource() instanceof TargetDataLibraryResource) {
+			TargetDataLibraryResource library = (TargetDataLibraryResource) specification.getLibraryResource();
+			// FIXME
+			String path = "/lib/files/v2/";
+			String ucfPath = path + "ucf/";
+			String inputPath = path + "input/";
+			String outputPath = path + "output/";
+			File userConstraintsFile = new File(library.getUserConstraintsFile().toString());
+			File inputSensorFile = new File(library.getInputSensorFile().toString());
+			File outputDeviceFile = new File(library.getOutputDeviceFile().toString());
+			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+			Resource r[] = null;
+			// user constraints file
+			try {
+				r = resolver.getResources("classpath:" + ucfPath + "**/" + userConstraintsFile.toString());
+				if (r.length < 1)
+					throw new ProjectException("Unable to locate user constraints file.");
+				userConstraintsFile = new File(this.filepath, userConstraintsFile.toString());
+				FileUtils.copyInputStreamToFile(r[0].getInputStream(), userConstraintsFile);
+			} catch (IOException e) {
+				throw new ProjectException("Unable to write user constraints file to project directory.");
+			}
+			// input sensor file
+			try {
+				r = resolver.getResources("classpath:" + inputPath + "**/" + inputSensorFile.toString());
+				if (r.length < 1)
+					throw new ProjectException("Unable to locate input sensor file.");
+				inputSensorFile = new File(this.filepath, inputSensorFile.toString());
+				FileUtils.copyInputStreamToFile(r[0].getInputStream(), inputSensorFile);
+			} catch (IOException e) {
+				throw new ProjectException("Unable to write input sensor file to project directory.");
+			}
+			// output device file
+			try {
+				r = resolver.getResources("classpath:" + outputPath + "**/" + outputDeviceFile.toString());
+				if (r.length < 1)
+					throw new ProjectException("Unable to locate output device file.");
+				outputDeviceFile = new File(this.filepath, outputDeviceFile.toString());
+				FileUtils.copyInputStreamToFile(r[0].getInputStream(), outputDeviceFile);
+			} catch (IOException e) {
+				throw new ProjectException("Unable to write output device file to project directory.");
+			}
+			this.userConstraintsFile = userConstraintsFile.toString();
+			this.inputSensorFile = inputSensorFile.toString();
+			this.outputDeviceFile = outputDeviceFile.toString();
+		}
+		if (specification.getLibraryResource() instanceof SynBioHubLibraryResource) {
+			SynBioHubLibraryResource library = (SynBioHubLibraryResource) specification.getLibraryResource();
+		}
+	}
 
-    public abstract void execute() throws CelloWebException;
+	public abstract void execute() throws CelloWebException;
 
-    public void delete() throws IOException {
-        FileUtils.deleteDirectory(new File(this.getFilepath()));
-    }
+	public void delete() throws IOException {
+		FileUtils.deleteDirectory(new File(this.getFilepath()));
+	}
 
-    /**
-     * Getter for <i>id</i>
-     *
-     * @return value of <i>id</i>
-     */
-    public ObjectId getId() {
-        return id;
-    }
+	/**
+	 * Getter for <i>id</i>
+	 *
+	 * @return value of <i>id</i>
+	 */
+	public ObjectId getId() {
+		return this.id;
+	}
 
-    /**
-     * Setter for <i>id</i>
-     *
-     * @param id the value to set <i>id</i>
-     */
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
+	/**
+	 * Setter for <i>id</i>
+	 *
+	 * @param id the value to set <i>id</i>
+	 */
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
 
-    /**
-     * Getter for <i>name</i>
-     *
-     * @return value of <i>name</i>
-     */
-    public String getName() {
-        return name;
-    }
+	/**
+	 * Getter for <i>name</i>
+	 *
+	 * @return value of <i>name</i>
+	 */
+	public String getName() {
+		return this.name;
+	}
 
-    /**
-     * Setter for <i>name</i>
-     *
-     * @param name the value to set <i>name</i>
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
+	/**
+	 * Setter for <i>name</i>
+	 *
+	 * @param name the value to set <i>name</i>
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    /**
-     * Getter for <i>filepath</i>
-     *
-     * @return value of <i>filepath</i>
-     */
-    public String getFilepath() {
-        return filepath;
-    }
+	/**
+	 * Getter for <i>filepath</i>
+	 *
+	 * @return value of <i>filepath</i>
+	 */
+	public String getFilepath() {
+		return this.filepath;
+	}
 
-    /**
-     * Setter for <i>filepath</i>
-     *
-     * @param filepath the value to set <i>filepath</i>
-     */
-    public void setFilepath(String filepath) {
-        this.filepath = filepath;
-    }
+	/**
+	 * Setter for <i>filepath</i>
+	 *
+	 * @param filepath the value to set <i>filepath</i>
+	 */
+	public void setFilepath(String filepath) {
+		this.filepath = filepath;
+	}
 
-    /**
-     * Getter for <i>created</i>
-     *
-     * @return value of <i>created</i>
-     */
-    public Date getCreated() {
-        return created;
-    }
+	/**
+	 * Getter for <i>created</i>
+	 *
+	 * @return value of <i>created</i>
+	 */
+	public Date getCreated() {
+		return this.created;
+	}
 
-    /**
-     * Setter for <i>created</i>
-     *
-     * @param created the value to set <i>created</i>
-     */
-    public void setCreated(Date created) {
-        this.created = created;
-    }
+	/**
+	 * Setter for <i>created</i>
+	 *
+	 * @param created the value to set <i>created</i>
+	 */
+	public void setCreated(Date created) {
+		this.created = created;
+	}
 
-    /**
-     * Getter for <i>verilogFile</i>
-     *
-     * @return value of <i>verilogFile</i>
-     */
-    public String getVerilogFile() {
-        return verilogFile;
-    }
+	/**
+	 * Getter for <i>verilogFile</i>
+	 *
+	 * @return value of <i>verilogFile</i>
+	 */
+	public String getVerilogFile() {
+		return this.verilogFile;
+	}
 
-    /**
-     * Setter for <i>verilogFile</i>
-     *
-     * @param verilogFile the value to set <i>verilogFile</i>
-     */
-    public void setVerilogFile(String verilogFile) {
-        this.verilogFile = verilogFile;
-    }
+	/**
+	 * Setter for <i>verilogFile</i>
+	 *
+	 * @param verilogFile the value to set <i>verilogFile</i>
+	 */
+	public void setVerilogFile(String verilogFile) {
+		this.verilogFile = verilogFile;
+	}
 
-    /**
-     * Getter for <i>optionsFile</i>
-     *
-     * @return value of <i>optionsFile</i>
-     */
-    public String getOptionsFile() {
-        return optionsFile;
-    }
+	/**
+	 * Getter for <i>optionsFile</i>
+	 *
+	 * @return value of <i>optionsFile</i>
+	 */
+	public String getOptionsFile() {
+		return this.optionsFile;
+	}
 
-    /**
-     * Setter for <i>optionsFile</i>
-     *
-     * @param optionsFile the value to set <i>optionsFile</i>
-     */
-    public void setOptionsFile(String optionsFile) {
-        this.optionsFile = optionsFile;
-    }
+	/**
+	 * Setter for <i>optionsFile</i>
+	 *
+	 * @param optionsFile the value to set <i>optionsFile</i>
+	 */
+	public void setOptionsFile(String optionsFile) {
+		this.optionsFile = optionsFile;
+	}
 
-    /**
-     * Getter for <i>netlistConstraintFile</i>
-     *
-     * @return value of <i>netlistConstraintFile</i>
-     */
-    public String getNetlistConstraintFile() {
-        return netlistConstraintFile;
-    }
+	/**
+	 * Getter for <i>netlistConstraintFile</i>
+	 *
+	 * @return value of <i>netlistConstraintFile</i>
+	 */
+	public String getNetlistConstraintFile() {
+		return this.netlistConstraintFile;
+	}
 
-    /**
-     * Setter for <i>netlistConstraintFile</i>
-     *
-     * @param netlistConstraintFile the value to set <i>netlistConstraintFile</i>
-     */
-    public void setNetlistConstraintFile(String netlistConstraintFile) {
-        this.netlistConstraintFile = netlistConstraintFile;
-    }
+	/**
+	 * Setter for <i>netlistConstraintFile</i>
+	 *
+	 * @param netlistConstraintFile the value to set <i>netlistConstraintFile</i>
+	 */
+	public void setNetlistConstraintFile(String netlistConstraintFile) {
+		this.netlistConstraintFile = netlistConstraintFile;
+	}
 
-    /**
-     * Getter for <i>userConstraintsFile</i>
-     *
-     * @return value of <i>userConstraintsFile</i>
-     */
-    public String getUserConstraintsFile() {
-        return userConstraintsFile;
-    }
+	/**
+	 * Getter for <i>userConstraintsFile</i>
+	 *
+	 * @return value of <i>userConstraintsFile</i>
+	 */
+	public String getUserConstraintsFile() {
+		return this.userConstraintsFile;
+	}
 
-    /**
-     * Setter for <i>userConstraintsFile</i>
-     *
-     * @param userConstraintsFile the value to set <i>userConstraintsFile</i>
-     */
-    public void setUserConstraintsFile(String userConstraintsFile) {
-        this.userConstraintsFile = userConstraintsFile;
-    }
+	/**
+	 * Setter for <i>userConstraintsFile</i>
+	 *
+	 * @param userConstraintsFile the value to set <i>userConstraintsFile</i>
+	 */
+	public void setUserConstraintsFile(String userConstraintsFile) {
+		this.userConstraintsFile = userConstraintsFile;
+	}
 
-    /**
-     * Getter for <i>inputSensorFile</i>
-     *
-     * @return value of <i>inputSensorFile</i>
-     */
-    public String getInputSensorFile() {
-        return inputSensorFile;
-    }
+	/**
+	 * Getter for <i>inputSensorFile</i>
+	 *
+	 * @return value of <i>inputSensorFile</i>
+	 */
+	public String getInputSensorFile() {
+		return this.inputSensorFile;
+	}
 
-    /**
-     * Setter for <i>inputSensorFile</i>
-     *
-     * @param inputSensorFile the value to set <i>inputSensorFile</i>
-     */
-    public void setInputSensorFile(String inputSensorFile) {
-        this.inputSensorFile = inputSensorFile;
-    }
+	/**
+	 * Setter for <i>inputSensorFile</i>
+	 *
+	 * @param inputSensorFile the value to set <i>inputSensorFile</i>
+	 */
+	public void setInputSensorFile(String inputSensorFile) {
+		this.inputSensorFile = inputSensorFile;
+	}
 
-    /**
-     * Getter for <i>outputDeviceFile</i>
-     *
-     * @return value of <i>outputDeviceFile</i>
-     */
-    public String getOutputDeviceFile() {
-        return outputDeviceFile;
-    }
+	/**
+	 * Getter for <i>outputDeviceFile</i>
+	 *
+	 * @return value of <i>outputDeviceFile</i>
+	 */
+	public String getOutputDeviceFile() {
+		return this.outputDeviceFile;
+	}
 
-    /**
-     * Setter for <i>outputDeviceFile</i>
-     *
-     * @param outputDeviceFile the value to set <i>outputDeviceFile</i>
-     */
-    public void setOutputDeviceFile(String outputDeviceFile) {
-        this.outputDeviceFile = outputDeviceFile;
-    }
+	/**
+	 * Setter for <i>outputDeviceFile</i>
+	 *
+	 * @param outputDeviceFile the value to set <i>outputDeviceFile</i>
+	 */
+	public void setOutputDeviceFile(String outputDeviceFile) {
+		this.outputDeviceFile = outputDeviceFile;
+	}
 
-    /**
-     * Getter for <i>results</i>
-     *
-     * @return value of <i>results</i>
-     */
-    public Collection<Result> getResults() {
-        File resultsPath = new File(this.getFilepath());
-        Collection<Result> results = new ArrayList<>();
-        for (File file : FileUtils.listFiles(resultsPath, TrueFileFilter.TRUE, TrueFileFilter.TRUE)) {
-            Result result = new Result(file);
-            results.add(result);
-        }
-        return results;
-    }
+	/**
+	 * Getter for <i>results</i>
+	 *
+	 * @return value of <i>results</i>
+	 */
+	public Collection<Result> getResults() {
+		File resultsPath = new File(this.getFilepath());
+		Collection<Result> results = new ArrayList<>();
+		for (File file : FileUtils.listFiles(resultsPath, TrueFileFilter.TRUE, TrueFileFilter.TRUE)) {
+			Result result = new Result(file);
+			results.add(result);
+		}
+		return results;
+	}
 
-    /**
-     * Setter for <i>results</i>
-     *
-     * @param results the value to set <i>results</i>
-     */
-    public void setResults(Collection<Result> results) {
-        this.results = results;
-    }
+	/**
+	 * Setter for <i>results</i>
+	 *
+	 * @param results the value to set <i>results</i>
+	 */
+	public void setResults(Collection<Result> results) {
+		this.results = results;
+	}
 
 }
