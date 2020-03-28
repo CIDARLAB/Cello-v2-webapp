@@ -113,6 +113,10 @@ public class ResourceControllerTest {
 	 */
 	@Test
 	public void settings_MockResponse_ShouldReturnExpectedJson() throws Exception {
+		String str = Utils.getResourceAsString("settings_MockResponse_ShouldReturnExpectedJson.json");
+		this.mockMvc.perform(get("/resources/settings"))
+		        .andExpect(status().isOk())
+		        .andExpect(content().json(str));
 	}
 
 }

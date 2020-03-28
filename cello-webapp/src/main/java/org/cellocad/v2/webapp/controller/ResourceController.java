@@ -49,46 +49,53 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/resources")
 public class ResourceController {
 
-    private static Logger getLogger() {
-        return LogManager.getLogger(ResourceController.class);
-    }
+	private static Logger getLogger() {
+		return LogManager.getLogger(ResourceController.class);
+	}
 
-    @PostConstruct
-    private static void init() throws IOException {
-        getLogger().info("Initializing resources.");
-        ResourceUtils.initResources();
-    }
+	@PostConstruct
+	private static void init() throws IOException {
+		getLogger().info("Initializing resources.");
+		ResourceUtils.initResources();
+	}
 
-    @GetMapping(value = "/user_constraints_files", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public JsonNode userConstraintsFiles(HttpServletResponse res) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        String filepath = ResourceUtils.getUserConstraintsFileMetaDataFile();
-        JsonNode rtn = mapper.readTree(new File(filepath));
-        return rtn;
-    }
+	@GetMapping(value = "/user_constraints_files", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public JsonNode userConstraintsFiles(HttpServletResponse res) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		String filepath = ResourceUtils.getUserConstraintsFileMetaDataFile();
+		JsonNode rtn = mapper.readTree(new File(filepath));
+		return rtn;
+	}
 
-    @GetMapping(value = "/input_sensor_files", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public JsonNode inputSensorFiles(HttpServletResponse res) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        String filepath = ResourceUtils.getInputSensorFileMetaDataFile();
-        JsonNode rtn = mapper.readTree(new File(filepath));
-        return rtn;
-    }
+	@GetMapping(value = "/input_sensor_files", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public JsonNode inputSensorFiles(HttpServletResponse res) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		String filepath = ResourceUtils.getInputSensorFileMetaDataFile();
+		JsonNode rtn = mapper.readTree(new File(filepath));
+		return rtn;
+	}
 
-    @GetMapping(value = "/output_device_files", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public JsonNode outputDeviceFiles(HttpServletResponse res) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        String filepath = ResourceUtils.getOutputDeviceFileMetaDataFile();
-        JsonNode rtn = mapper.readTree(new File(filepath));
-        return rtn;
-    }
+	@GetMapping(value = "/output_device_files", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public JsonNode outputDeviceFiles(HttpServletResponse res) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		String filepath = ResourceUtils.getOutputDeviceFileMetaDataFile();
+		JsonNode rtn = mapper.readTree(new File(filepath));
+		return rtn;
+	}
 
-    @GetMapping(value = "/settings", produces = { MediaType.APPLICATION_JSON_VALUE })
-    public JsonNode settings(HttpServletResponse res) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        String filepath = ResourceUtils.getSettingsFile();
-        JsonNode rtn = mapper.readTree(new File(filepath));
-        return rtn;
-    }
+	/**
+	 * Get the available settings for all applications.
+	 *
+	 * @param res The {@link HttpServletResponse} object.
+	 * @return The settings.
+	 * @throws IOException The settings file could not be produced.
+	 */
+	@GetMapping(value = "/settings", produces = { MediaType.APPLICATION_JSON_VALUE })
+	public JsonNode settings(HttpServletResponse res) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		String filepath = ResourceUtils.getSettingsFile();
+		JsonNode rtn = mapper.readTree(new File(filepath));
+		return rtn;
+	}
 
 }

@@ -100,6 +100,11 @@ public class ResourceUtils {
 		return rtn;
 	}
 
+	/**
+	 * Get the settings description file.
+	 *
+	 * @return The settings file.
+	 */
 	public static String getSettingsFile() {
 		String rtn = "";
 		rtn = getSettingsResourcesDirectory() + Utils.getFileSeparator() + "settings.json";
@@ -180,25 +185,14 @@ public class ResourceUtils {
 				break;
 			}
 		}
-		if (rtn == null) {
-			rtn = stages.addObject();
-			rtn.put("name", name);
-			rtn.putArray("algorithms");
-		}
 		return rtn;
 	}
 
-	private static Boolean isDefaultAlgo(String stage, String algo, JsonNode Configuration) {
-		Boolean rtn = false;
-		for (JsonNode node : Configuration.get("stages")) {
-			if (node.get("name").asText().equals(stage) && node.get("algorithm_name").asText().equals(algo)) {
-				rtn = true;
-				break;
-			}
-		}
-		return rtn;
-	}
-
+	/**
+	 * Build the complete description of all available settings.
+	 *
+	 * @throws IOException Unable to read or write resource.
+	 */
 	private static void initSettingsFile() throws IOException {
 		InputStream is = DNACompilerRuntimeEnv.class.getClassLoader().getResourceAsStream("Configuration.json");
 		ObjectMapper mapper = new ObjectMapper();
@@ -208,6 +202,11 @@ public class ResourceUtils {
 		ObjectNode DNACompiler = applications.addObject();
 		DNACompiler.put("name", "DNACompiler");
 		ArrayNode stages = DNACompiler.putArray("stages");
+		for (JsonNode node : Configuration.get("stages")) {
+			ObjectNode stage = stages.addObject();
+			stage.set("name", node.get("name"));
+			stage.putArray("algorithms");
+		}
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(
 		        DNACompilerRuntimeEnv.class.getClassLoader());
 		Resource resources[] = resolver.getResources("classpath:/algorithms/**/*.json");

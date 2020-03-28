@@ -1,0 +1,116 @@
+{
+  "applications" : [ {
+    "name" : "DNACompiler",
+    "stages" : [ {
+      "name" : "logicSynthesis",
+      "algorithms" : [ {
+        "name" : "Yosys",
+        "parameters" : [ {
+          "name" : "Gates",
+          "type" : "string",
+          "value" : "NOR"
+        }, {
+          "name" : "NetSynth",
+          "type" : "boolean",
+          "value" : true
+        } ]
+      } ],
+      "default" : "Yosys"
+    }, {
+      "name" : "logicOptimization",
+      "algorithms" : [ {
+        "name" : "maxFanout",
+        "parameters" : [ {
+          "name" : "max",
+          "type" : "int",
+          "value" : 4
+        } ]
+      } ],
+      "default" : "maxFanout"
+    }, {
+      "name" : "clustering",
+      "algorithms" : [ {
+        "name" : "CL_RC",
+        "parameters" : [ ]
+      } ],
+      "default" : "CL_RC"
+    }, {
+      "name" : "partitioning",
+      "algorithms" : [ {
+        "name" : "GPCC_BASE",
+        "parameters" : [ ]
+      }, {
+        "name" : "GPCC_SCIP_BASE",
+        "parameters" : [ ]
+      }, {
+        "name" : "GPCC_SUGARM_BASE",
+        "parameters" : [ {
+          "name" : "LowerBoundValue",
+          "type" : "int",
+          "value" : -1
+        }, {
+          "name" : "UpperBoundValue",
+          "type" : "int",
+          "value" : -1
+        }, {
+          "name" : "Attempts",
+          "type" : "int",
+          "value" : -1
+        }, {
+          "name" : "Iteration",
+          "type" : "int",
+          "value" : -1
+        } ]
+      }, {
+        "name" : "HMetis",
+        "parameters" : [ ]
+      } ],
+      "default" : "HMetis"
+    }, {
+      "name" : "technologyMapping",
+      "algorithms" : [ {
+        "name" : "SimulatedAnnealing",
+        "parameters" : [ ]
+      } ],
+      "default" : "SimulatedAnnealing"
+    }, {
+      "name" : "placing",
+      "algorithms" : [ {
+        "name" : "Eugene",
+        "parameters" : [ {
+          "name" : "MaxPlacements",
+          "type" : "int",
+          "value" : 5
+        } ]
+      }, {
+        "name" : "GPCC_GRID",
+        "parameters" : [ ]
+      } ],
+      "default" : "Eugene"
+    }, {
+      "name" : "export",
+      "algorithms" : [ {
+        "name" : "SBOL",
+        "parameters" : [ {
+          "name" : "RepositoryUrl",
+          "type" : "string",
+          "value" : "https://synbiohub.programmingbiology.org"
+        }, {
+          "name" : "CollectionUri",
+          "type" : "string",
+          "value" : "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/Eco1C1G1T1_collection/1"
+        }, {
+          "name" : "AddInteractions",
+          "type" : "boolean",
+          "value" : false
+        }, {
+          "name" : "AddDesignModules",
+          "type" : "boolean",
+          "value" : true
+        } ]
+      } ],
+      "default" : "SBOL"
+    } ]
+  } ],
+  "default" : "DNACompiler"
+}
