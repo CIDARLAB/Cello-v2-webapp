@@ -35,10 +35,48 @@ import org.cellocad.v2.webapp.common.CObject;
 public class Result extends CObject {
 
 	private File file;
+	private String stage;
+	private String tag;
 
 	public Result(File file) {
 		this.file = file;
 		this.setName(file.getName());
+		if (this.getName().endsWith("dpl.png")) {
+			this.stage = "placing";
+			this.tag = "dpl";
+		}
+		if (this.getName().startsWith("response_plot") && this.getName().endsWith(".png") ) {
+			this.stage = "technologyMapping";
+			this.tag = "response_plot";
+		}
+		if (this.getName().endsWith("_technologyMapping.png") ) {
+			this.stage = "technologyMapping";
+			this.tag = "topology";
+		}
+		if (this.getName().endsWith("_logicSynthesis.png") ) {
+			this.stage = "logicSynthesis";
+			this.tag = "topology";
+		}
+		if (this.getName().endsWith(".xml") ) {
+			this.stage = "export";
+			this.tag = "SBOL";
+		}
+		if (this.getName().endsWith("_logic.csv") ) {
+			this.stage = "logicSynthesis";
+			this.tag = "logic";
+		}
+		if (this.getName().endsWith("_activity.csv") ) {
+			this.stage = "technologyMapping";
+			this.tag = "activity";
+		}
+		if (this.getName().endsWith("_toxicity.csv") ) {
+			this.stage = "technologyMapping";
+			this.tag = "toxicity";
+		}
+		if (this.getName().endsWith("log.log") ) {
+			this.stage = "application";
+			this.tag = "log";
+		}
 	}
 
 	/**
