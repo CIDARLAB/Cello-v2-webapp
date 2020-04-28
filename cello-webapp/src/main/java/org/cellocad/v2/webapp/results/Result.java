@@ -88,4 +88,22 @@ public class Result extends CObject {
 		return file;
 	}
 
+	/**
+	 * Getter for <i>stage</i>
+	 * 
+	 * @return value of <i>stage</i>
+	 */
+	public String getStage() {
+		return stage;
+	}
+
+	/**
+	 * Getter for <i>tag</i>
+	 * 
+	 * @return value of <i>tag</i>
+	 */
+	public String getTag() {
+		return tag;
+	}
+
 }
