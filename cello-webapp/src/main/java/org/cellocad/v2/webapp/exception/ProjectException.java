@@ -1,15 +1,16 @@
-/**
+/*
  * Copyright (C) 2019 Boston University (BU)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
-
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,34 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.cellocad.v2.webapp.exception;
 
 /**
- *
+ * An exception associated with a project.
  *
  * @author Timothy Jones
- *
  * @date 2019-03-25
- *
  */
 public class ProjectException extends Exception {
 
-	private static final long serialVersionUID = 4296345331473607087L;
-	
-	public ProjectException() {
-		super();
-	}
+  private static final long serialVersionUID = 4296345331473607087L;
 
-	public ProjectException(String message) {
-		super(message);
-	}
+  public ProjectException() {
+    super();
+  }
 
-	public ProjectException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
-	public ProjectException(Throwable cause) {
-		super(cause);
-	}
+  public ProjectException(final String message) {
+    super(message);
+  }
 
+  public ProjectException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+
+  public ProjectException(final Throwable cause) {
+    super(cause);
+  }
 }

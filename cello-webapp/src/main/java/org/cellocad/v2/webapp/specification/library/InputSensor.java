@@ -1,31 +1,30 @@
-/**
+/*
  * Copyright (C) 2019 Boston University (BU)
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ * and associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
-
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
 package org.cellocad.v2.webapp.specification.library;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
 import org.cellocad.v2.webapp.exception.LibraryException;
 import org.cellocad.v2.webapp.specification.library.serialization.InputSensorSerializer;
 import org.sbolstandard.core2.Component;
@@ -35,126 +34,139 @@ import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLValidationException;
 import org.sbolstandard.core2.SequenceOntology;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 /**
- *
+ * An input sensor.
  *
  * @author Timothy Jones
- *
  * @date 2019-03-20
- *
  */
 @JsonSerialize(using = InputSensorSerializer.class)
 public class InputSensor {
-	
-	private String name;
-	private Collection<Part> parts;
-	private Part promoter;
-	private Double low;
-	private Double high;
-	private URI uri;
-	
-	/**
-	 * @param name
-	 * @param parts
-	 * @param promoter
-	 * @param low
-	 * @param high
-	 * @param uri
-	 */
-	public InputSensor(String name, Collection<Part> parts, Part promoter, Double low, Double high, URI uri) {
-		this.name = name;
-		this.parts = parts;
-		this.promoter = promoter;
-		this.low = low;
-		this.high = high;
-		this.uri = uri;
-	}
-	
-	/**
-	 * @param cd
-	 * @param document
-	 * @throws LibraryException
-	 */
-	public InputSensor(ComponentDefinition cd, SBOLDocument document) throws LibraryException {
-		this.name = cd.getDisplayId();
-		this.parts = new ArrayList<>();
-		List<Component> components;
-		try {
-			components = cd.getSortedComponents();
-		} catch (SBOLValidationException e) {
-			throw new LibraryException("Error with ComponentDefinition.");
-		}
-		for (Component c : components) {
-			parts.add(new Part(c.getDefinition()));
-		}
-		ComponentDefinition cds = null;
-		for (Component c : cd.getComponents()) {
-			ComponentDefinition def = c.getDefinition();
-			if (def.getRoles().contains(SequenceOntology.CDS)) {
-				cds = def;
-				break;
-			}
-		}
-		if (cds == null) {
-			throw new LibraryException("Error with ComponentDefinition.");
-		}
-		Set<Interaction> regulations = SBOLUtils.getRegulations(document, cds);
-		Interaction regulation = regulations.iterator().next();
-		this.low = Double.valueOf(SBOLUtils.getCelloAnnotationString(regulation,"ymax"));
-		this.high = Double.valueOf(SBOLUtils.getCelloAnnotationString(regulation,"ymin"));
-		ComponentDefinition promoter = SBOLUtils.getRegulated(document,cds).iterator().next();
-		this.promoter = new Part(promoter);
-		this.uri = cd.getIdentity();
-	}
 
-	/**
-	 * Getter for <i>name</i>
-	 * @return value of <i>name</i>
-	 */
-	public String getName() {
-		return name;
-	}
+  private final String name;
+  private final Collection<Part> parts;
+  private final Part promoter;
+  private final Double low;
+  private final Double high;
+  private final URI uri;
 
-	/**
-	 * Getter for <i>parts</i>
-	 * @return value of <i>parts</i>
-	 */
-	public Collection<Part> getParts() {
-		return parts;
-	}
+  /**
+   * Initialize a new input sensor.
+   *
+   * @param name The name of the sensor.
+   * @param parts The parts associated with the sensor.
+   * @param promoter The promoter associated with the sensor.
+   * @param low The minimal expression of the sensor.
+   * @param high The maximal expression of the sensor.
+   * @param uri The URI pointing to the sensor definition.
+   */
+  public InputSensor(
+      final String name,
+      final Collection<Part> parts,
+      final Part promoter,
+      final Double low,
+      final Double high,
+      final URI uri) {
+    this.name = name;
+    this.parts = parts;
+    this.promoter = promoter;
+    this.low = low;
+    this.high = high;
+    this.uri = uri;
+  }
 
-	/**
-	 * Getter for <i>promoter</i>
-	 * @return value of <i>promoter</i>
-	 */
-	public Part getPromoter() {
-		return promoter;
-	}
+  /**
+   * Build an input sensor from an appropriately constructed {@link ComponentDefinition}, i.e. one
+   * created by <a href=https://github.com/MyersResearchGroup/UCF2SBOL>UCF2SBOL</a>.
+   *
+   * @param cd The component definition encoding the input sensor.
+   * @param document The document that contains the component definition.
+   * @throws LibraryException Unable to build input sensor.
+   */
+  public InputSensor(final ComponentDefinition cd, final SBOLDocument document)
+      throws LibraryException {
+    name = cd.getDisplayId();
+    parts = new ArrayList<>();
+    List<Component> components;
+    try {
+      components = cd.getSortedComponents();
+    } catch (final SBOLValidationException e) {
+      throw new LibraryException("Error with ComponentDefinition.");
+    }
+    for (final Component c : components) {
+      parts.add(new Part(c.getDefinition()));
+    }
+    ComponentDefinition cds = null;
+    for (final Component c : cd.getComponents()) {
+      final ComponentDefinition def = c.getDefinition();
+      if (def.getRoles().contains(SequenceOntology.CDS)) {
+        cds = def;
+        break;
+      }
+    }
+    if (cds == null) {
+      throw new LibraryException("Error with ComponentDefinition.");
+    }
+    final Set<Interaction> regulations = SBOLUtils.getRegulations(document, cds);
+    final Interaction regulation = regulations.iterator().next();
+    low = Double.valueOf(SBOLUtils.getCelloAnnotationString(regulation, "ymax"));
+    high = Double.valueOf(SBOLUtils.getCelloAnnotationString(regulation, "ymin"));
+    final ComponentDefinition promoter = SBOLUtils.getRegulated(document, cds).iterator().next();
+    this.promoter = new Part(promoter);
+    uri = cd.getIdentity();
+  }
 
-	/**
-	 * Getter for <i>low</i>
-	 * @return value of <i>low</i>
-	 */
-	public Double getLow() {
-		return low;
-	}
+  /**
+   * Getter for {@code name}.
+   *
+   * @return The value of {@code name}.
+   */
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * Getter for <i>high</i>
-	 * @return value of <i>high</i>
-	 */
-	public Double getHigh() {
-		return high;
-	}
+  /**
+   * Getter for {@code parts}.
+   *
+   * @return The value of {@code parts}.
+   */
+  public Collection<Part> getParts() {
+    return parts;
+  }
 
-	/**
-	 * Getter for <i>uri</i>
-	 * @return value of <i>uri</i>
-	 */
-	public URI getUri() {
-		return uri;
-	}
+  /**
+   * Getter for {@code promoter}.
+   *
+   * @return The value of {@code promoter}.
+   */
+  public Part getPromoter() {
+    return promoter;
+  }
 
+  /**
+   * Getter for {@code low}.
+   *
+   * @return The value of {@code low}.
+   */
+  public Double getLow() {
+    return low;
+  }
+
+  /**
+   * Getter for {@code high}.
+   *
+   * @return The value of {@code high}.
+   */
+  public Double getHigh() {
+    return high;
+  }
+
+  /**
+   * Getter for {@code uri}.
+   *
+   * @return The value of {@code uri}.
+   */
+  public URI getUri() {
+    return uri;
+  }
 }

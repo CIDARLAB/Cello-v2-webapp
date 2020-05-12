@@ -1,15 +1,16 @@
-/**
+/*
  * Copyright (C) 2019 Boston University (BU)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
-
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,14 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.cellocad.v2.webapp.user;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-
 import javax.validation.constraints.NotNull;
-
 import org.bson.types.ObjectId;
 import org.cellocad.v2.webapp.project.Project;
 import org.cellocad.v2.webapp.specification.library.TargetDataLibraryResource;
@@ -34,104 +34,109 @@ import org.springframework.data.annotation.Persistent;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 /**
- *
+ * A user.
  *
  * @author Timothy Jones
- *
- * 2019-03-17
- *
+ * @date 2019-03-17
  */
 @Persistent
 public class ApplicationUser {
 
-	@Id
-    private ObjectId id = new ObjectId();
-	@NotNull(message = "Missing username.")
-    private String username;
-	@NotNull(message = "Missing password.")
-    private String password;
-	private String institution;
-	private String name;
+  @Id private final ObjectId id = new ObjectId();
 
-	private Collection<TargetDataLibraryResource> ucfLibraryResources = new ArrayList<TargetDataLibraryResource>();
+  @NotNull(message = "Missing username.")
+  private String username;
 
-	@DBRef
-	private Collection<Project> projects = new LinkedList<Project>();
+  @NotNull(message = "Missing password.")
+  private String password;
 
-    public ObjectId getId() {
-        return id;
-    }
+  private String institution;
+  private String name;
 
-    public String getUsername() {
-        return username;
-    }
+  private final Collection<TargetDataLibraryResource> ucfLibraryResources = new ArrayList<>();
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+  @DBRef private Collection<Project> projects = new LinkedList<>();
 
-    public String getPassword() {
-        return password;
-    }
+  public ObjectId getId() {
+    return id;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-	/**
-	 * Getter for <i>institution</i>
-	 * @return value of <i>institution</i>
-	 */
-	public String getInstitution() {
-		return institution;
-	}
+  public void setUsername(final String username) {
+    this.username = username;
+  }
 
-	/**
-	 * Setter for <i>institution</i>
-	 * @param institution the value to set <i>institution</i>
-	 */
-	public void setInstitution(String institution) {
-		this.institution = institution;
-	}
+  public String getPassword() {
+    return password;
+  }
 
-	/**
-	 * Getter for <i>name</i>
-	 * @return value of <i>name</i>
-	 */
-	public String getName() {
-		return name;
-	}
+  public void setPassword(final String password) {
+    this.password = password;
+  }
 
-	/**
-	 * Setter for <i>name</i>
-	 * @param name the value to set <i>name</i>
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+  /**
+   * Getter for {@code institution}.
+   *
+   * @return The value of {@code institution}.
+   */
+  public String getInstitution() {
+    return institution;
+  }
 
-	/**
-	 * Getter for <i>ucfs</i>
-	 * @return value of <i>ucfs</i>
-	 */
-	public Collection<TargetDataLibraryResource> getUcfLibraryResources() {
-		return ucfLibraryResources;
-	}
+  /**
+   * Setter for {@code institution}.
+   *
+   * @param institution The value to set {@code institution}.
+   */
+  public void setInstitution(final String institution) {
+    this.institution = institution;
+  }
 
-	/**
-	 * Getter for <i>projects</i>
-	 * @return value of <i>projects</i>
-	 */
-	public Collection<Project> getProjects() {
-		return projects;
-	}
+  /**
+   * Getter for {@code name}.
+   *
+   * @return The value of {@code name}.
+   */
+  public String getName() {
+    return name;
+  }
 
-	/**
-	 * Setter for <i>projects</i>
-	 * @param projects the value to set <i>projects</i>
-	 */
-	public void setProjects(Collection<Project> projects) {
-		this.projects = projects;
-	}
-	
+  /**
+   * Setter for {@code name}.
+   *
+   * @param name The value to set {@code name}.
+   */
+  public void setName(final String name) {
+    this.name = name;
+  }
+
+  /**
+   * Getter for {@code ucfLibraryResources}.
+   *
+   * @return The value of {@code ucfLibraryResources}.
+   */
+  public Collection<TargetDataLibraryResource> getUcfLibraryResources() {
+    return ucfLibraryResources;
+  }
+
+  /**
+   * Getter for {@code projects}.
+   *
+   * @return The value of {@code projects}.
+   */
+  public Collection<Project> getProjects() {
+    return projects;
+  }
+
+  /**
+   * Setter for {@code projects}.
+   *
+   * @param projects The value to set {@code projects}.
+   */
+  public void setProjects(final Collection<Project> projects) {
+    this.projects = projects;
+  }
 }

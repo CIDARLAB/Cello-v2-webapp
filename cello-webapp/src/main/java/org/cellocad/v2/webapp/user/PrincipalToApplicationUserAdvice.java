@@ -1,15 +1,16 @@
-/**
+/*
  * Copyright (C) 2019 Boston University (BU)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
-
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,33 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.cellocad.v2.webapp.user;
 
 import java.security.Principal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 /**
- *
+ * Advice to get a user from their credentials.
  *
  * @author Timothy Jones
- *
  * @date 2019-03-19
- *
  */
 @ControllerAdvice
 public class PrincipalToApplicationUserAdvice {
 
-	@Autowired
-	private ApplicationUserRepository applicationUserRepository;
+  @Autowired private ApplicationUserRepository applicationUserRepository;
 
-	@ModelAttribute
-	public ApplicationUser getUser(Principal principal) {
-		if (principal == null)
-			return null;
-		return applicationUserRepository.findByUsername(principal.getName());
-	}
-
+  /**
+   * Gets the user from the principal.
+   *
+   * @param principal The principal.
+   * @return The user corresponding to the principal.
+   */
+  @ModelAttribute
+  public ApplicationUser getUser(final Principal principal) {
+    if (principal == null) {
+      return null;
+    }
+    return applicationUserRepository.findByUsername(principal.getName());
+  }
 }

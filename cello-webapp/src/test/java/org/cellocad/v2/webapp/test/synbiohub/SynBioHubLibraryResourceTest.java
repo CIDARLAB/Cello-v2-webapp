@@ -1,15 +1,16 @@
-/**
+/*
  * Copyright (C) 2019 Boston University (BU)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
-
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,36 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.cellocad.v2.webapp.test.synbiohub;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-
 import org.cellocad.v2.webapp.exception.LibraryException;
 import org.cellocad.v2.webapp.specification.library.SynBioHubLibraryResource;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.Test;
 
 /**
- *
+ * Tests for {@link SynBioHubLibraryResource}.
  *
  * @author Timothy Jones
- *
  * @date 2019-03-22
- *
  */
-public class SynBioHubTest {
+public class SynBioHubLibraryResourceTest {
 
-	// @Test
-	public void test() throws MalformedURLException, LibraryException, JsonProcessingException {
-		URL url = new URL("https://synbiohub.programmingbiology.org");
-		URI uri = URI.create("https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/Eco1C1G1T1_collection/1");
-		SynBioHubLibraryResource resource = new SynBioHubLibraryResource(url,uri);
-		resource.getLibrary();
-		// Library library = resource.getLibrary();
-		// ObjectMapper mapper = new ObjectMapper();
-		// System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(library));
-	}
-
+  @Test
+  public void test() throws MalformedURLException, LibraryException, JsonProcessingException {
+    final URL url = new URL("https://synbiohub.programmingbiology.org");
+    final URI uri =
+        URI.create(
+            "https://synbiohub.programmingbiology.org/public/Eco1C1G1T1/Eco1C1G1T1_collection/1");
+    // final SynBioHubLibraryResource resource =
+    new SynBioHubLibraryResource(url, uri);
+    // resource.getLibrary();
+    // Library library = resource.getLibrary();
+    // ObjectMapper mapper = new ObjectMapper();
+    // System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(library));
+  }
 }

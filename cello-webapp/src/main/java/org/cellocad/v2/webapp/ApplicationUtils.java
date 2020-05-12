@@ -1,15 +1,16 @@
-/**
+/*
  * Copyright (C) 2019 Boston University (BU)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
-
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,80 +19,75 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
 package org.cellocad.v2.webapp;
 
 import org.cellocad.v2.webapp.common.Utils;
 
 /**
- * A Utils class for the {@link Application} class.
+ * Utility methods for the {@link Application}.
  *
  * @author Timothy Jones
- *
  * @date 2019-02-23
- *
  */
 public class ApplicationUtils {
 
-    // https://github.com/spring-projects/spring-boot/blob/4b670f8696e252f4a5cc596b9f8a96ca7978daa1/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/system/ApplicationHome.java#L105
-    private static boolean isUnitTest() {
-        try {
-            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-            for (int i = stackTrace.length - 1; i >= 0; i--) {
-                if (stackTrace[i].getClassName().startsWith("org.junit.")) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
+  // https://github.com/spring-projects/spring-boot/blob/4b670f8696e252f4a5cc596b9f8a96ca7978daa1/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/system/ApplicationHome.java#L105
+  private static boolean isUnitTest() {
+    try {
+      final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+      for (int i = stackTrace.length - 1; i >= 0; i--) {
+        if (stackTrace[i].getClassName().startsWith("org.junit.")) {
+          return true;
         }
-        return false;
+      }
+    } catch (final Exception e) {
+      return false;
     }
+    return false;
+  }
 
-    private static String getApplicationDirectory() {
-        String rtn = "";
-        rtn += Utils.getFilepath();
-        if (isUnitTest()) {
-            rtn += "target";
-            rtn += Utils.getFileSeparator();
-            rtn += "test-classes";
-            rtn += Utils.getFileSeparator();
-        }
-        return rtn;
+  private static String getApplicationDirectory() {
+    String rtn = "";
+    rtn += Utils.getFilepath();
+    if (ApplicationUtils.isUnitTest()) {
+      rtn += "target";
+      rtn += Utils.getFileSeparator();
+      rtn += "test-classes";
+      rtn += Utils.getFileSeparator();
     }
+    return rtn;
+  }
 
-    /**
-     * Get the projects directory.
-     *
-     * @return The projects directory.
-     */
-    public static String getProjectsDirectory() {
-        String rtn = "";
-        rtn += getApplicationDirectory() + "projects";
-        return rtn;
-    }
+  /**
+   * Get the projects directory.
+   *
+   * @return The projects directory.
+   */
+  public static String getProjectsDirectory() {
+    String rtn = "";
+    rtn += ApplicationUtils.getApplicationDirectory() + "projects";
+    return rtn;
+  }
 
-    /**
-     * Create the projects directory.
-     */
-    public static void createProjectsDirectory() {
-        Utils.makeDirectory(getProjectsDirectory());
-    }
+  /** Create the projects directory. */
+  public static void createProjectsDirectory() {
+    Utils.makeDirectory(ApplicationUtils.getProjectsDirectory());
+  }
 
-    /**
-     * Get the resources directory.
-     *
-     * @return The resources directory.
-     */
-    public static String getResourcesDirectory() {
-        String rtn = "";
-        rtn += getApplicationDirectory() + "resources";
-        return rtn;
-    }
+  /**
+   * Get the resources directory.
+   *
+   * @return The resources directory.
+   */
+  public static String getResourcesDirectory() {
+    String rtn = "";
+    rtn += ApplicationUtils.getApplicationDirectory() + "resources";
+    return rtn;
+  }
 
-    /**
-     * Create the resources directory.
-     */
-    public static void createResourcesDirectory() {
-        Utils.makeDirectory(getResourcesDirectory());
-    }
-
+  /** Create the resources directory. */
+  public static void createResourcesDirectory() {
+    Utils.makeDirectory(ApplicationUtils.getResourcesDirectory());
+  }
 }

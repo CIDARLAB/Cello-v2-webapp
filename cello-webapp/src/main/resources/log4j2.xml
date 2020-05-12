@@ -4,48 +4,48 @@
     <Property name="CONSOLE_LOG_PATTERN">
       %style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{dim} %-5level [%style{%-15.15thread}{magenta}] %style{%-30.30c{1.}}{cyan} - %msg%n
     </Property>
-	<Property name="FILE_LOG_PATTERN">
-	  %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-15.15thread] %-30.30c{1} - %msg%n
-	</Property>
-	<Property name="logFilepath">.</Property>
+    <Property name="FILE_LOG_PATTERN">
+      %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-15.15thread] %-30.30c{1} - %msg%n
+    </Property>
+    <Property name="logFilepath">.</Property>
   </Properties>
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="${CONSOLE_LOG_PATTERN}"/>
     </Console>
-	<Routing name="Routing">
-	  <Routes pattern="$${ctx:logFilepath}">
-		<Route>
-		  <File name="${ctx:logFilepath}" fileName="${ctx:logFilepath}/log.log">
-			<PatternLayout pattern="${FILE_LOG_PATTERN}"/>
-		  </File>
-		</Route>
-	  </Routes>
-	</Routing>
+    <Routing name="Routing">
+      <Routes pattern="$${ctx:logFilepath}">
+        <Route>
+          <File name="${ctx:logFilepath}" fileName="${ctx:logFilepath}/log.log">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+          </File>
+        </Route>
+      </Routes>
+    </Routing>
   </Appenders>
   <Loggers>
-	<Logger name="org.cellocad.v2.logicSynthesis" level="INFO" additivity="false">
-	  <AppenderRef ref="Routing" />
-	</Logger>
-	<Logger name="org.cellocad.v2.technologyMapping" level="INFO" additivity="false">
-	  <AppenderRef ref="Routing" />
-	</Logger>
-	<Logger name="org.cellocad.v2.DNACompiler" level="INFO" additivity="false">
-	  <AppenderRef ref="Routing" />
-	</Logger>
-	<Logger name="org.cellocad.v2.export" level="INFO" additivity="false">
-	  <AppenderRef ref="Routing" />
-	</Logger>
-	<Logger name="org.cellocad.v2.placing" level="INFO" additivity="false">
-	  <AppenderRef ref="Routing" />
-	</Logger>
-	<Logger name="org.springframework" level="INFO" additivity="false" />
-	<Logger name="org.mongodb" level="WARN" additivity="false" />
-	<Logger name="org.apache" level="WARN" additivity="false" />
-	<Logger name="org.cellocad.v2.webapp" level="INFO" additivity="false">
-	  <AppenderRef ref="Console" />
-	</Logger>
-	<Root level="INFO">
+    <Logger name="org.cellocad.v2.logicSynthesis" level="INFO" additivity="false">
+      <AppenderRef ref="Routing" />
+    </Logger>
+    <Logger name="org.cellocad.v2.technologyMapping" level="INFO" additivity="false">
+      <AppenderRef ref="Routing" />
+    </Logger>
+    <Logger name="org.cellocad.v2.DNACompiler" level="INFO" additivity="false">
+      <AppenderRef ref="Routing" />
+    </Logger>
+    <Logger name="org.cellocad.v2.export" level="INFO" additivity="false">
+      <AppenderRef ref="Routing" />
+    </Logger>
+    <Logger name="org.cellocad.v2.placing" level="INFO" additivity="false">
+      <AppenderRef ref="Routing" />
+    </Logger>
+    <Logger name="org.springframework" level="INFO" additivity="false" />
+    <Logger name="org.mongodb" level="WARN" additivity="false" />
+    <Logger name="org.apache" level="WARN" additivity="false" />
+    <Logger name="org.cellocad.v2.webapp" level="INFO" additivity="false">
+      <AppenderRef ref="Console" />
+    </Logger>
+    <Root level="INFO">
       <AppenderRef ref="Console" />
     </Root>
   </Loggers>

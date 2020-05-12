@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+  <!-- Allow non-standard method names for integration tests -->
+  <suppress checks="MethodName" files="[a-zA-Z0-9]+(IT|Test).java"/>
+  <!-- Non-standard algorithm names -->
+  <suppress checks="TypeName" files="maxFanout[a-zA-Z]*.java"/>
+  <suppress checks="AbbreviationAsWordInName" files="(GPCC_BASE|GPCC_SCIP_BASE|GPCC_SUGARM_BASE|GPCC_GRID|SBOL|DNACompiler)[a-zA-Z_]*.java"/>
+</suppressions>
