@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -267,10 +268,11 @@ public class ResourceUtils {
     final Resource[] resources = resolver.getResources("classpath:/algorithms/**/*.json");
     for (final Resource r : resources) {
       final InputStream i = r.getInputStream();
-      final File algo = r.getFile().getParentFile();
-      final File stage = algo.getParentFile();
+      final URI uri = r.getURI();
+      final String[] segments = uri.toURL().getPath().split("/");
+      final String stage = segments[segments.length - 3];
       final JsonNode refAlgoNode = mapper.readTree(i);
-      final ObjectNode stageNode = ResourceUtils.getStageNode(stage.getName(), stages);
+      final ObjectNode stageNode = ResourceUtils.getStageNode(stage, stages);
       final ArrayNode algorithms = (ArrayNode) stageNode.get("algorithms");
       final ObjectNode algoNode = algorithms.addObject();
       algoNode.set("name", refAlgoNode.get("name"));
