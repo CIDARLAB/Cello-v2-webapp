@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cellocad.v2.DNACompiler.runtime.environment.DNACompilerRuntimeEnv;
 import org.cellocad.v2.webapp.ApplicationUtils;
 import org.cellocad.v2.webapp.common.Utils;
@@ -46,6 +48,10 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
  * @date 2020-03-08
  */
 public class ResourceUtils {
+
+  private static Logger getLogger() {
+    return LogManager.getLogger(ResourceUtils.class);
+  }
 
   private static String getTargetDataResourcesDirectory() {
     String rtn = "";
@@ -188,22 +194,39 @@ public class ResourceUtils {
   }
 
   private static void initTargetDataResources() throws IOException {
-    Utils.makeDirectory(ResourceUtils.getTargetDataResourcesDirectory());
+    // Create directory
+    String baseDir = ResourceUtils.getTargetDataResourcesDirectory();
+    getLogger().debug(String.format("Creating target data resources directory at %s.", baseDir));
+    Utils.makeDirectory(baseDir);
+    // Reused variables
     String dir = "";
     String metadata = "";
     // user constraints
     dir = ResourceUtils.getUserConstraintsFileResourcesDirectory();
+    getLogger()
+        .debug(String.format("Creating user constraints file resources directory at %s.", dir));
     metadata = ResourceUtils.getUserConstraintsFileMetaDataFile();
+    getLogger()
+        .debug(
+            String.format(
+                "Initializing user constraints file resources metadata at %s.", metadata));
     ResourceUtils.initTargetDataResources(
         dir, metadata, "classpath:/lib/files/v2/ucf/**/*.UCF.json");
     // input sensor
     dir = ResourceUtils.getInputSensorFileResourcesDirectory();
+    getLogger().debug(String.format("Creating input sensor file resources directory at %s.", dir));
     metadata = ResourceUtils.getInputSensorFileMetaDataFile();
+    getLogger()
+        .debug(String.format("Initializing input sensor file resources metadata at %s.", metadata));
     ResourceUtils.initTargetDataResources(
         dir, metadata, "classpath:/lib/files/v2/input/**/*.input.json");
     // output device
     dir = ResourceUtils.getOutputDeviceFileResourcesDirectory();
+    getLogger().debug(String.format("Creating output device file resources directory at %s.", dir));
     metadata = ResourceUtils.getOutputDeviceFileMetaDataFile();
+    getLogger()
+        .debug(
+            String.format("Initializing output device file resources metadata at %s.", metadata));
     ResourceUtils.initTargetDataResources(
         dir, metadata, "classpath:/lib/files/v2/output/**/*.output.json");
   }
@@ -263,7 +286,12 @@ public class ResourceUtils {
   }
 
   private static void initSettingsResources() throws IOException {
-    Utils.makeDirectory(ResourceUtils.getSettingsResourcesDirectory());
+    // Create directory
+    String dir = ResourceUtils.getSettingsResourcesDirectory();
+    getLogger().debug(String.format("Creating settings directory at %s.", dir));
+    Utils.makeDirectory(dir);
+    // Initialize settings file
+    getLogger().debug(String.format("Creating settings file."));
     ResourceUtils.initSettingsFile();
   }
 
@@ -273,8 +301,15 @@ public class ResourceUtils {
    * @throws IOException Unable to read or write resources.
    */
   public static void initResources() throws IOException {
+    // Create directory
+    String dir = ApplicationUtils.getResourcesDirectory();
+    getLogger().debug(String.format("Creating resource directory at %s.", dir));
     Utils.makeDirectory(ApplicationUtils.getResourcesDirectory());
+    // Initialize target data resources
+    getLogger().debug("Initializing target data resources.");
     ResourceUtils.initTargetDataResources();
+    // Initialize settings description for webapp
+    getLogger().debug("Initializing settings description.");
     ResourceUtils.initSettingsResources();
   }
 }

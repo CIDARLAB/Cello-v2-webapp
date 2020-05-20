@@ -51,8 +51,9 @@ public class ResourceController {
 
   @PostConstruct
   private static void init() throws IOException {
-    ResourceController.getLogger().info("Initializing resources.");
+    getLogger().debug("Initializing resources.");
     ResourceUtils.initResources();
+    getLogger().debug("Resource initialization completed.");
   }
 
   /**
