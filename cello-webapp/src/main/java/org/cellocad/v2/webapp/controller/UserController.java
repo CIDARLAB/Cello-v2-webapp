@@ -54,8 +54,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/users")
 public class UserController {
 
-  private final ApplicationUserRepository applicationUserRepository;
-  private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private ApplicationUserRepository applicationUserRepository;
+  private BCryptPasswordEncoder bCryptPasswordEncoder;
 
   public UserController(
       final ApplicationUserRepository applicationUserRepository,

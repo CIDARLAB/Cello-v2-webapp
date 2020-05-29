@@ -50,16 +50,16 @@ import org.sbolstandard.core2.SequenceOntology;
 @JsonSerialize(using = GateSerializer.class)
 public class Gate {
 
-  private final String regulator;
-  private final String group;
-  private final String name;
-  private final String type;
-  private final String system;
-  private final String color;
-  private final URI uri;
+  private String regulator;
+  private String group;
+  private String name;
+  private String type;
+  private String system;
+  private String color;
+  private URI uri;
 
-  private final GateParts gateParts;
-  private final ResponseFunction responseFunction;
+  private GateParts gateParts;
+  private ResponseFunction responseFunction;
 
   public Collection<JsonNode> objects;
 

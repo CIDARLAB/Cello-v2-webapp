@@ -30,9 +30,9 @@ import java.io.File;
  */
 public class TargetDataLibraryResource extends LibraryResource {
 
-  private final File userConstraintsFile;
-  private final File inputSensorFile;
-  private final File outputDeviceFile;
+  private File userConstraintsFile;
+  private File inputSensorFile;
+  private File outputDeviceFile;
 
   /**
    * Initialize a new target data library resource.

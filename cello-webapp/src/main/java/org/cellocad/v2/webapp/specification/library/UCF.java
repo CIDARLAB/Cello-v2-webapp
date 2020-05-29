@@ -29,7 +29,7 @@ import java.io.File;
  */
 public class UCF {
 
-  private final File file;
+  private File file;
 
   public UCF(final File ucf) {
     file = ucf;

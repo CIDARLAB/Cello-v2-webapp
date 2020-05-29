@@ -40,9 +40,9 @@ import org.sbolstandard.core2.SBOLValidationException;
 @JsonSerialize(using = OutputReporterSerializer.class)
 public class OutputReporter {
 
-  private final String name;
-  private final Collection<Part> parts;
-  private final URI uri;
+  private String name;
+  private Collection<Part> parts;
+  private URI uri;
 
   /**
    * Initialze an output reporter.

@@ -33,8 +33,8 @@ import org.synbiohub.frontend.SynBioHubException;
  */
 public class SynBioHubLibraryResource extends LibraryResource {
 
-  private final URL registry;
-  private final URI collection;
+  private URL registry;
+  private URI collection;
 
   public SynBioHubLibraryResource(final URL registry, final URI collection) {
     this.registry = registry;

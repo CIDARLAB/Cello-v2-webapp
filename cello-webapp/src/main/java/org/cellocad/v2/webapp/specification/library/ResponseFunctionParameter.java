@@ -27,8 +27,8 @@ package org.cellocad.v2.webapp.specification.library;
  */
 public class ResponseFunctionParameter {
 
-  private final String name;
-  private final Double value;
+  private String name;
+  private Double value;
 
   public ResponseFunctionParameter(final String name, final Double value) {
     this.name = name;

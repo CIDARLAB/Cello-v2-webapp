@@ -43,12 +43,12 @@ import org.sbolstandard.core2.SequenceOntology;
 @JsonSerialize(using = InputSensorSerializer.class)
 public class InputSensor {
 
-  private final String name;
-  private final Collection<Part> parts;
-  private final Part promoter;
-  private final Double low;
-  private final Double high;
-  private final URI uri;
+  private String name;
+  private Collection<Part> parts;
+  private Part promoter;
+  private Double low;
+  private Double high;
+  private URI uri;
 
   /**
    * Initialize a new input sensor.

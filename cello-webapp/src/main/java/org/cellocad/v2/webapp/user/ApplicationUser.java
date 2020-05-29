@@ -42,7 +42,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 @Persistent
 public class ApplicationUser {
 
-  @Id private final ObjectId id = new ObjectId();
+  @Id private ObjectId id = new ObjectId();
 
   @NotNull(message = "Missing username.")
   private String username;
@@ -53,7 +53,7 @@ public class ApplicationUser {
   private String institution;
   private String name;
 
-  private final Collection<TargetDataLibraryResource> ucfLibraryResources = new ArrayList<>();
+  private Collection<TargetDataLibraryResource> ucfLibraryResources = new ArrayList<>();
 
   @DBRef private Collection<Project> projects = new LinkedList<>();
 

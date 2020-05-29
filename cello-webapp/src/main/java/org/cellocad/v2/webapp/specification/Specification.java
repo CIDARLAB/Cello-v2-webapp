@@ -36,10 +36,10 @@ import org.cellocad.v2.webapp.specification.settings.Settings;
  */
 public class Specification {
 
-  private final String verilog;
-  private final Settings settings;
-  private final Constraints constraints;
-  private final LibraryResource libraryResource;
+  private String verilog;
+  private Settings settings;
+  private Constraints constraints;
+  private LibraryResource libraryResource;
 
   /**
    * Initialize a project specification.

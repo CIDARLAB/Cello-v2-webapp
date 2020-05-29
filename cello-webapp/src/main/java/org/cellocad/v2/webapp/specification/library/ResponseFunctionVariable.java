@@ -27,7 +27,7 @@ package org.cellocad.v2.webapp.specification.library;
  */
 public class ResponseFunctionVariable {
 
-  private final String name;
+  private String name;
   private Double offThreshold;
   private Double onThreshold;
 

@@ -38,9 +38,9 @@ import org.sbolstandard.core2.ComponentDefinition;
  */
 public class ResponseFunction {
 
-  private final String equation;
-  private final Collection<ResponseFunctionVariable> variables;
-  private final Collection<ResponseFunctionParameter> parameters;
+  private String equation;
+  private Collection<ResponseFunctionVariable> variables;
+  private Collection<ResponseFunctionParameter> parameters;
 
   /**
    * Initialize a response function based on an SBOL component definition.

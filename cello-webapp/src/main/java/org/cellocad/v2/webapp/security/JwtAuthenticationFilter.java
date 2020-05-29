@@ -48,7 +48,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-  private final AuthenticationManager authenticationManager;
+  private AuthenticationManager authenticationManager;
 
   public JwtAuthenticationFilter(final AuthenticationManager authenticationManager) {
     this.authenticationManager = authenticationManager;

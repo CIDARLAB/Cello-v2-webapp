@@ -36,8 +36,8 @@ import org.cellocad.v2.webapp.specification.settings.serialization.SettingsDeser
 @JsonDeserialize(using = SettingsDeserializer.class)
 public class Settings {
 
-  private final String application;
-  private final Map<String, String> settings;
+  private String application;
+  private Map<String, String> settings;
 
   public Settings(final Map<String, String> settings, final String application) {
     this.application = application;

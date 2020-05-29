@@ -59,8 +59,8 @@ public class DNACompilerProject extends Project {
 
   public class DNACompilerMainCallable implements Callable<Void> {
 
-    private final String[] args;
-    private final String outputDir;
+    private String[] args;
+    private String outputDir;
 
     public DNACompilerMainCallable(final String[] args, final String outputDir) {
       this.args = args;

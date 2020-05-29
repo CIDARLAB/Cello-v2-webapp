@@ -33,7 +33,7 @@ import org.cellocad.v2.webapp.common.CObject;
  */
 public class Result extends CObject {
 
-  private final File file;
+  private File file;
 
   public Result(final File file) {
     this.file = file;

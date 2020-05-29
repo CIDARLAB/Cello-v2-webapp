@@ -38,13 +38,13 @@ public class Part {
   @JsonProperty(LibrarySerializationConstants.S_UCF_COLLECTION)
   private static final String S_UCF_COLLECTION = "parts";
 
-  private final String name;
-  private final String type;
+  private String name;
+  private String type;
 
   @JsonProperty("dnasequence")
   private String sequence;
 
-  private final URI uri;
+  private URI uri;
 
   /**
    * Initialize a part from an SBOL component definition.

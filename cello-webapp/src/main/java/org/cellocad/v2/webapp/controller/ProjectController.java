@@ -63,8 +63,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class ProjectController {
 
-  @Autowired private final ApplicationUserRepository applicationUserRepository;
-  @Autowired private final ProjectRepository projectRepository;
+  @Autowired private ApplicationUserRepository applicationUserRepository;
+  @Autowired private ProjectRepository projectRepository;
 
   public ProjectController(
       final ApplicationUserRepository applicationUserRepository,

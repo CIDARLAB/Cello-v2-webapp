@@ -61,8 +61,8 @@ public class CustomWebSecurity extends WebSecurityConfigurerAdapter {
     "/cordova-js-src/**"
   };
 
-  private final UserDetailsServiceImpl userDetailsService;
-  private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private UserDetailsServiceImpl userDetailsService;
+  private BCryptPasswordEncoder bCryptPasswordEncoder;
 
   public CustomWebSecurity(
       final UserDetailsServiceImpl userDetailsService,

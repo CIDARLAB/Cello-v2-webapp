@@ -45,7 +45,7 @@ public class ExecCommand {
   private Process p;
 
   private class InputWriter extends Thread {
-    private final String input;
+    private String input;
 
     public InputWriter(final String input) {
       this.input = input;

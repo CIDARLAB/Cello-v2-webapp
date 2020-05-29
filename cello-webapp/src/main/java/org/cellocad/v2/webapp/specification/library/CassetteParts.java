@@ -29,7 +29,7 @@ import java.util.Collection;
  */
 public class CassetteParts {
 
-  private final Collection<Part> parts;
+  private Collection<Part> parts;
 
   public CassetteParts(final Collection<Part> parts) {
     this.parts = parts;
