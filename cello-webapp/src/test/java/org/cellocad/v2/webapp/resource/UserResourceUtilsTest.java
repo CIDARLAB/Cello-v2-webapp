@@ -22,24 +22,10 @@
 
 package org.cellocad.v2.webapp.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import java.io.IOException;
-import org.cellocad.v2.webapp.common.Utils;
-
 /**
- * General utilities for resources.
+ * Tests for {@link UserResourceUtils}.
  *
  * @author Timothy Jones
  * @date 2020-05-30
  */
-public class ResourceUtils {
-
-  static void initMetaDataFile(final String filepath) throws IOException {
-    Utils.createFile(filepath);
-    // write empty array
-    final ObjectMapper mapper = new ObjectMapper();
-    final ArrayNode arr = mapper.createArrayNode();
-    Utils.writeToFile(arr.toString(), filepath);
-  }
-}
+public class UserResourceUtilsTest {}

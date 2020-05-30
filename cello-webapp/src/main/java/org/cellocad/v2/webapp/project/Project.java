@@ -111,9 +111,9 @@ public abstract class Project {
       throws ProjectException {
     this.name = name;
     final ObjectMapper mapper = new ObjectMapper();
-    ProjectUtils.createProjectDirectory(user, name);
+    ProjectUtils.initUserProjectDirectory(user, name);
     id = new ObjectId();
-    filepath = new File(ProjectUtils.getProjectDirectory(user, name)).getAbsolutePath();
+    filepath = new File(ProjectUtils.getUserProjectDirectory(user, name)).getAbsolutePath();
     created = new Date();
     // verilog
     final String verilogFilepath = filepath.toString() + Utils.getFileSeparator() + name + ".v";

@@ -20,26 +20,52 @@
  * SOFTWARE.
  */
 
-package org.cellocad.v2.webapp.resource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import java.io.IOException;
-import org.cellocad.v2.webapp.common.Utils;
+package org.cellocad.v2.webapp.resource.library;
 
 /**
- * General utilities for resources.
+ * A descriptor for a user constraints file.
  *
  * @author Timothy Jones
  * @date 2020-05-30
  */
-public class ResourceUtils {
+public class UserConstraintsFileDescriptor {
 
-  static void initMetaDataFile(final String filepath) throws IOException {
-    Utils.createFile(filepath);
-    // write empty array
-    final ObjectMapper mapper = new ObjectMapper();
-    final ArrayNode arr = mapper.createArrayNode();
-    Utils.writeToFile(arr.toString(), filepath);
+  private String file;
+  private Header header;
+
+  /**
+   * Getter for {@code file}.
+   *
+   * @return The value of {@code file}.
+   */
+  public String getFile() {
+    return file;
+  }
+
+  /**
+   * Setter for {@code file}.
+   *
+   * @param file The value to set {@code file}.
+   */
+  public void setFile(String file) {
+    this.file = file;
+  }
+
+  /**
+   * Getter for {@code header}.
+   *
+   * @return The value of {@code header}.
+   */
+  public Header getHeader() {
+    return header;
+  }
+
+  /**
+   * Setter for {@code header}.
+   *
+   * @param header The value to set {@code header}.
+   */
+  public void setHeader(Header header) {
+    this.header = header;
   }
 }

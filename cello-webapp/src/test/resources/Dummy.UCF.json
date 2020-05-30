@@ -1,0 +1,17 @@
+[
+    {
+        "collection": "header",
+        "description": "TetR homologs: PhlF, SrpR, BM3R1, HlyIIR, BetI, AmtR, AmeR, QacR, IcaRA, LitR, PsrA, LmrA",
+        "version": "Dummy",
+        "date": "Thu Dec 24 00:56:10 EST 2015",
+        "author": [
+            "Bryan Der",
+            "Timothy Jones"
+        ],
+        "organism": "Escherichia coli NEB 10-beta",
+        "genome": "NEB 10 \u2206(ara-leu) 7697 araD139 fhuA \u2206lacX74 galK16 galE15 e14- \u03c680dlacZ\u2206M15  recA1 relA1 endA1 nupG  rpsL (StrR) rph spoT1 \u2206(mrr-hsdRMS-mcrBC)",
+        "media": "M9 minimal media composed of M9 media salts (6.78 g/L Na2HPO4, 3 g/L KH2PO4, 1 g/L NH4Cl, 0.5 g/L NaCl, 0.34 g/L thiamine hydrochloride, 0.4% D-glucose, 0.2% Casamino acids, 2 mM MgSO4, and 0.1 mM CaCl2; kanamycin (50 ug/ml), spectinomycin (50 ug/ml)",
+        "temperature": "37",
+        "growth": "Inoculation: Individual colonies into M9 media, 16 hours overnight in plate shaker.  Dilution: Next day, cells dilute ~200-fold into M9 media with antibiotics, growth for 3 hours.  Induction: Cells diluted ~650-fold into M9 media with antibiotics.  Growth: shaking incubator for 5 hours.  Arrest protein production: PBS and 2mg/ml kanamycin.  Measurement: flow cytometry, data processing for RPU normalization."
+    }
+]

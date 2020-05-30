@@ -22,9 +22,9 @@
 
 package org.cellocad.v2.webapp.project;
 
-import org.cellocad.v2.webapp.ApplicationUtils;
 import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.user.ApplicationUser;
+import org.cellocad.v2.webapp.user.UserUtils;
 
 /**
  * A Utils class for user projects.
@@ -35,40 +35,38 @@ import org.cellocad.v2.webapp.user.ApplicationUser;
 public class ProjectUtils {
 
   /**
-   * Get the projects directory for the specified user.
+   * Get the projects directory of a user.
    *
    * @param user The user.
-   * @return The projects directory.
+   * @return The projects directory of the user.
    */
-  public static String getUserDirectory(final ApplicationUser user) {
+  public static String getUserProjectsDirectory(final ApplicationUser user) {
     String rtn = "";
-    rtn +=
-        ApplicationUtils.getProjectsDirectory()
-            + Utils.getFileSeparator()
-            + user.getUsername().toString();
+    rtn += UserUtils.getUserDirectory(user);
+    rtn += Utils.getFileSeparator();
+    rtn += "projects";
     return rtn;
   }
 
-  /**
-   * Create a projects directory for the specified user.
-   *
-   * @param user The user.
-   */
-  public static void createUserDirectory(final ApplicationUser user) {
-    final String path = ProjectUtils.getUserDirectory(user);
+  private static void createUserProjectsDirectory(final ApplicationUser user) {
+    final String path = getUserProjectsDirectory(user);
     Utils.makeDirectory(path);
   }
 
+  public static void initUserProjectsDirectory(final ApplicationUser user) {
+    createUserProjectsDirectory(user);
+  }
+
   /**
-   * Get the project directory for the specified user and project.
+   * Get the project directory for the specified project of the specified user.
    *
    * @param user The user.
    * @param name The project name.
    * @return The project directory.
    */
-  public static String getProjectDirectory(final ApplicationUser user, final String name) {
+  public static String getUserProjectDirectory(final ApplicationUser user, final String name) {
     String rtn = "";
-    rtn += ProjectUtils.getUserDirectory(user);
+    rtn += getUserProjectsDirectory(user);
     rtn += Utils.getFileSeparator();
     rtn += name;
     return rtn;
@@ -81,9 +79,13 @@ public class ProjectUtils {
    * @param name The project name.
    * @return The directory created.
    */
-  public static String createProjectDirectory(final ApplicationUser user, final String name) {
-    final String rtn = ProjectUtils.getProjectDirectory(user, name);
+  private static String createUserProjectDirectory(final ApplicationUser user, final String name) {
+    final String rtn = ProjectUtils.getUserProjectDirectory(user, name);
     Utils.makeDirectory(rtn);
     return rtn;
+  }
+
+  public static void initUserProjectDirectory(final ApplicationUser user, final String name) {
+    createUserProjectDirectory(user, name);
   }
 }

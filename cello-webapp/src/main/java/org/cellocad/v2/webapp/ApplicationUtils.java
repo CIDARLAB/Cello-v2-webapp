@@ -47,7 +47,12 @@ public class ApplicationUtils {
     return false;
   }
 
-  private static String getApplicationDirectory() {
+  /**
+   * Get the application directory.
+   *
+   * @return The application directory.
+   */
+  public static String getApplicationDirectory() {
     String rtn = "";
     rtn += Utils.getFilepath();
     if (ApplicationUtils.isUnitTest()) {
@@ -57,22 +62,6 @@ public class ApplicationUtils {
       rtn += Utils.getFileSeparator();
     }
     return rtn;
-  }
-
-  /**
-   * Get the projects directory.
-   *
-   * @return The projects directory.
-   */
-  public static String getProjectsDirectory() {
-    String rtn = "";
-    rtn += ApplicationUtils.getApplicationDirectory() + "projects";
-    return rtn;
-  }
-
-  /** Create the projects directory. */
-  public static void createProjectsDirectory() {
-    Utils.makeDirectory(ApplicationUtils.getProjectsDirectory());
   }
 
   /**

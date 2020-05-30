@@ -27,11 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cellocad.v2.webapp.ApplicationUtils;
 import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
@@ -75,16 +73,6 @@ public class ProjectController {
 
   private static Logger getLogger() {
     return LogManager.getLogger(ProjectController.class);
-  }
-
-  /** Initialize controller. */
-  @PostConstruct
-  public void init() {
-    final String dir = ApplicationUtils.getProjectsDirectory();
-    if (!Utils.isValidFilepath(dir)) {
-      ProjectController.getLogger().info("Creating projects directory.");
-      ApplicationUtils.createProjectsDirectory();
-    }
   }
 
   @ResponseBody

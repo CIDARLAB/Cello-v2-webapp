@@ -26,15 +26,21 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import org.cellocad.v2.webapp.project.ProjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.cellocad.v2.webapp.common.Utils;
+import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.security.SecurityConstants;
 import org.cellocad.v2.webapp.specification.library.TargetDataLibraryResource;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.cellocad.v2.webapp.user.ApplicationUserRepository;
+import org.cellocad.v2.webapp.user.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,14 +70,30 @@ public class UserController {
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
   }
 
+  private static Logger getLogger() {
+    return LogManager.getLogger(UserController.class);
+  }
+
+  /** Initialize controller. */
+  @PostConstruct
+  public void init() {
+    final String dir = UserUtils.getUsersDirectory();
+    if (!Utils.isValidFilepath(dir)) {
+      UserUtils.initUsersDirectory();
+      getLogger().debug("Users directory initialized.");
+    }
+  }
+
   /**
    * User signup.
    *
    * @param node The request body including username and password.
    * @param res The response.
+   * @throws CelloWebException Unable to initialize user.
    */
   @PostMapping("/signup")
-  public void signup(@Valid @RequestBody final JsonNode node, final HttpServletResponse res) {
+  public void signup(@Valid @RequestBody final JsonNode node, final HttpServletResponse res)
+      throws CelloWebException {
     final ObjectMapper mapper = new ObjectMapper();
     ApplicationUser user;
     try {
@@ -84,7 +106,11 @@ public class UserController {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "User exists.");
     }
     applicationUserRepository.save(user);
-    ProjectUtils.createUserDirectory(user);
+    try {
+      UserUtils.initUserDirectory(user);
+    } catch (IOException e) {
+      throw new CelloWebException("Unable to initialize user.");
+    }
     final String token =
         JWT.create()
             .withSubject(user.getUsername())

@@ -66,7 +66,7 @@ public class ResourceControllerTest {
    *
    * @throws Exception Error with user constraints files.
    */
-  @Test
+  // @Test
   public void userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
     final String str =
         Utils.getResourceAsString(

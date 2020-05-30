@@ -25,14 +25,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cellocad.v2.webapp.resource.ResourceUtils;
+import org.cellocad.v2.webapp.exception.CelloWebException;
+import org.cellocad.v2.webapp.resource.ApplicationResourceUtils;
+import org.cellocad.v2.webapp.resource.UserResourceUtils;
+import org.cellocad.v2.webapp.resource.library.UserConstraintsFileDescriptor;
+import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -51,8 +60,7 @@ public class ResourceController {
 
   @PostConstruct
   private static void init() throws IOException {
-    getLogger().debug("Initializing resources.");
-    ResourceUtils.initResources();
+    ApplicationResourceUtils.initApplicationResources();
     getLogger().debug("Resource initialization completed.");
   }
 
@@ -67,11 +75,18 @@ public class ResourceController {
   @GetMapping(
       value = "/user_constraints_files",
       produces = {MediaType.APPLICATION_JSON_VALUE})
-  public JsonNode userConstraintsFiles(final HttpServletResponse res) throws IOException {
-    final ObjectMapper mapper = new ObjectMapper();
-    final String filepath = ResourceUtils.getUserConstraintsFileMetaDataFile();
-    final JsonNode rtn = mapper.readTree(new File(filepath));
+  public Collection<UserConstraintsFileDescriptor> userConstraintsFiles(
+      final ApplicationUser user, final HttpServletResponse res) throws IOException {
+    Collection<UserConstraintsFileDescriptor> rtn = new ArrayList<>();
+    rtn = UserResourceUtils.getAllUserConstraintsFileDescriptors(user);
     return rtn;
+  }
+
+  @ResponseBody
+  @PostMapping(value = "/user_constraints_file")
+  public void userConstraintsFile(final ApplicationUser user, @RequestBody JsonNode node)
+      throws CelloWebException {
+    UserResourceUtils.addUserConstraintsFile(user, node);
   }
 
   /**
@@ -87,7 +102,7 @@ public class ResourceController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   public JsonNode inputSensorFiles(final HttpServletResponse res) throws IOException {
     final ObjectMapper mapper = new ObjectMapper();
-    final String filepath = ResourceUtils.getInputSensorFileMetaDataFile();
+    final String filepath = ApplicationResourceUtils.getInputSensorFileMetaDataFile();
     final JsonNode rtn = mapper.readTree(new File(filepath));
     return rtn;
   }
@@ -105,7 +120,7 @@ public class ResourceController {
   // TODO Don't return JsonNode
   public JsonNode outputDeviceFiles(final HttpServletResponse res) throws IOException {
     final ObjectMapper mapper = new ObjectMapper();
-    final String filepath = ResourceUtils.getOutputDeviceFileMetaDataFile();
+    final String filepath = ApplicationResourceUtils.getOutputDeviceFileMetaDataFile();
     final JsonNode rtn = mapper.readTree(new File(filepath));
     return rtn;
   }
@@ -123,7 +138,7 @@ public class ResourceController {
       produces = {MediaType.APPLICATION_JSON_VALUE})
   public JsonNode settings(final HttpServletResponse res) throws IOException {
     final ObjectMapper mapper = new ObjectMapper();
-    final String filepath = ResourceUtils.getSettingsFile();
+    final String filepath = ApplicationResourceUtils.getSettingsFile();
     final JsonNode rtn = mapper.readTree(new File(filepath));
     return rtn;
   }

@@ -21,32 +21,44 @@ package org.cellocad.v2.webapp.resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import org.cellocad.v2.webapp.resource.library.UserConstraintsFileDescriptor;
 import org.junit.Test;
 
 /**
- * Tests for {@link ResourceUtils}.
+ * Tests for {@link ApplicationResourceUtils}.
  *
  * @author Timothy Jones
  * @date 2020-05-12
  */
-public class ResourceUtilsTest {
+public class ApplicationResourceUtilsTest {
 
   /**
-   * Test {@link ResourceUtils#initResources()}. The test only checks that certain files and
-   * directories are created.
+   * Test {@link ApplicationResourceUtils#initApplicationResources()}. The test only checks that
+   * certain files and directories are created.
    *
    * @throws IOException Unable to initialize resources.
    */
   @Test
-  public void initResources_None_SouldCreateExpectedFiles() throws IOException {
-    ResourceUtils.initResources();
-    File settingsDir = new File(ResourceUtils.getSettingsResourcesDirectory());
-    File userConstraintsMeta = new File(ResourceUtils.getUserConstraintsFileMetaDataFile());
-    File inputMeta = new File(ResourceUtils.getInputSensorFileMetaDataFile());
-    File outputMeta = new File(ResourceUtils.getOutputDeviceFileMetaDataFile());
+  public void initApplicationResources_None_SouldCreateExpectedFiles() throws IOException {
+    ApplicationResourceUtils.initApplicationResources();
+    File settingsDir = new File(ApplicationResourceUtils.getSettingsResourcesDirectory());
+    File userConstraintsMeta =
+        new File(ApplicationResourceUtils.getUserConstraintsFileMetaDataFile());
+    File inputMeta = new File(ApplicationResourceUtils.getInputSensorFileMetaDataFile());
+    File outputMeta = new File(ApplicationResourceUtils.getOutputDeviceFileMetaDataFile());
     assert (settingsDir.exists()
         && userConstraintsMeta.exists()
         && inputMeta.exists()
         && outputMeta.exists());
+  }
+
+  @Test
+  public void getUserConstraintsFileDescriptors_None_ShouldReturnExpectedFiles()
+      throws IOException {
+    ApplicationResourceUtils.initApplicationResources();
+    Collection<UserConstraintsFileDescriptor> descriptors =
+        ApplicationResourceUtils.getUserConstraintsFileDescriptors();
+    assert (descriptors.size() == 5);
   }
 }
