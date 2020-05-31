@@ -75,9 +75,9 @@ public class LibraryResourceDeserializer extends StdDeserializer<LibraryResource
     if (userConstraintsFileName != null
         && inputSensorFileName != null
         && outputDeviceFileName != null) {
-      final File userConstraintsFile = new File(userConstraintsFileName.asText());
-      final File inputSensorFile = new File(inputSensorFileName.asText());
-      final File outputDeviceFile = new File(outputDeviceFileName.asText());
+      final File userConstraintsFile = new File(userConstraintsFileName.get("file").asText());
+      final File inputSensorFile = new File(inputSensorFileName.get("file").asText());
+      final File outputDeviceFile = new File(outputDeviceFileName.get("file").asText());
       rtn = new TargetDataLibraryResource(userConstraintsFile, inputSensorFile, outputDeviceFile);
     } else {
       rtn =
