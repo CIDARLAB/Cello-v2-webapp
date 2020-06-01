@@ -22,19 +22,20 @@
 
 package org.cellocad.v2.webapp.project;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.bson.types.ObjectId;
+import org.cellocad.v2.results.common.Result;
 import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
-import org.cellocad.v2.webapp.results.Result;
 import org.cellocad.v2.webapp.specification.Specification;
 import org.cellocad.v2.webapp.specification.library.SynBioHubLibraryResource;
 import org.cellocad.v2.webapp.specification.library.TargetDataLibraryResource;
@@ -63,11 +64,9 @@ public abstract class Project {
   private String verilogFile;
   private String optionsFile;
   private String netlistConstraintFile;
-  private String userConstraintsFile;
+  private String targetDataFile;
   private String inputSensorFile;
   private String outputDeviceFile;
-
-  private Collection<Result> results;
 
   public Project() {}
 
@@ -96,7 +95,7 @@ public abstract class Project {
     this.verilogFile = verilogFile;
     this.optionsFile = optionsFile;
     this.netlistConstraintFile = netlistConstraintFile;
-    userConstraintsFile = targetDataFile;
+    this.targetDataFile = targetDataFile;
   }
 
   /**
@@ -151,19 +150,6 @@ public abstract class Project {
     }
     netlistConstraintFile = netlistConstraintFilepath;
 
-    // // user constraints file
-    // String userConstraintsFilePath = filepath.toString() +
-    // Utils.getFileSeparator() + name +
-    // ".UCF.json";
-    // Utils.createFile(userConstraintsFilePath);
-    // try {
-    // mapper.writerWithDefaultPrettyPrinter().writeValue(new
-    // File(userConstraintsFilePath),
-    // specification.getLibraryResource().getLibrary());
-    // } catch (IOException | LibraryException e) {
-    // throw new ProjectException(e);
-    // }
-    // this.userConstraintsFile = userConstraintsFilePath;
     if (specification.getLibraryResource() instanceof TargetDataLibraryResource) {
       final TargetDataLibraryResource library =
           (TargetDataLibraryResource) specification.getLibraryResource();
@@ -211,7 +197,7 @@ public abstract class Project {
       } catch (final IOException e) {
         throw new ProjectException("Unable to write output device file to project directory.");
       }
-      this.userConstraintsFile = userConstraintsFile.toString();
+      this.targetDataFile = userConstraintsFile.toString();
       this.inputSensorFile = inputSensorFile.toString();
       this.outputDeviceFile = outputDeviceFile.toString();
     }
@@ -238,7 +224,7 @@ public abstract class Project {
   /**
    * Setter for {@code id}.
    *
-   * @param id the value to set <i>id</i>
+   * @param id The value to set {@code id}.
    */
   public void setId(final ObjectId id) {
     this.id = id;
@@ -256,7 +242,7 @@ public abstract class Project {
   /**
    * Setter for {@code name}.
    *
-   * @param name the value to set <i>name</i>
+   * @param name The value to set {@code name}
    */
   public void setName(final String name) {
     this.name = name;
@@ -274,7 +260,7 @@ public abstract class Project {
   /**
    * Setter for {@code filepath}.
    *
-   * @param filepath the value to set <i>filepath</i>
+   * @param filepath The value to set {@code filepath}.
    */
   public void setFilepath(final String filepath) {
     this.filepath = filepath;
@@ -292,7 +278,7 @@ public abstract class Project {
   /**
    * Setter for {@code created}.
    *
-   * @param created the value to set <i>created</i>
+   * @param created The value to set {@code created}.
    */
   public void setCreated(final Date created) {
     this.created = created;
@@ -310,7 +296,7 @@ public abstract class Project {
   /**
    * Setter for {@code verilogFile}.
    *
-   * @param verilogFile the value to set <i>verilogFile</i>
+   * @param verilogFile The value to set {@code verilogFile}.
    */
   public void setVerilogFile(final String verilogFile) {
     this.verilogFile = verilogFile;
@@ -328,7 +314,7 @@ public abstract class Project {
   /**
    * Setter for {@code optionsFile}.
    *
-   * @param optionsFile the value to set <i>optionsFile</i>
+   * @param optionsFile the value to set {@code optionsFile}.
    */
   public void setOptionsFile(final String optionsFile) {
     this.optionsFile = optionsFile;
@@ -346,28 +332,28 @@ public abstract class Project {
   /**
    * Setter for {@code netlistConstraintFile}.
    *
-   * @param netlistConstraintFile the value to set <i>netlistConstraintFile</i>
+   * @param netlistConstraintFile The value to set {@code netlistConstraintFile}.
    */
   public void setNetlistConstraintFile(final String netlistConstraintFile) {
     this.netlistConstraintFile = netlistConstraintFile;
   }
 
   /**
-   * Getter for {@code userConstraintsFile}.
+   * Getter for {@code targetDataFile}.
    *
-   * @return The value of {@code userConstraintsFile}.
+   * @return The value of {@code targetDataFile}.
    */
-  public String getUserConstraintsFile() {
-    return userConstraintsFile;
+  public String getTargetDataFile() {
+    return targetDataFile;
   }
 
   /**
-   * Setter for {@code userConstraintsFile}.
+   * Setter for {@code targedDataFile}.
    *
-   * @param userConstraintsFile the value to set <i>userConstraintsFile</i>
+   * @param targetDataFile The value to set {@code targetDataFile}.
    */
-  public void setUserConstraintsFile(final String userConstraintsFile) {
-    this.userConstraintsFile = userConstraintsFile;
+  public void setTargetDataFile(final String targetDataFile) {
+    this.targetDataFile = targetDataFile;
   }
 
   /**
@@ -382,7 +368,7 @@ public abstract class Project {
   /**
    * Setter for {@code inputSensorFile}.
    *
-   * @param inputSensorFile the value to set <i>inputSensorFile</i>
+   * @param inputSensorFile The value to set {@code inputSensorFile}.
    */
   public void setInputSensorFile(final String inputSensorFile) {
     this.inputSensorFile = inputSensorFile;
@@ -400,7 +386,7 @@ public abstract class Project {
   /**
    * Setter for {@code outputDeviceFile}.
    *
-   * @param outputDeviceFile the value to set <i>outputDeviceFile</i>
+   * @param outputDeviceFile The value to set {@code outputDeviceFile}.
    */
   public void setOutputDeviceFile(final String outputDeviceFile) {
     this.outputDeviceFile = outputDeviceFile;
@@ -410,24 +396,16 @@ public abstract class Project {
    * Getter for {@code results}.
    *
    * @return The value of {@code results}.
+   * @throws IOException Unable to load results metadata.
+   * @throws JsonMappingException Unable to map to result class.
+   * @throws JsonParseException Unable to parse results JSON.
    */
-  public Collection<Result> getResults() {
-    final File resultsPath = new File(getFilepath());
-    final Collection<Result> results = new ArrayList<>();
-    for (final File file :
-        FileUtils.listFiles(resultsPath, TrueFileFilter.TRUE, TrueFileFilter.TRUE)) {
-      final Result result = new Result(file);
-      results.add(result);
-    }
+  public Collection<Result> getResults()
+      throws JsonParseException, JsonMappingException, IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    final File resultsPath = new File(getFilepath(), "results.json");
+    final Collection<Result> results =
+        mapper.readValue(resultsPath, new TypeReference<Collection<Result>>() {});
     return results;
-  }
-
-  /**
-   * Setter for {@code results}.
-   *
-   * @param results the value to set <i>results</i>
-   */
-  public void setResults(final Collection<Result> results) {
-    this.results = results;
   }
 }

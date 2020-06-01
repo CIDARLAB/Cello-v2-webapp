@@ -30,14 +30,13 @@ import java.util.Iterator;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cellocad.v2.webapp.common.Utils;
+import org.cellocad.v2.results.common.Result;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
 import org.cellocad.v2.webapp.exception.ResourceNotFoundException;
 import org.cellocad.v2.webapp.project.Project;
 import org.cellocad.v2.webapp.project.ProjectFactory;
 import org.cellocad.v2.webapp.project.ProjectRepository;
-import org.cellocad.v2.webapp.results.Result;
 import org.cellocad.v2.webapp.specification.Specification;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.cellocad.v2.webapp.user.ApplicationUserRepository;
@@ -73,6 +72,48 @@ public class ProjectController {
 
   private static Logger getLogger() {
     return LogManager.getLogger(ProjectController.class);
+  }
+
+  static Collection<Result> getResults(final Project project) {
+    Collection<Result> rtn = null;
+    try {
+      rtn = project.getResults();
+    } catch (IOException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to load project results.", e);
+    }
+    return rtn;
+  }
+
+  static Result getResult(final String file, final Project project) {
+    Result rtn = null;
+    Collection<Result> results = getResults(project);
+    for (Result r : results) {
+      if (r.getFile().getName().equals(file)) {
+        rtn = r;
+        break;
+      }
+    }
+    if (rtn == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find result.");
+    }
+    return rtn;
+  }
+
+  static Project getProject(final String name, final ApplicationUser user) {
+    Project rtn = null;
+    final Iterator<Project> it = user.getProjects().iterator();
+    while (it.hasNext()) {
+      final Project p = it.next();
+      if (p.getName().equals(name)) {
+        rtn = p;
+        break;
+      }
+    }
+    if (rtn == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find project.");
+    }
+    return rtn;
   }
 
   @ResponseBody
@@ -120,26 +161,19 @@ public class ProjectController {
    *
    * @param user The user to whom the project belongs.
    * @param name The name of the project.
-   * @throws CelloWebException Error in project execution.
    */
   @ResponseBody
   @GetMapping("/project/{name}/execute")
-  public void execute(final ApplicationUser user, @PathVariable(value = "name") final String name)
-      throws CelloWebException {
-    Project project = null; // = Utils.findCObjectByName(name,user.getProjects());
-    final Iterator<Project> it = user.getProjects().iterator();
-    while (it.hasNext()) {
-      final Project p = it.next();
-      if (p.getName().equals(name)) {
-        project = p;
-      }
-    }
-    if (project == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.");
-    }
+  public void execute(final ApplicationUser user, @PathVariable(value = "name") final String name) {
+    final Project project = getProject(name, user);
     ProjectController.getLogger()
         .info(String.format("Executing job '%s' for user '%s'.", name, user.getUsername()));
-    project.execute();
+    try {
+      project.execute();
+    } catch (CelloWebException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to execute project.", e);
+    }
     ProjectController.getLogger()
         .info(String.format("Completed job '%s' for user '%s'.", name, user.getUsername()));
   }
@@ -171,25 +205,17 @@ public class ProjectController {
    * @param user The user to whom the project belongs.
    * @param name The name of the project.
    * @return All the results in a project.
-   * @throws ResourceNotFoundException Unable to find project.
+   * @throws ResourceNotFoundException Unable to find project or load results.
    */
   @ResponseBody
   @GetMapping("/project/{name}/results")
   public Collection<Result> results(
       final ApplicationUser user, @PathVariable(value = "name") final String name)
       throws ResourceNotFoundException {
-    Project project = null;
-    final Iterator<Project> it = user.getProjects().iterator();
-    while (it.hasNext()) {
-      final Project p = it.next();
-      if (p.getName().equals(name)) {
-        project = p;
-      }
-    }
-    if (project == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.");
-    }
-    return project.getResults();
+    Collection<Result> rtn = null;
+    final Project project = getProject(name, user);
+    rtn = getResults(project);
+    return rtn;
   }
 
   /**
@@ -197,27 +223,20 @@ public class ProjectController {
    *
    * @param user The user to whom the project belongs.
    * @param name The name of the project.
-   * @param result The name of the result.
+   * @param file The filename of the result.
    * @return The result metadata.
    * @throws ResourceNotFoundException Could not find the result.
    */
   @ResponseBody
-  @GetMapping("/project/{name}/result/{result}")
+  @GetMapping("/project/{name}/result/{file}")
   public Result result(
       final ApplicationUser user,
       @PathVariable(value = "name") final String name,
-      @PathVariable(value = "result") final String result)
+      @PathVariable(value = "file") final String file)
       throws ResourceNotFoundException {
     Result rtn = null;
-    Project project = null;
-    final Iterator<Project> it = user.getProjects().iterator();
-    while (it.hasNext()) {
-      final Project p = it.next();
-      if (p.getName().equals(name)) {
-        project = p;
-      }
-    }
-    rtn = Utils.findCObjectByName(result, project.getResults());
+    final Project project = getProject(name, user);
+    rtn = getResult(file, project);
     return rtn;
   }
 
@@ -226,29 +245,22 @@ public class ProjectController {
    *
    * @param user The user to whom the project belongs.
    * @param name The name of the project.
-   * @param result The name of the result.
+   * @param file The filename of the result.
    * @return A byte array of the result content.
    * @throws ResourceNotFoundException Could not find the result.
    * @throws IOException Could not read result.
    */
   @ResponseBody
   @GetMapping(
-      value = "/project/{name}/result/{result}/download",
+      value = "/project/{name}/result/{file}/download",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
   public byte[] download(
       final ApplicationUser user,
       @PathVariable(value = "name") final String name,
-      @PathVariable(value = "result") final String result)
+      @PathVariable(value = "file") final String file)
       throws ResourceNotFoundException, IOException {
-    Project project = null;
-    final Iterator<Project> it = user.getProjects().iterator();
-    while (it.hasNext()) {
-      final Project p = it.next();
-      if (p.getName().equals(name)) {
-        project = p;
-      }
-    }
-    final Result r = Utils.findCObjectByName(result, project.getResults());
+    final Project project = getProject(name, user);
+    final Result r = getResult(file, project);
     final InputStream is = new FileInputStream(r.getFile());
     return IOUtils.toByteArray(is);
   }

@@ -32,14 +32,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collections;
-import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cellocad.v2.webapp.common.Utils;
+import org.cellocad.v2.results.common.Result;
 import org.cellocad.v2.webapp.exception.ResourceNotFoundException;
 import org.cellocad.v2.webapp.project.Project;
-import org.cellocad.v2.webapp.results.Result;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -246,15 +244,8 @@ public class SynBioHubController {
     }
     map.add("user", token);
 
-    Project project = null;
-    final Iterator<Project> it = user.getProjects().iterator();
-    while (it.hasNext()) {
-      final Project p = it.next();
-      if (p.getName().equals(projectName)) {
-        project = p;
-      }
-    }
-    final Result r = Utils.findCObjectByName(fileName, project.getResults());
+    final Project project = ProjectController.getProject(projectName, user);
+    final Result r = ProjectController.getResult(fileName, project);
     map.add("file", new ByteArrayResource(Files.readAllBytes(r.getFile().toPath())));
 
     // entity

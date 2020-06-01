@@ -22,9 +22,7 @@
 
 package org.cellocad.v2.webapp.project.DNACompiler;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -32,8 +30,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.logging.log4j.ThreadContext;
 import org.cellocad.v2.DNACompiler.runtime.Main;
 import org.cellocad.v2.common.CelloException;
@@ -41,7 +37,6 @@ import org.cellocad.v2.common.runtime.environment.ArgString;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
 import org.cellocad.v2.webapp.project.Project;
-import org.cellocad.v2.webapp.results.Result;
 import org.cellocad.v2.webapp.specification.Specification;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.springframework.data.annotation.TypeAlias;
@@ -125,7 +120,7 @@ public class DNACompilerProject extends Project {
     args.add("-" + ArgString.INPUTNETLIST);
     args.add(getVerilogFile());
     args.add("-" + ArgString.USERCONSTRAINTSFILE);
-    args.add(getUserConstraintsFile());
+    args.add(getTargetDataFile());
     args.add("-" + ArgString.INPUTSENSORFILE);
     args.add(getInputSensorFile());
     args.add("-" + ArgString.OUTPUTDEVICEFILE);
@@ -150,14 +145,5 @@ public class DNACompilerProject extends Project {
       throw new CelloWebException(e.getCause());
     }
     executor.shutdown();
-    // results
-    final File resultsPath = new File(getFilepath());
-    final Collection<Result> results = new ArrayList<>();
-    for (final File file :
-        FileUtils.listFiles(resultsPath, TrueFileFilter.TRUE, TrueFileFilter.TRUE)) {
-      final Result result = new Result(file);
-      results.add(result);
-    }
-    setResults(results);
   }
 }

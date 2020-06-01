@@ -35,12 +35,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * @author Timothy Jones
  * @date 2019-03-18
  */
+// TODO
 @ControllerAdvice
 public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(SignatureVerificationException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public void handleException() {
-    System.out.println("foo");
-  }
+  public void handleException() {}
 }
