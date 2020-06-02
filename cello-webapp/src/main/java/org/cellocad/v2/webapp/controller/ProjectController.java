@@ -31,6 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cellocad.v2.results.common.Result;
+import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
 import org.cellocad.v2.webapp.exception.ResourceNotFoundException;
@@ -261,7 +262,8 @@ public class ProjectController {
       throws ResourceNotFoundException, IOException {
     final Project project = getProject(name, user);
     final Result r = getResult(file, project);
-    final InputStream is = new FileInputStream(r.getFile());
+    final InputStream is =
+        new FileInputStream(project.getFilepath() + Utils.getFileSeparator() + r.getFile());
     return IOUtils.toByteArray(is);
   }
 }
