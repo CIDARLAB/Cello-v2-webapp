@@ -406,6 +406,10 @@ public abstract class Project {
     final File resultsPath = new File(getFilepath(), "results.json");
     final Collection<Result> results =
         mapper.readValue(resultsPath, new TypeReference<Collection<Result>>() {});
+    // Results are serialized with a base filename only. Add the full path back in.
+    for (final Result result : results) {
+      result.setFile(new File(this.getFilepath(), result.getFile().getName()));
+    }
     return results;
   }
 }
