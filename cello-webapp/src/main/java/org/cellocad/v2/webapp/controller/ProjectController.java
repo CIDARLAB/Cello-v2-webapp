@@ -22,14 +22,17 @@
 
 package org.cellocad.v2.webapp.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Iterator;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cellocad.v2.common.file.zip.utils.ZipUtils;
 import org.cellocad.v2.results.common.Result;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
@@ -179,6 +182,29 @@ public class ProjectController {
   }
 
   /**
+   * Downloads a project.
+   *
+   * @param user The user to whom the project belongs.
+   * @param name The name of the project.
+   */
+  @ResponseBody
+  @GetMapping(
+      value = "/project/{name}/download",
+      produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  public byte[] downloadProject(
+      final ApplicationUser user, @PathVariable(value = "name") final String name) {
+    final Project project = getProject(name, user);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try {
+      ZipUtils.zipDirectory(baos, Paths.get(project.getFilepath()));
+    } catch (IOException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to zip project directory.", e);
+    }
+    return baos.toByteArray();
+  }
+
+  /**
    * Delete a project.
    *
    * @param user The user to whom the project belongs.
@@ -254,7 +280,7 @@ public class ProjectController {
   @GetMapping(
       value = "/project/{name}/result/{file}/download",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  public byte[] download(
+  public byte[] downloadResult(
       final ApplicationUser user,
       @PathVariable(value = "name") final String name,
       @PathVariable(value = "file") final String file)
