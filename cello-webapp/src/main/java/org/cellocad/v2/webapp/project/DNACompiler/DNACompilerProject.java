@@ -32,7 +32,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.apache.logging.log4j.ThreadContext;
 import org.cellocad.v2.DNACompiler.runtime.Main;
-import org.cellocad.v2.common.CelloException;
+import org.cellocad.v2.common.exception.CelloException;
 import org.cellocad.v2.common.runtime.environment.ArgString;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ProjectException;
