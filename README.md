@@ -84,3 +84,10 @@ Build.
 Run.
 
     mvn spring-boot:run
+
+# 3. Development
+
+## Debug a running webapp in Eclipse
+
+Navigate to `Application.java` in Eclipse, right-click on the `main` method, choose `Debug As > Java Application`.
+
