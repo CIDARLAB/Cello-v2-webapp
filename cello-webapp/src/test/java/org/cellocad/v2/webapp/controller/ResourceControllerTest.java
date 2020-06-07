@@ -87,7 +87,7 @@ public class ResourceControllerTest {
     final String str =
         Utils.getResourceAsString("inputSensorFiles_MockResponse_ShouldReturnExpectedFiles.json");
     mockMvc
-        .perform(MockMvcRequestBuilders.head("/resources/input-sensor-files"))
+        .perform(MockMvcRequestBuilders.get("/resources/input-sensor-files"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().json(str));
   }
