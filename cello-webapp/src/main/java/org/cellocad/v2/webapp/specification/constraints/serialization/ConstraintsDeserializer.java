@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import org.cellocad.v2.webapp.specification.constraints.Constraints;
 
@@ -65,8 +66,8 @@ public class ConstraintsDeserializer extends StdDeserializer<Constraints> {
     Constraints rtn = null;
     final ObjectMapper mapper = new ObjectMapper();
     final JsonNode node = p.getCodec().readTree(p);
-    Map<String, String> sensors = null;
-    Map<String, String> reporters = null;
+    Map<String, String> sensors = new HashMap<>();
+    Map<String, String> reporters = new HashMap<>();
     if (node.has(ConstraintsSerializationConstants.S_INPUT_CONSTRAINTS)) {
       sensors =
           mapper.convertValue(

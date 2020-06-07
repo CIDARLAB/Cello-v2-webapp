@@ -40,18 +40,16 @@ public class ProjectFactory extends CObject {
    * Create a new project of the specified type.
    *
    * @param user The user the project belongs to.
-   * @param name The name of the project.
    * @param specification The project specification. The specification contains the application
    *     definition that determines the project type of the factory.
    * @return A new project.
    * @throws ProjectException Unable to generate the project.
    */
-  public Project getProject(
-      final ApplicationUser user, final String name, final Specification specification)
+  public Project getProject(final ApplicationUser user, final Specification specification)
       throws ProjectException {
     Project rtn = null;
     if (specification.getSettings().getApplication().equals("DNACompiler")) {
-      rtn = new DNACompilerProject(user, name, specification);
+      rtn = new DNACompilerProject(user, specification);
     }
     return rtn;
   }

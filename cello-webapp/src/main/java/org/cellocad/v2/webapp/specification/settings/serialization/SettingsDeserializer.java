@@ -24,12 +24,11 @@ package org.cellocad.v2.webapp.specification.settings.serialization;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import org.cellocad.v2.webapp.specification.settings.Settings;
 
@@ -63,13 +62,19 @@ public class SettingsDeserializer extends StdDeserializer<Settings> {
   public Settings deserialize(final JsonParser p, final DeserializationContext ctxt)
       throws IOException, JsonProcessingException {
     Settings rtn = null;
-    final ObjectMapper mapper = new ObjectMapper();
     final JsonNode node = p.getCodec().readTree(p);
-    final Map<String, String> settings =
-        mapper.convertValue(
-            node.get(SettingsSerializationConstants.S_PARAMETERS),
-            new TypeReference<Map<String, String>>() {});
-    final String application = node.get(SettingsSerializationConstants.S_APPLICATION).asText();
+    final String application = node.get("application").get("name").asText();
+    // remap into the Cello format
+    // see example Cello files
+    final Map<String, String> settings = new HashMap<>();
+    for (JsonNode stage : node.get("application").get("stages")) {
+      settings.put(stage.get("name").asText(), stage.get("algorithm").get("name").asText());
+      for (JsonNode parameter : stage.get("algorithm").get("parameters")) {
+        settings.put(
+            stage.get("name").asText() + "." + parameter.get("name").asText(),
+            parameter.get("value").asText());
+      }
+    }
     rtn = new Settings(settings, application);
     return rtn;
   }

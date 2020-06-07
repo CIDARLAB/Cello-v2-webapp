@@ -32,12 +32,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collections;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cellocad.v2.results.common.Result;
 import org.cellocad.v2.webapp.exception.ResourceNotFoundException;
 import org.cellocad.v2.webapp.project.Project;
+import org.cellocad.v2.webapp.synbiohub.ExistingCollectionDescriptor;
+import org.cellocad.v2.webapp.synbiohub.NewCollectionDescriptor;
+import org.cellocad.v2.webapp.synbiohub.SynBioHubSubmission;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -49,14 +51,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -80,22 +79,52 @@ public class SynBioHubController {
   }
 
   /**
+   * User login to a SynBioHub.
+   *
+   * @param registry The registry URL.
+   * @param request The SynBioHub login credentials.
+   * @return A token.
+   */
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = "/login",
+      produces = MediaType.TEXT_PLAIN_VALUE)
+  public String login(
+      @RequestParam(name = "registry") final URL registry, @RequestBody final String request) {
+    String rtn = null;
+    URI endpoint = null;
+    try {
+      final URL url = new URL(registry, "login");
+      endpoint = url.toURI();
+    } catch (MalformedURLException | URISyntaxException e) {
+      throw new RuntimeException("Error with SynBioHub url.");
+    }
+    final RestTemplate rest = new RestTemplate();
+    final HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    final HttpEntity<String> entity = new HttpEntity<>(request, headers);
+    final ResponseEntity<String> result =
+        rest.exchange(endpoint, HttpMethod.POST, entity, String.class);
+    rtn = result.getBody();
+    return rtn;
+  }
+
+  /**
    * Get root public and private collections.
    *
    * @param registry The registry URL.
    * @param token The SynBioHub login token.
-   * @param response The response.
    * @return The collections.
    */
-  @ResponseBody
-  @GetMapping(
+  @RequestMapping(
+      method = RequestMethod.GET,
       value = "/collections",
       produces = {MediaType.APPLICATION_JSON_VALUE})
   // TODO Don't return JsonNode. Use something like List<Collection> instead.
-  public JsonNode collections(
-      @RequestParam(name = "u") final URL registry,
-      @RequestHeader(value = "X-authorization", required = false) final String token,
-      final HttpServletResponse response) {
+  public JsonNode getCollections(
+      @RequestParam(name = "registry") final URL registry,
+      @RequestHeader(value = "X-authorization", required = false) final String token) {
     if (token == null) {
       URL url = null;
       try {
@@ -140,36 +169,17 @@ public class SynBioHubController {
     }
   }
 
-  /**
-   * User login to a SynBioHub.
-   *
-   * @param registry The registry URL.
-   * @param request The request.
-   * @param response The response.
-   * @return A token.
-   */
-  @ResponseBody
-  @PostMapping(value = "/login")
-  public String login(
-      @RequestParam(name = "u") final URL registry,
-      @RequestBody final String request,
-      final HttpServletResponse response) {
-    String rtn = null;
-    URI endpoint = null;
+  private URI getSynBioHubSubmitEndpoint(final URL registry) {
+    URI rtn = null;
     try {
-      final URL url = new URL(registry, "login");
-      endpoint = url.toURI();
+      final URL url = new URL(registry, "submit");
+      rtn = url.toURI();
     } catch (MalformedURLException | URISyntaxException e) {
-      throw new RuntimeException("Error with SynBioHub url.");
+      throw new ResponseStatusException(
+          HttpStatus.UNPROCESSABLE_ENTITY,
+          "Unable to construct submission endpoint for registry.",
+          e);
     }
-    final RestTemplate rest = new RestTemplate();
-    final HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    final HttpEntity<String> entity = new HttpEntity<>(request, headers);
-    final ResponseEntity<String> result =
-        rest.exchange(endpoint, HttpMethod.POST, entity, String.class);
-    rtn = result.getBody();
     return rtn;
   }
 
@@ -177,39 +187,23 @@ public class SynBioHubController {
    * Submit a project file to a SynBioHub.
    *
    * @param user The user to whom the project belongs.
-   * @param registry The registry URL to submit to.
    * @param token The SynBioHub login token.
-   * @param projectName The name of the project.
-   * @param fileName The name of the file to submit.
    * @param request The SynBioHub request.
-   * @param response The SynBioHub response.
    * @throws IOException Unable to read file.
    * @throws ResourceNotFoundException Unable to find file.
    */
-  @ResponseBody
-  // TODO Change endpoint to something more aligned with others, like
-  // /project/{name}/result/{result}/submit or /synbiohub or /registry
-  @PostMapping(value = "/submit/{project}/{file}")
-  public void submit(
+  @RequestMapping(method = RequestMethod.POST, value = "/collections")
+  public void createNewCollection(
       final ApplicationUser user,
-      @RequestParam(name = "u") final URL registry,
       @RequestHeader(value = "X-authorization") final String token,
-      @PathVariable(value = "project") final String projectName,
-      @PathVariable(value = "file") final String fileName,
-      @RequestBody final JsonNode request,
-      final HttpServletResponse response)
+      @RequestBody final SynBioHubSubmission<NewCollectionDescriptor> request)
       throws IOException, ResourceNotFoundException {
+    // Forgot why we aren't just using SynBioHubFrontend in libSBOLj - tsj 6/6/2020
     // rest
     final RestTemplate rest = new RestTemplate();
 
     // url
-    URI uri;
-    try {
-      final URL url = new URL(registry, "submit");
-      uri = url.toURI();
-    } catch (MalformedURLException | URISyntaxException e) {
-      return;
-    }
+    URI uri = getSynBioHubSubmitEndpoint(request.getRegistry());
 
     // headers
     final HttpHeaders headers = new HttpHeaders();
@@ -219,33 +213,17 @@ public class SynBioHubController {
 
     // body
     final MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-    if (!request.has("collection")) {
-      return;
-    }
-    final JsonNode coll = request.get("collection");
-    if (coll.has("uri") && !coll.get("uri").asText("").equals("")) {
-      map.add("rootCollections", coll.get("uri").toString());
-    } else {
-      try {
-        map.add("id", coll.get("id").asText());
-        map.add("version", coll.get("version").asText());
-        map.add("name", coll.get("name").asText());
-        map.add("description", coll.get("description").asText());
-        map.add("citations", coll.get("citations").asText(""));
-      } catch (final NullPointerException e) {
-        return;
-      }
-      map.add("collectionChoices", "");
-    }
-    try {
-      map.add("overwrite_merge", coll.get("overwrite").asBoolean() ? 1 : 0);
-    } catch (final NullPointerException e) {
-      return;
-    }
+    map.add("id", request.getCollection().getId());
+    map.add("version", request.getCollection().getVersion());
+    map.add("name", request.getCollection().getName());
+    map.add("description", request.getCollection().getDescription());
+    map.add("citations", request.getCollection().getCitations());
+    map.add("collectionChoices", ""); // ??
+    map.add("overwrite_merge", request.getCollection().getOverwrite().getValue());
     map.add("user", token);
 
-    final Project project = ProjectController.getProject(projectName, user);
-    final Result r = ProjectController.getResult(fileName, project);
+    final Project project = ProjectController.getProject(request.getProjectName(), user);
+    final Result r = ProjectController.getProjectResult(request.getResultName(), project);
     map.add("file", new ByteArrayResource(Files.readAllBytes(r.getFile().toPath())));
 
     // entity
@@ -255,7 +233,57 @@ public class SynBioHubController {
     try {
       rest.exchange(uri, HttpMethod.POST, entity, String.class);
     } catch (final RestClientException e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to create collection.", e);
+    }
+  }
+
+  /**
+   * Submit a project file to a SynBioHub.
+   *
+   * @param user The user to whom the project belongs.
+   * @param token The SynBioHub login token.
+   * @param request The SynBioHub request.
+   * @throws IOException Unable to read file.
+   * @throws ResourceNotFoundException Unable to find file.
+   */
+  @RequestMapping(method = RequestMethod.PUT, value = "/collections")
+  public void addToExistingCollection(
+      final ApplicationUser user,
+      @RequestHeader(value = "X-authorization") final String token,
+      @RequestBody final SynBioHubSubmission<ExistingCollectionDescriptor> request)
+      throws IOException, ResourceNotFoundException {
+    // rest
+    final RestTemplate rest = new RestTemplate();
+
+    // url
+    URI uri = getSynBioHubSubmitEndpoint(request.getRegistry());
+
+    // headers
+    final HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+    headers.set("X-authorization", token);
+
+    // body
+    final MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+    map.add("rootCollections", request.getCollection().getUri());
+    map.add("overwrite_merge", request.getCollection().getOverwrite().getValue());
+    map.add("user", token);
+
+    final Project project = ProjectController.getProject(request.getProjectName(), user);
+    final Result r = ProjectController.getProjectResult(request.getResultName(), project);
+    map.add("file", new ByteArrayResource(Files.readAllBytes(r.getFile().toPath())));
+
+    // entity
+    final HttpEntity<?> entity = new HttpEntity<>(map, headers);
+
+    // response
+    try {
+      rest.exchange(uri, HttpMethod.POST, entity, String.class);
+    } catch (final RestClientException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to add to collection.", e);
     }
   }
 }

@@ -102,13 +102,12 @@ public abstract class Project {
    * Initialize a new project.
    *
    * @param user The user the project belongs to.
-   * @param name The project name.
    * @param specification Thne project specification.
    * @throws ProjectException Unable to initialize project.
    */
-  public Project(final ApplicationUser user, final String name, final Specification specification)
+  public Project(final ApplicationUser user, final Specification specification)
       throws ProjectException {
-    this.name = name;
+    this.name = specification.getName();
     final ObjectMapper mapper = new ObjectMapper();
     ProjectUtils.initUserProjectDirectory(user, name);
     id = new ObjectId();

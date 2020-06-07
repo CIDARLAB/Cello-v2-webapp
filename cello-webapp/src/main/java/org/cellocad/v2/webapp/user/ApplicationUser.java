@@ -22,6 +22,7 @@
 
 package org.cellocad.v2.webapp.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -39,6 +40,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
  * @author Timothy Jones
  * @date 2019-03-17
  */
+@JsonIgnoreProperties(ignoreUnknown = true) // added to ignore 'remember' property
 @Persistent
 public class ApplicationUser {
 

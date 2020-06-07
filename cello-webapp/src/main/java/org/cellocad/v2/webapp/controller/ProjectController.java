@@ -46,10 +46,10 @@ import org.cellocad.v2.webapp.user.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -77,30 +77,57 @@ public class ProjectController {
     return LogManager.getLogger(ProjectController.class);
   }
 
-  static Collection<Result> getResults(final Project project) {
-    Collection<Result> rtn = null;
-    try {
-      rtn = project.getResults();
-    } catch (IOException e) {
-      throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to load project results.", e);
-    }
-    return rtn;
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = "/projects",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Collection<Project> getProjects(final ApplicationUser user) {
+    return user.getProjects();
   }
 
-  static Result getResult(final String file, final Project project) {
-    Result rtn = null;
-    Collection<Result> results = getResults(project);
-    for (Result r : results) {
-      if (r.getFile().getName().equals(file)) {
-        rtn = r;
-        break;
+  /**
+   * Specify a new project.
+   *
+   * @param user The user to whom the project belongs.
+   * @param specification The project specification.
+   */
+  @RequestMapping(method = RequestMethod.POST, value = "/projects")
+  public void createProject(
+      final ApplicationUser user, @RequestBody final Specification specification) {
+    final Iterator<Project> it = user.getProjects().iterator();
+    while (it.hasNext()) {
+      final Project p = it.next();
+      if (p.getName().equals(specification.getName())) {
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT, "A project with that name already exists.");
       }
     }
-    if (rtn == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find result.");
+    // project
+    final ProjectFactory factory = new ProjectFactory();
+    Project project;
+    try {
+      project = factory.getProject(user, specification);
+    } catch (final ProjectException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Error creating project.", e);
     }
-    return rtn;
+    projectRepository.insert(project);
+    user.getProjects().add(project);
+    applicationUserRepository.save(user);
+    ProjectController.getLogger()
+        .info(
+            String.format(
+                "Executing job '%s' for user '%s'.", project.getName(), user.getUsername()));
+    try {
+      project.execute();
+    } catch (CelloWebException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to execute project.", e);
+    }
+    ProjectController.getLogger()
+        .info(
+            String.format(
+                "Completed job '%s' for user '%s'.", project.getName(), user.getUsername()));
   }
 
   static Project getProject(final String name, final ApplicationUser user) {
@@ -119,81 +146,19 @@ public class ProjectController {
     return rtn;
   }
 
-  @ResponseBody
-  @GetMapping("/projects")
-  public Collection<Project> projects(final ApplicationUser user) {
-    return user.getProjects();
-  }
-
   /**
-   * Specify a new project.
+   * Downloads a zip archive containing all files associated with a project.
    *
    * @param user The user to whom the project belongs.
-   * @param name The name of the project.
-   * @param specification The project specification.
+   * @param projectName The name of the project.
    */
-  @ResponseBody
-  @PostMapping("/project/{name}/specify")
-  public void specify(
-      final ApplicationUser user,
-      @PathVariable(value = "name") final String name,
-      @RequestBody final Specification specification) {
-    final Iterator<Project> it = user.getProjects().iterator();
-    while (it.hasNext()) {
-      final Project p = it.next();
-      if (p.getName().equals(name)) {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT, "A project with that name already exists.");
-      }
-    }
-    // project
-    final ProjectFactory factory = new ProjectFactory();
-    Project project;
-    try {
-      project = factory.getProject(user, name, specification);
-    } catch (final ProjectException e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
-    projectRepository.insert(project);
-    user.getProjects().add(project);
-    applicationUserRepository.save(user);
-  }
-
-  /**
-   * Execute a project.
-   *
-   * @param user The user to whom the project belongs.
-   * @param name The name of the project.
-   */
-  @ResponseBody
-  @GetMapping("/project/{name}/execute")
-  public void execute(final ApplicationUser user, @PathVariable(value = "name") final String name) {
-    final Project project = getProject(name, user);
-    ProjectController.getLogger()
-        .info(String.format("Executing job '%s' for user '%s'.", name, user.getUsername()));
-    try {
-      project.execute();
-    } catch (CelloWebException e) {
-      throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to execute project.", e);
-    }
-    ProjectController.getLogger()
-        .info(String.format("Completed job '%s' for user '%s'.", name, user.getUsername()));
-  }
-
-  /**
-   * Downloads a project.
-   *
-   * @param user The user to whom the project belongs.
-   * @param name The name of the project.
-   */
-  @ResponseBody
-  @GetMapping(
-      value = "/project/{name}/download",
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = "/projects/{project-name}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  public byte[] downloadProject(
-      final ApplicationUser user, @PathVariable(value = "name") final String name) {
-    final Project project = getProject(name, user);
+  public byte[] getProjectArchive(
+      final ApplicationUser user, @PathVariable(value = "project-name") final String projectName) {
+    final Project project = getProject(projectName, user);
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       ZipUtils.zipDirectory(baos, Paths.get(project.getFilepath()));
@@ -208,85 +173,92 @@ public class ProjectController {
    * Delete a project.
    *
    * @param user The user to whom the project belongs.
-   * @param name The name of the project.
+   * @param projectName The name of the project.
    * @throws IOException Unable to delete project.
    */
-  @ResponseBody
-  @GetMapping("/project/{name}/delete")
-  public void delete(final ApplicationUser user, @PathVariable(value = "name") final String name)
+  @RequestMapping(method = RequestMethod.DELETE, value = "/projects/{project-name}")
+  public void deleteProject(
+      final ApplicationUser user, @PathVariable(value = "project-name") final String projectName)
       throws IOException {
     final Iterator<Project> it = user.getProjects().iterator();
     while (it.hasNext()) {
       final Project p = it.next();
-      if (p.getName().equals(name)) {
+      if (p.getName().equals(projectName)) {
         p.delete();
         it.remove();
       }
     }
   }
 
+  static Result getProjectResult(final String file, final Project project) {
+    Result rtn = null;
+    Collection<Result> results = getProjectResults(project);
+    for (Result r : results) {
+      if (r.getFile().getName().equals(file)) {
+        rtn = r;
+        break;
+      }
+    }
+    if (rtn == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find result.");
+    }
+    return rtn;
+  }
+
+  static Collection<Result> getProjectResults(final Project project) {
+    Collection<Result> rtn = null;
+    try {
+      rtn = project.getResults();
+    } catch (IOException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to load project results.", e);
+    }
+    return rtn;
+  }
+
   /**
    * Get all results in a project.
    *
    * @param user The user to whom the project belongs.
-   * @param name The name of the project.
+   * @param projectName The name of the project.
    * @return All the results in a project.
    * @throws ResourceNotFoundException Unable to find project or load results.
    */
-  @ResponseBody
-  @GetMapping("/project/{name}/results")
-  public Collection<Result> results(
-      final ApplicationUser user, @PathVariable(value = "name") final String name)
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = "/projects/{project-name}/results",
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public Collection<Result> getProjectResults(
+      final ApplicationUser user, @PathVariable(value = "project-name") final String projectName)
       throws ResourceNotFoundException {
     Collection<Result> rtn = null;
-    final Project project = getProject(name, user);
-    rtn = getResults(project);
+    final Project project = getProject(projectName, user);
+    rtn = getProjectResults(project);
     return rtn;
   }
 
   /**
-   * Get result metadata.
+   * Get a project result as binary data.
    *
    * @param user The user to whom the project belongs.
-   * @param name The name of the project.
-   * @param file The filename of the result.
-   * @return The result metadata.
-   * @throws ResourceNotFoundException Could not find the result.
-   */
-  @ResponseBody
-  @GetMapping("/project/{name}/result/{file}")
-  public Result result(
-      final ApplicationUser user,
-      @PathVariable(value = "name") final String name,
-      @PathVariable(value = "file") final String file)
-      throws ResourceNotFoundException {
-    Result rtn = null;
-    final Project project = getProject(name, user);
-    rtn = getResult(file, project);
-    return rtn;
-  }
-
-  /**
-   * Download a project result.
-   *
-   * @param user The user to whom the project belongs.
-   * @param name The name of the project.
-   * @param file The filename of the result.
+   * @param projectName The name of the project.
+   * @param fileName The filename of the result.
    * @return A byte array of the result content.
    * @throws ResourceNotFoundException Could not find the result.
    * @throws IOException Could not read result.
    */
   @ResponseBody
-  @GetMapping(
-      value = "/project/{name}/result/{file}/download",
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = "/projects/{project-name}/results/{file-name}",
       produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-  public byte[] downloadResult(
+  public byte[] getResult(
       final ApplicationUser user,
-      @PathVariable(value = "name") final String name,
-      @PathVariable(value = "file") final String file)
+      @PathVariable(value = "project-name") final String projectName,
+      @PathVariable(value = "file-name") final String fileName)
       throws ResourceNotFoundException, IOException {
-    final Project project = getProject(name, user);
-    final Result r = getResult(file, project);
+    final Project project = getProject(projectName, user);
+    final Result r = getProjectResult(fileName, project);
     final InputStream is = new FileInputStream(r.getFile());
     return IOUtils.toByteArray(is);
   }

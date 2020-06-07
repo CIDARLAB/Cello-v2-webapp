@@ -99,14 +99,12 @@ public class DNACompilerProject extends Project {
    * Initialize a {@code DNACompiler} project.
    *
    * @param user The user to whom the project belongs.
-   * @param name The name of the project.
    * @param specification The project specification.
    * @throws ProjectException Unable to initialize project.
    */
-  public DNACompilerProject(
-      final ApplicationUser user, final String name, final Specification specification)
+  public DNACompilerProject(final ApplicationUser user, final Specification specification)
       throws ProjectException {
-    super(user, name, specification);
+    super(user, specification);
   }
 
   /*

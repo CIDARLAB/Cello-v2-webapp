@@ -27,7 +27,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
@@ -37,16 +36,14 @@ import org.apache.logging.log4j.Logger;
 import org.cellocad.v2.webapp.common.Utils;
 import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.security.SecurityConstants;
-import org.cellocad.v2.webapp.specification.library.TargetDataLibraryResource;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.cellocad.v2.webapp.user.ApplicationUserRepository;
 import org.cellocad.v2.webapp.user.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -57,7 +54,6 @@ import org.springframework.web.server.ResponseStatusException;
  * @date 2019-03-17
  */
 @RestController
-@RequestMapping("/users")
 public class UserController {
 
   private ApplicationUserRepository applicationUserRepository;
@@ -91,7 +87,7 @@ public class UserController {
    * @param res The response.
    * @throws CelloWebException Unable to initialize user.
    */
-  @PostMapping("/signup")
+  @RequestMapping(method = RequestMethod.POST, value = "/users")
   public void signup(@Valid @RequestBody final JsonNode node, final HttpServletResponse res)
       throws CelloWebException {
     final ObjectMapper mapper = new ObjectMapper();
@@ -117,10 +113,5 @@ public class UserController {
             .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
             .sign(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()));
     res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
-  }
-
-  @GetMapping("/ucfs")
-  public Collection<TargetDataLibraryResource> ucfs(final ApplicationUser user) {
-    return user.getUcfLibraryResources();
   }
 }

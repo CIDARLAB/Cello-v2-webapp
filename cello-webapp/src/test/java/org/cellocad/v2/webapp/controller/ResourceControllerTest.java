@@ -72,7 +72,7 @@ public class ResourceControllerTest {
         Utils.getResourceAsString(
             "userConstraintsFiles_MockResponse_ShouldReturnExpectedFiles.json");
     mockMvc
-        .perform(MockMvcRequestBuilders.get("/resources/user_constraints_files"))
+        .perform(MockMvcRequestBuilders.get("/resources/user-constraints-files"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().json(str));
   }
@@ -87,7 +87,7 @@ public class ResourceControllerTest {
     final String str =
         Utils.getResourceAsString("inputSensorFiles_MockResponse_ShouldReturnExpectedFiles.json");
     mockMvc
-        .perform(MockMvcRequestBuilders.get("/resources/input_sensor_files"))
+        .perform(MockMvcRequestBuilders.head("/resources/input-sensor-files"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().json(str));
   }
@@ -102,7 +102,7 @@ public class ResourceControllerTest {
     final String str =
         Utils.getResourceAsString("outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles.json");
     mockMvc
-        .perform(MockMvcRequestBuilders.get("/resources/output_device_files"))
+        .perform(MockMvcRequestBuilders.get("/resources/output-device-files"))
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andExpect(MockMvcResultMatchers.content().json(str));
   }

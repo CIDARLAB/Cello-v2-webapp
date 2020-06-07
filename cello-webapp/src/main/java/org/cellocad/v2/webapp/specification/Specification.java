@@ -24,6 +24,7 @@ package org.cellocad.v2.webapp.specification;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.HashMap;
 import org.cellocad.v2.webapp.specification.constraints.Constraints;
 import org.cellocad.v2.webapp.specification.library.LibraryResource;
 import org.cellocad.v2.webapp.specification.settings.Settings;
@@ -36,6 +37,7 @@ import org.cellocad.v2.webapp.specification.settings.Settings;
  */
 public class Specification {
 
+  private String name;
   private String verilog;
   private Settings settings;
   private Constraints constraints;
@@ -51,14 +53,31 @@ public class Specification {
    */
   @JsonCreator
   public Specification(
+      @JsonProperty("name") final String name,
       @JsonProperty("verilog") final String verilog,
       @JsonProperty("settings") final Settings settings,
       @JsonProperty("constraints") final Constraints constraints,
       @JsonProperty("library") final LibraryResource resource) {
+    this.name = name;
     this.verilog = verilog;
     this.settings = settings;
-    this.constraints = constraints;
-    libraryResource = resource;
+    // TODO Fix this hack
+    if (constraints != null) {
+      this.constraints = constraints;
+    } else {
+      this.constraints =
+          new Constraints(new HashMap<String, String>(), new HashMap<String, String>());
+    }
+    this.libraryResource = resource;
+  }
+
+  /**
+   * Getter for {@code name}.
+   *
+   * @return The value of {@code name}.
+   */
+  public String getName() {
+    return name;
   }
 
   /**
