@@ -28,4 +28,63 @@ package org.cellocad.v2.webapp.resource.library;
  * @author Timothy Jones
  * @date 2020-05-30
  */
-public class OutputDeviceFileDescriptor {}
+public class OutputDeviceFileDescriptor {
+
+  private String file;
+  private Header header;
+  private Boolean isPrivate;
+
+  /**
+   * Getter for {@code file}.
+   *
+   * @return The value of {@code file}.
+   */
+  public String getFile() {
+    return file;
+  }
+
+  /**
+   * Setter for {@code file}.
+   *
+   * @param file The value to set {@code file}.
+   */
+  public void setFile(String file) {
+    this.file = file;
+  }
+
+  /**
+   * Getter for {@code header}.
+   *
+   * @return The value of {@code header}.
+   */
+  public Header getHeader() {
+    return header;
+  }
+
+  /**
+   * Setter for {@code header}.
+   *
+   * @param header The value to set {@code header}.
+   */
+  public void setHeader(Header header) {
+    this.header = header;
+  }
+
+  /**
+   * Getter for {@code isPrivate}.
+   *
+   * @return The value of {@code isPrivate}.
+   */
+  public Boolean getIsPrivate() {
+    return isPrivate;
+  }
+
+  /**
+   * Setter for {@code isPrivate}.
+   *
+   * @param isPrivate The value to set {@code isPrivate}.
+   */
+  public void setIsPrivate(Boolean isPrivate) {
+    this.isPrivate = isPrivate;
+  }
+}

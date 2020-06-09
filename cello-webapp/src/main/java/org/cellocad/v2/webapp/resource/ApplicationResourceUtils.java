@@ -41,6 +41,8 @@ import org.apache.logging.log4j.Logger;
 import org.cellocad.v2.DNACompiler.runtime.environment.DNACompilerRuntimeEnv;
 import org.cellocad.v2.webapp.ApplicationUtils;
 import org.cellocad.v2.webapp.common.Utils;
+import org.cellocad.v2.webapp.resource.library.InputSensorFileDescriptor;
+import org.cellocad.v2.webapp.resource.library.OutputDeviceFileDescriptor;
 import org.cellocad.v2.webapp.resource.library.UserConstraintsFileDescriptor;
 import org.cellocad.v2.webapp.specification.library.serialization.HeaderSerializationConstants;
 import org.cellocad.v2.webapp.specification.library.serialization.LibrarySerializationConstants;
@@ -65,7 +67,7 @@ public class ApplicationResourceUtils {
     return rtn;
   }
 
-  private static String getUserConstraintsFileResourcesDirectory() {
+  static String getUserConstraintsFileResourcesDirectory() {
     String rtn = "";
     rtn =
         ApplicationResourceUtils.getTargetDataResourcesDirectory()
@@ -106,12 +108,30 @@ public class ApplicationResourceUtils {
     return rtn;
   }
 
-  private static String getInputSensorFileResourcesDirectory() {
+  static String getInputSensorFileResourcesDirectory() {
     String rtn = "";
     rtn =
         ApplicationResourceUtils.getTargetDataResourcesDirectory()
             + Utils.getFileSeparator()
             + "input";
+    return rtn;
+  }
+
+  /**
+   * Get the descriptors of the available input sensor files.
+   *
+   * @return A collection of descriptors.
+   * @throws JsonProcessingException Unable to deserialize descriptors.
+   * @throws IOException Unable to read metadata file.
+   */
+  public static Collection<InputSensorFileDescriptor> getInputSensorFileDescriptors()
+      throws JsonProcessingException, IOException {
+    Collection<InputSensorFileDescriptor> rtn = null;
+    final ObjectMapper mapper = new ObjectMapper();
+    final String filepath = getInputSensorFileMetaDataFile();
+    rtn =
+        mapper.readValue(
+            new File(filepath), new TypeReference<List<InputSensorFileDescriptor>>() {});
     return rtn;
   }
 
@@ -129,12 +149,30 @@ public class ApplicationResourceUtils {
     return rtn;
   }
 
-  private static String getOutputDeviceFileResourcesDirectory() {
+  static String getOutputDeviceFileResourcesDirectory() {
     String rtn = "";
     rtn =
         ApplicationResourceUtils.getTargetDataResourcesDirectory()
             + Utils.getFileSeparator()
             + "output";
+    return rtn;
+  }
+
+  /**
+   * Get the descriptors of the available output device files.
+   *
+   * @return A collection of descriptors.
+   * @throws JsonProcessingException Unable to deserialize descriptors.
+   * @throws IOException Unable to read metadata file.
+   */
+  public static Collection<OutputDeviceFileDescriptor> getOutputDeviceFileDescriptors()
+      throws JsonProcessingException, IOException {
+    Collection<OutputDeviceFileDescriptor> rtn = null;
+    final ObjectMapper mapper = new ObjectMapper();
+    final String filepath = getOutputDeviceFileMetaDataFile();
+    rtn =
+        mapper.readValue(
+            new File(filepath), new TypeReference<List<OutputDeviceFileDescriptor>>() {});
     return rtn;
   }
 
@@ -185,6 +223,7 @@ public class ApplicationResourceUtils {
     Utils.writeToFile(arr.toString(), filepath);
   }
 
+  // TODO use a descriptor class
   private static void appendToMetaDataFile(
       final String filepath, final File resource, final JsonNode header)
       throws JsonGenerationException, JsonMappingException, IOException {
@@ -198,6 +237,7 @@ public class ApplicationResourceUtils {
     final ObjectNode obj = mapper.createObjectNode();
     obj.put("file", resource.getName());
     obj.set("header", header);
+    obj.put("isPrivate", false);
     node.add(obj);
     final ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
     writer.writeValue(new File(filepath), node);

@@ -1,16 +1,21 @@
 [ {
   "file" : "Bth1C1G1T1.input.json",
-  "header" : null
+  "header" : null,
+  "isPrivate" : "false"
 }, {
   "file" : "Eco1C1G1T1.input.json",
-  "header" : null
+  "header" : null,
+  "isPrivate" : "false"
 }, {
   "file" : "Eco1C2G2T2.input.json",
-  "header" : null
+  "header" : null,
+  "isPrivate" : "false"
 }, {
   "file" : "Eco2C1G3T1.input.json",
-  "header" : null
+  "header" : null,
+  "isPrivate" : "false"
 }, {
   "file" : "SC1C1G1T1.input.json",
-  "header" : null
+  "header" : null,
+  "isPrivate" : "false"
 } ]

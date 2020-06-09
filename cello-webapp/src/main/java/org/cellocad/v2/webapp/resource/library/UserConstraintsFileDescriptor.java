@@ -32,6 +32,7 @@ public class UserConstraintsFileDescriptor {
 
   private String file;
   private Header header;
+  private Boolean isPrivate;
 
   /**
    * Getter for {@code file}.
@@ -67,5 +68,23 @@ public class UserConstraintsFileDescriptor {
    */
   public void setHeader(Header header) {
     this.header = header;
+  }
+
+  /**
+   * Getter for {@code isPrivate}.
+   *
+   * @return The value of {@code isPrivate}.
+   */
+  public Boolean getIsPrivate() {
+    return isPrivate;
+  }
+
+  /**
+   * Setter for {@code isPrivate}.
+   *
+   * @param isPrivate The value to set {@code isPrivate}.
+   */
+  public void setIsPrivate(Boolean isPrivate) {
+    this.isPrivate = isPrivate;
   }
 }
