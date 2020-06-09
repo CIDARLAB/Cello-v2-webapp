@@ -86,6 +86,8 @@ public class CustomWebSecurity extends WebSecurityConfigurerAdapter {
         .permitAll()
         .antMatchers(HttpMethod.GET, CustomWebSecurity.ALLOWED_RESOURCES)
         .permitAll()
+        .antMatchers(HttpMethod.DELETE, "/resources/**")
+        .permitAll()
         .anyRequest()
         .authenticated()
         .and()
@@ -108,6 +110,7 @@ public class CustomWebSecurity extends WebSecurityConfigurerAdapter {
     config.applyPermitDefaultValues();
     config.addExposedHeader("Authorization");
     config.setAllowCredentials(true);
+    config.addAllowedMethod("DELETE");
     config.addAllowedHeader("Authorization");
     config.addAllowedHeader("Access-Control-Request-Headers");
     config.addAllowedHeader("Access-Control-Allow-Headers");
