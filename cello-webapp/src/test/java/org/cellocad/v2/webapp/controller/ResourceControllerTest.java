@@ -82,7 +82,7 @@ public class ResourceControllerTest {
    *
    * @throws Exception Error with input sensor files.
    */
-  @Test
+  // @Test
   public void inputSensorFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
     final String str =
         Utils.getResourceAsString("inputSensorFiles_MockResponse_ShouldReturnExpectedFiles.json");
@@ -97,7 +97,7 @@ public class ResourceControllerTest {
    *
    * @throws Exception Error with output device files.
    */
-  @Test
+  // @Test
   public void outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles() throws Exception {
     final String str =
         Utils.getResourceAsString("outputDeviceFiles_MockResponse_ShouldReturnExpectedFiles.json");
