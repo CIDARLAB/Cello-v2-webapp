@@ -65,7 +65,7 @@ public class ConstraintsSerializer extends StdSerializer<Constraints> {
       gen.writeStringField(
           ConstraintsSerializationConstants.S_COLLECTION,
           ConstraintsSerializationConstants.S_SENSORS);
-      gen.writeObjectField(ConstraintsSerializationConstants.S_SENSOR_MAP, value.getReporters());
+      gen.writeObjectField(ConstraintsSerializationConstants.S_SENSOR_MAP, value.getSensors());
       gen.writeEndObject();
     }
     if (value.getReporters() != null) {
