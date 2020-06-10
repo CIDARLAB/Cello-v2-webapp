@@ -22,7 +22,9 @@
 
 package org.cellocad.v2.webapp.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +42,13 @@ import org.cellocad.v2.webapp.exception.ResourceNotFoundException;
 import org.cellocad.v2.webapp.project.Project;
 import org.cellocad.v2.webapp.project.ProjectFactory;
 import org.cellocad.v2.webapp.project.ProjectRepository;
+import org.cellocad.v2.webapp.resource.ApplicationResourceUtils;
+import org.cellocad.v2.webapp.resource.UserResourceUtils;
+import org.cellocad.v2.webapp.resource.library.InputSensorFileDescriptor;
+import org.cellocad.v2.webapp.resource.library.OutputDeviceFileDescriptor;
+import org.cellocad.v2.webapp.resource.library.UserConstraintsFileDescriptor;
 import org.cellocad.v2.webapp.specification.Specification;
+import org.cellocad.v2.webapp.specification.library.TargetDataLibraryResource;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.cellocad.v2.webapp.user.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,10 +98,13 @@ public class ProjectController {
    *
    * @param user The user to whom the project belongs.
    * @param specification The project specification.
+   * @throws IOException Unable to read target data metadata.
+   * @throws JsonProcessingException Unable to parse target data metadata.
    */
   @RequestMapping(method = RequestMethod.POST, value = "/projects")
   public void createProject(
-      final ApplicationUser user, @RequestBody final Specification specification) {
+      final ApplicationUser user, @RequestBody final Specification specification)
+      throws JsonProcessingException, IOException {
     final Iterator<Project> it = user.getProjects().iterator();
     while (it.hasNext()) {
       final Project p = it.next();
@@ -101,6 +112,89 @@ public class ProjectController {
         throw new ResponseStatusException(
             HttpStatus.CONFLICT, "A project with that name already exists.");
       }
+    }
+    // This is too long.
+    if (specification.getLibraryResource() instanceof TargetDataLibraryResource) {
+      final TargetDataLibraryResource library =
+          (TargetDataLibraryResource) specification.getLibraryResource();
+      Collection<InputSensorFileDescriptor> isfDescriptors =
+          UserResourceUtils.getAllInputSensorFileDescriptors(user);
+      String isfPath = null;
+      for (InputSensorFileDescriptor d : isfDescriptors) {
+        if (d.getFile().equals(library.getInputSensorFile().getName())) {
+          if (d.getIsPrivate()) {
+            isfPath =
+                Paths.get(UserResourceUtils.getInputSensorFileResourcesDirectory(user), d.getFile())
+                    .toString();
+            break;
+          } else {
+            isfPath =
+                Paths.get(
+                        ApplicationResourceUtils.getInputSensorFileResourcesDirectory(),
+                        d.getFile())
+                    .toString();
+            break;
+          }
+        }
+      }
+      if (isfPath == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Input sensor file not found.");
+      }
+      File isfFile = new File(isfPath);
+      library.setInputSensorFile(isfFile);
+      Collection<OutputDeviceFileDescriptor> odfDescriptors =
+          UserResourceUtils.getAllOutputDeviceFileDescriptors(user);
+      String odfPath = null;
+      for (OutputDeviceFileDescriptor d : odfDescriptors) {
+        if (d.getFile().equals(library.getOutputDeviceFile().getName())) {
+          if (d.getIsPrivate()) {
+            odfPath =
+                Paths.get(
+                        UserResourceUtils.getOutputDeviceFileResourcesDirectory(user), d.getFile())
+                    .toString();
+            break;
+          } else {
+            odfPath =
+                Paths.get(
+                        ApplicationResourceUtils.getOutputDeviceFileResourcesDirectory(),
+                        d.getFile())
+                    .toString();
+            break;
+          }
+        }
+      }
+      if (odfPath == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Output device file not found.");
+      }
+      File odfFile = new File(odfPath);
+      library.setOutputDeviceFile(odfFile);
+      Collection<UserConstraintsFileDescriptor> ucfDescriptors =
+          UserResourceUtils.getAllUserConstraintsFileDescriptors(user);
+      String ucfPath = null;
+      for (UserConstraintsFileDescriptor d : ucfDescriptors) {
+        if (d.getFile().equals(library.getUserConstraintsFile().getName())) {
+          if (d.getIsPrivate()) {
+            ucfPath =
+                Paths.get(
+                        UserResourceUtils.getUserConstraintsFileResourcesDirectory(user),
+                        d.getFile())
+                    .toString();
+            break;
+          } else {
+            ucfPath =
+                Paths.get(
+                        ApplicationResourceUtils.getUserConstraintsFileResourcesDirectory(),
+                        d.getFile())
+                    .toString();
+            break;
+          }
+        }
+      }
+      if (ucfPath == null) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User constraints file not found.");
+      }
+      File ucfFile = new File(ucfPath);
+      library.setUserConstraintsFile(ucfFile);
     }
     // project
     final ProjectFactory factory = new ProjectFactory();

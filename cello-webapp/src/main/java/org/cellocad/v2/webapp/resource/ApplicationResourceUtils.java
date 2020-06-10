@@ -67,7 +67,12 @@ public class ApplicationResourceUtils {
     return rtn;
   }
 
-  static String getUserConstraintsFileResourcesDirectory() {
+  /**
+   * Get the directory containing the user constraints files.
+   *
+   * @return The directory containing the user constraints files.
+   */
+  public static String getUserConstraintsFileResourcesDirectory() {
     String rtn = "";
     rtn =
         ApplicationResourceUtils.getTargetDataResourcesDirectory()
@@ -108,7 +113,12 @@ public class ApplicationResourceUtils {
     return rtn;
   }
 
-  static String getInputSensorFileResourcesDirectory() {
+  /**
+   * Get the directory containing the input sensor files.
+   *
+   * @return The directory containing the input sensor files.
+   */
+  public static String getInputSensorFileResourcesDirectory() {
     String rtn = "";
     rtn =
         ApplicationResourceUtils.getTargetDataResourcesDirectory()
@@ -149,7 +159,12 @@ public class ApplicationResourceUtils {
     return rtn;
   }
 
-  static String getOutputDeviceFileResourcesDirectory() {
+  /**
+   * Get the directory containing the output device files.
+   *
+   * @return The directory containing the output device files.
+   */
+  public static String getOutputDeviceFileResourcesDirectory() {
     String rtn = "";
     rtn =
         ApplicationResourceUtils.getTargetDataResourcesDirectory()

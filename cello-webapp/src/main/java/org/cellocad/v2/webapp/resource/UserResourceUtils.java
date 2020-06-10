@@ -135,7 +135,13 @@ public class UserResourceUtils {
    * User Constraints File
    */
 
-  private static String getUserConstraintsFileResourcesDirectory(final ApplicationUser user) {
+  /**
+   * Get the directory containing the user constraints files.
+   *
+   * @param user The user.
+   * @return The directory containing the user constraints files.
+   */
+  public static String getUserConstraintsFileResourcesDirectory(final ApplicationUser user) {
     String rtn = "";
     rtn = getTargetDataResourcesDirectory(user) + Utils.getFileSeparator() + "ucf";
     return rtn;
@@ -313,7 +319,13 @@ public class UserResourceUtils {
    * Input Sensor File
    */
 
-  private static String getInputSensorFileResourcesDirectory(final ApplicationUser user) {
+  /**
+   * Get the directory containing the input sensor files.
+   *
+   * @param user The user.
+   * @return The directory containing the input sensor files.
+   */
+  public static String getInputSensorFileResourcesDirectory(final ApplicationUser user) {
     String rtn = "";
     rtn = getTargetDataResourcesDirectory(user) + Utils.getFileSeparator() + "input";
     return rtn;
@@ -423,7 +435,13 @@ public class UserResourceUtils {
       }
     }
     if (descriptor != null) {
-      Path path = Paths.get(descriptor.getFile());
+      String prefix = null;
+      if (descriptor.getIsPrivate()) {
+        prefix = getInputSensorFileResourcesDirectory(user);
+      } else {
+        prefix = ApplicationResourceUtils.getInputSensorFileResourcesDirectory();
+      }
+      Path path = Paths.get(prefix, descriptor.getFile());
       rtn = Files.readAllBytes(path);
     }
     return rtn;
@@ -467,7 +485,13 @@ public class UserResourceUtils {
    * Output Device File
    */
 
-  private static String getOutputDeviceFileResourcesDirectory(final ApplicationUser user) {
+  /**
+   * Get the directory containing the output device files.
+   *
+   * @param user The user.
+   * @return The directory containing the output device files.
+   */
+  public static String getOutputDeviceFileResourcesDirectory(final ApplicationUser user) {
     String rtn = "";
     rtn = getTargetDataResourcesDirectory(user) + Utils.getFileSeparator() + "output";
     return rtn;
@@ -577,7 +601,13 @@ public class UserResourceUtils {
       }
     }
     if (descriptor != null) {
-      Path path = Paths.get(descriptor.getFile());
+      String prefix = null;
+      if (descriptor.getIsPrivate()) {
+        prefix = getOutputDeviceFileResourcesDirectory(user);
+      } else {
+        prefix = ApplicationResourceUtils.getOutputDeviceFileResourcesDirectory();
+      }
+      Path path = Paths.get(prefix, descriptor.getFile());
       rtn = Files.readAllBytes(path);
     }
     return rtn;

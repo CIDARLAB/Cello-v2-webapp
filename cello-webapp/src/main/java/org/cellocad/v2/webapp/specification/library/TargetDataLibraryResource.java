@@ -58,6 +58,15 @@ public class TargetDataLibraryResource extends LibraryResource {
   }
 
   /**
+   * Setter for {@code userConstraintsFile}.
+   *
+   * @param userConstraintsFile The value to set {@code userConstraintsFile}.
+   */
+  public void setUserConstraintsFile(File userConstraintsFile) {
+    this.userConstraintsFile = userConstraintsFile;
+  }
+
+  /**
    * Getter for {@code inputSensorFile}.
    *
    * @return The value of {@code inputSensorFile}.
@@ -67,12 +76,30 @@ public class TargetDataLibraryResource extends LibraryResource {
   }
 
   /**
+   * Setter for {@code inputSensorFile}.
+   *
+   * @param inputSensorFile The value to set {@code inputSensorFile}.
+   */
+  public void setInputSensorFile(File inputSensorFile) {
+    this.inputSensorFile = inputSensorFile;
+  }
+
+  /**
    * Getter for {@code outputDeviceFile}.
    *
    * @return The value of {@code outputDeviceFile}.
    */
   public File getOutputDeviceFile() {
     return outputDeviceFile;
+  }
+
+  /**
+   * Setter for {@code outputDeviceFile}.
+   *
+   * @param outputDeviceFile The value to set {@code outputDeviceFile}.
+   */
+  public void setOutputDeviceFile(File outputDeviceFile) {
+    this.outputDeviceFile = outputDeviceFile;
   }
 
   /*
