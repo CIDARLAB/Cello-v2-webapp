@@ -86,7 +86,7 @@ public class SynBioHubController {
    * @return A token.
    */
   @RequestMapping(
-      method = RequestMethod.GET,
+      method = RequestMethod.POST,
       value = "/login",
       produces = MediaType.TEXT_PLAIN_VALUE)
   public String login(
