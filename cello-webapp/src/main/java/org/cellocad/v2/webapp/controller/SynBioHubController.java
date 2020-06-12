@@ -42,6 +42,7 @@ import org.cellocad.v2.webapp.synbiohub.NewCollectionDescriptor;
 import org.cellocad.v2.webapp.synbiohub.SynBioHubSubmission;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -218,13 +219,23 @@ public class SynBioHubController {
     map.add("name", request.getCollection().getName());
     map.add("description", request.getCollection().getDescription());
     map.add("citations", request.getCollection().getCitations());
-    map.add("collectionChoices", ""); // ??
     map.add("overwrite_merge", request.getCollection().getOverwrite().getValue());
-    map.add("user", token);
 
     final Project project = ProjectController.getProject(request.getProjectName(), user);
     final Result r = ProjectController.getProjectResult(request.getResultName(), project);
-    map.add("file", new ByteArrayResource(Files.readAllBytes(r.getFile().toPath())));
+
+    ContentDisposition contentDisposition =
+        ContentDisposition.builder("form-data")
+            .name("file")
+            .filename(request.getResultName())
+            .build();
+    HttpHeaders fileHeaders = new HttpHeaders();
+    fileHeaders.setContentDisposition(contentDisposition);
+    fileHeaders.setContentType(MediaType.TEXT_XML);
+    HttpEntity<?> fileEntity =
+        new HttpEntity<>(
+            new ByteArrayResource(Files.readAllBytes(r.getFile().toPath())), fileHeaders);
+    map.add("file", fileEntity);
 
     // entity
     final HttpEntity<?> entity = new HttpEntity<>(map, headers);
