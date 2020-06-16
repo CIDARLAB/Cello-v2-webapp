@@ -87,7 +87,24 @@ Run.
 
 # 3. Development
 
+## Code style
+
+This project uses the [Maven Checkstyle Plugin][maven-checkstyle-plugin] with a slightly relaxed version of `google_checks.xml` to enforce code style. If the code does not match the style requirements, maven will fail during the `validate` phase. If using Eclipse, you can use the [Eclipse Checkstyle Plugin][eclipse-checkstyle-plugin] to show warnings when code does not meet the style requirements. You can also automatically format written code with the [`google-java-format`][google-java-format], which can be used from the command line, or as a plugin in Eclipse or JetBrains IDEs.
+
+## Deployment
+
+### Docker Hub
+
+  + Docker images are built and deployed automatically via Travis CI. See `.travis.yml`.
+  + Manual:
+
+        mvn docker:build
+		mvn docker:push
+
 ## Debug a running webapp in Eclipse
 
 Navigate to `Application.java` in Eclipse, right-click on the `main` method, choose `Debug As > Java Application`.
 
+[maven-checkstyle-plugin]: https://maven.apache.org/plugins/maven-checkstyle-plugin/index.html
+[eclipse-checkstyle-plugin]: https://checkstyle.org/eclipse-cs/#!/
+[google-java-format]: https://github.com/google/google-java-format
