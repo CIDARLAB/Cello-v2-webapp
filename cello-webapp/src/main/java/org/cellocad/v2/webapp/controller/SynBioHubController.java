@@ -22,9 +22,6 @@
 
 package org.cellocad.v2.webapp.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -43,7 +40,6 @@ import org.cellocad.v2.webapp.synbiohub.SynBioHubSubmission;
 import org.cellocad.v2.webapp.user.ApplicationUser;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -62,6 +58,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * A controller for interaction with a SynBioHub.
