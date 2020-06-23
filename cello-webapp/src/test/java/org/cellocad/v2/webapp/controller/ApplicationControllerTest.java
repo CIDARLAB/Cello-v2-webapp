@@ -24,6 +24,7 @@ package org.cellocad.v2.webapp.controller;
 
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
 
+import org.cellocad.v2.common.Utils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,6 +62,18 @@ public class ApplicationControllerTest {
   }
 
   /**
+   * Test the Cello version endpoint.
+   *
+   * @throws Exception Error with request.
+   */
+  @Test
+  public void getCelloVersion_None_ShouldReturnVersion() throws Exception {
+    mockMvc
+        .perform(MockMvcRequestBuilders.get("/version-core"))
+        .andExpect(MockMvcResultMatchers.content().string(matchesPattern(Utils.SEM_VER_PATTERN)));
+  }
+
+  /**
    * Test the API version endpoint.
    *
    * @throws Exception Error with request.
@@ -69,6 +82,6 @@ public class ApplicationControllerTest {
   public void getApiVersion_None_ShouldReturnVersion() throws Exception {
     mockMvc
         .perform(MockMvcRequestBuilders.get("/version-api"))
-        .andExpect(MockMvcResultMatchers.content().string(matchesPattern("^\\d+\\.\\d+\\.\\d+.*")));
+        .andExpect(MockMvcResultMatchers.content().string(matchesPattern(Utils.SEM_VER_PATTERN)));
   }
 }

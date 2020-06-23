@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Random;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -42,17 +43,36 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.cellocad.v2.webapp.Application;
+import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.cellocad.v2.webapp.exception.ResourceNotFoundException;
 import org.springframework.boot.system.ApplicationHome;
 
 /**
- * The Utils class is class with utility methods for the Poros framework.
+ * Utility methods for the Cello webapp.
  *
  * @author Vincent Mirian
  * @author Timothy Jones
  * @date Oct 28, 2017
  */
 public final class Utils {
+
+  /**
+   * Get the version of this project.
+   *
+   * @return The version of this project.
+   * @throws CelloWebException Unable to get the version.
+   */
+  public static String getVersion() throws CelloWebException {
+    String rtn = null;
+    final Properties properties = new Properties();
+    try {
+      properties.load(Utils.class.getClassLoader().getResourceAsStream(".properties"));
+    } catch (IOException e) {
+      throw new CelloWebException("Unable to get version.");
+    }
+    rtn = properties.getProperty("org.cellocad.v2.cello-webapp.version");
+    return rtn;
+  }
 
   /**
    * Get the resource as a stream.

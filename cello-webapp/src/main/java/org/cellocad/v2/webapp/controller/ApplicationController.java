@@ -22,8 +22,10 @@
 
 package org.cellocad.v2.webapp.controller;
 
-import java.io.IOException;
-import java.util.Properties;
+import org.cellocad.v2.DNACompiler.common.DNACompilerUtils;
+import org.cellocad.v2.common.exception.CelloException;
+import org.cellocad.v2.webapp.common.Utils;
+import org.cellocad.v2.webapp.exception.CelloWebException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +52,14 @@ public class ApplicationController {
       value = "/version-core",
       produces = {MediaType.TEXT_PLAIN_VALUE})
   public String getCelloVersion() {
-    throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+    String rtn = null;
+    try {
+      rtn = DNACompilerUtils.getVersion();
+    } catch (CelloException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get version.", e);
+    }
+    return rtn;
   }
 
   /**
@@ -64,13 +73,11 @@ public class ApplicationController {
       produces = {MediaType.TEXT_PLAIN_VALUE})
   public String getApiVersion() {
     String rtn = null;
-    final Properties properties = new Properties();
     try {
-      properties.load(this.getClass().getClassLoader().getResourceAsStream(".properties"));
-      rtn = properties.getProperty("cello-v2.api.version");
-    } catch (IOException e) {
+      rtn = Utils.getVersion();
+    } catch (CelloWebException e) {
       throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Error accessing resource.", e);
+          HttpStatus.INTERNAL_SERVER_ERROR, "Unable to get version.", e);
     }
     return rtn;
   }
