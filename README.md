@@ -27,7 +27,7 @@ Download and install Docker.
   
 Pull and run the image:
 
-    docker run --rm -p 8080:8080 -v /local/path/to/db:/data/db -v /local/path/to/projects:/root/projects -t cidarlab/cello-webapp
+    docker run --rm -p 8080:8080 -v /local/path/to/db:/data/db -v /local/path/to/users:/root/users -v /local/path/to/resources:/root/resources -t cidarlab/cello-webapp
 	
 Note the two `/local/path/to` directories. You will need to replace these with folders on your machine of your choosing. You can omit these `-v` clauses, but then the user database and projects storage will be destroyed when you stop the container.
 
@@ -104,6 +104,10 @@ This project uses the [Maven Checkstyle Plugin][maven-checkstyle-plugin] with a 
 ## Debug a running webapp in Eclipse
 
 Navigate to `Application.java` in Eclipse, right-click on the `main` method, choose `Debug As > Java Application`.
+
+## Troubleshooting
+
+If you want to clear or edit the database when running from Docker, invoke `docker` with the `-i` switch. Then enter the running container: `docker exec -it [container-id] bash`. You can find the container id from `docker ps`. Now invoke the mongo shell with `mongo`, and manipulate the database by hand.
 
 [maven-checkstyle-plugin]: https://maven.apache.org/plugins/maven-checkstyle-plugin/index.html
 [eclipse-checkstyle-plugin]: https://checkstyle.org/eclipse-cs/#!/
