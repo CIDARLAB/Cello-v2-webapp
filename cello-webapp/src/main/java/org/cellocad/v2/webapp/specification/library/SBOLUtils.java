@@ -55,7 +55,7 @@ public class SBOLUtils {
    * @see #S_CELLO_TERM_NAMESPACE
    * @param i The object in which to search for the given annotation name.
    * @param name The annotation name.
-   * @return
+   * @return A string annotation by name from within the given SBOL object.
    */
   public static String getCelloAnnotationString(final Identified i, final String name) {
     String rtn = null;

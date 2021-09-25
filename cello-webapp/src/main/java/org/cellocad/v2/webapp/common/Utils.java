@@ -212,9 +212,9 @@ public final class Utils {
   /**
    * Create a directory only if it doesn't already exist.
    *
-   * @deprecated This method is not useful. Replace with {@link #makeDirectory(String)}.
    * @param filepath The path of the directory to create.
    * @return False.
+   * @deprecated This method is not useful. Replace with {@link #makeDirectory(String)}.
    */
   @Deprecated
   public static boolean createDirectoryIfNonExistant(final String filepath) {
@@ -228,9 +228,9 @@ public final class Utils {
   /**
    * Create a file only if it doesn't already exist.
    *
-   * @deprecated This method is not useful. Replace with {@link #createFile(String)}.
    * @param filepath The path of the file to create.
    * @return False.
+   * @deprecated This method is not useful. Replace with {@link #createFile(String)}.
    */
   @Deprecated
   public static boolean createFileIfNonExistant(final String filepath) throws IOException {

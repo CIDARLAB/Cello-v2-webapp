@@ -63,9 +63,9 @@ public class Settings {
   }
 
   /**
-   * Serialize settings to CSV format.
+   * Serialize settings in CSV format.
    *
-   * @return
+   * @return Settings serialized in CSV format.
    */
   public String toCSV() {
     // FIXME
