@@ -25,6 +25,23 @@
     <dnacompiler.version>2.0.0-SNAPSHOT</dnacompiler.version>
   </properties>
 
+  <organization>
+    <name>CIDAR Lab, Boston University</name>
+    <url>http://cidarlab.org/</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>tim-tx</id>			<!-- GitHub -->
+      <name>Timothy Jones</name>
+      <email>jonests@bu.edu</email>
+	  <url>https://github.com/tim-tx</url>
+      <organization>CIDAR Lab, Boston University</organization>
+	  <organizationUrl>http://cidarlab.org/</organizationUrl>
+	  <timezone>America/New_York</timezone>
+    </developer>
+  </developers>
+
   <repositories>
     <repository>
       <id>sonatypeSnapshots</id>
