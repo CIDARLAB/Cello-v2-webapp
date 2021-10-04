@@ -22,7 +22,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <start-class>org.cellocad.v2.webapp.Application</start-class>
     <docker.image.prefix>cidarlab</docker.image.prefix>
-    <dnacompiler.version>2.0.0-SNAPSHOT</dnacompiler.version>
+    <dnacompiler.version>2.0.1-SNAPSHOT</dnacompiler.version>
   </properties>
 
   <organization>
@@ -181,62 +181,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <goals>
-                <goal>repackage</goal>
-              </goals>
-              <configuration>
-                <classifier>spring-boot</classifier>
-                <mainClass>org.cellocad.v2.webapp.Application</mainClass>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>io.fabric8</groupId>
-          <artifactId>docker-maven-plugin</artifactId>
-          <extensions>true</extensions>
-          <version>0.33.0</version>
-          <configuration>
-            <images>
-              <image>
-                <name>${docker.image.prefix}/${project.artifactId}:%l</name>
-                <build>
-                  <args>
-                    <JAR_FILE>${project.build.finalName}-spring-boot.jar</JAR_FILE>
-                  </args>
-                  <dockerFile>src${file.separator}main${file.separator}docker${file.separator}Dockerfile</dockerFile>
-                  <contextDir>${project.basedir}</contextDir>
-                </build>
-              </image>
-            </images>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <!-- https://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
-              <id>unpack-shared-resources</id>
-              <phase>generate-resources</phase>
-              <goals>
-                <goal>unpack-dependencies</goal>
-              </goals>
-              <configuration>
-                <includes>algorithms/**/*.json,Configuration.json</includes>
-                <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
-                <excludeTransitive>true</excludeTransitive>
-                <includeGroupIds>${project.groupId}</includeGroupIds>
-                <includeArtifactIds>cello-dnacompiler</includeArtifactIds>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>3.1.2</version>
@@ -270,5 +214,63 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+            <configuration>
+              <classifier>spring-boot</classifier>
+              <mainClass>org.cellocad.v2.webapp.Application</mainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <version>0.33.0</version>
+        <configuration>
+          <images>
+            <image>
+              <name>${docker.image.prefix}/${project.artifactId}:%l</name>
+              <build>
+                <args>
+                  <JAR_FILE>${project.build.finalName}-spring-boot.jar</JAR_FILE>
+                </args>
+                <dockerFile>src${file.separator}main${file.separator}docker${file.separator}Dockerfile</dockerFile>
+                <contextDir>${project.basedir}</contextDir>
+              </build>
+            </image>
+          </images>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- https://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
+            <id>unpack-shared-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includes>algorithms/**/*.json,Configuration.json</includes>
+              <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+              <excludeTransitive>true</excludeTransitive>
+              <includeGroupIds>${project.groupId}</includeGroupIds>
+              <includeArtifactIds>cello-dnacompiler</includeArtifactIds>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
